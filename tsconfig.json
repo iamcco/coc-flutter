@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": [
+      "es2015",
+      "esnext"
+    ],
+    "module": "commonjs",
+    "declaration": false,
+    "sourceMap": false,
+    "outDir": "out",
+    "strict": true,
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "esModuleInterop": true
+  },
+  "include": ["src"]
+}

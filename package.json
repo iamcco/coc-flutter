@@ -1,0 +1,98 @@
+{
+  "name": "coc-flutter",
+  "version": "0.0.1-dev2",
+  "description": "flutter support for (Neo)vim",
+  "author": "iamcco <ooiss@qq.com>",
+  "license": "MIT",
+  "main": "out/index.js",
+  "keywords": [
+    "coc.nvim",
+    "flutter",
+    "lsp",
+    "dart"
+  ],
+  "engines": {
+    "coc": "^0.0.74"
+  },
+  "scripts": {
+    "clean": "rimraf out",
+    "watch": "webpack --watch",
+    "build": "webpack",
+    "prepare": "npx npm-run-all clean build"
+  },
+  "activationEvents": [
+    "onLanguage:dart",
+    "onCommand:flutter.run",
+    "onCommand:flutter.createProject",
+    "onCommand:flutter.doctor",
+    "onCommand:flutter.upgrade"
+  ],
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "flutter configuration",
+      "properties": {
+        "flutter.trace.server": {
+          "type": "string",
+          "default": "off",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "description": "Trace level of log"
+        },
+        "flutter.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable coc-flutter extension"
+        },
+        "flutter.lsp.debug": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable debug for language server"
+        },
+        "flutter.sdk.dart-command": {
+          "type": "string",
+          "default": "dart",
+          "description": "dart command"
+        },
+        "flutter.provider.hot-reload": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable hot reload after save"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "flutter.run",
+        "title": "Run flutter server"
+      },
+      {
+        "command": "flutter.createProject",
+        "title": "Create flutter project using: flutter create project-name"
+      },
+      {
+        "command": "flutter.doctor",
+        "title": "Run: flutter doctor"
+      },
+      {
+        "command": "flutter.upgrade",
+        "title": "Run: flutter upgrade"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.1",
+    "coc.nvim": "^0.0.74",
+    "fast-glob": "^3.1.0",
+    "rimraf": "^3.0.0",
+    "ts-loader": "^6.0.4",
+    "typescript": "^3.5.3",
+    "vscode-languageserver-protocol": "^3.14.1",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.6",
+    "which": "^2.0.1"
+  }
+}
