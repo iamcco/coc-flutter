@@ -8,10 +8,12 @@ import {
   services,
 } from 'coc.nvim';
 
-import {flutterSDK} from './sdk';
+import {flutterSDK} from '../lib/sdk';
 import {logger} from '../util/logger';
-import {statusBar} from './status';
+import {statusBar} from '../lib/status';
 import {Dispose} from '../util/dispose';
+import {CompletionItem, CompletionList, TextDocument, Position, CancellationToken} from 'vscode-languageserver-protocol';
+import {resolveProvider} from './resolveProvider';
 
 const log = logger.getlog('lsp-server')
 
@@ -64,7 +66,11 @@ export class LspServer extends Dispose {
       }],
 
       outputChannel: logger.outchannel,
-      revealOutputChannelOn: traceServer === 'off' ? RevealOutputChannelOn.Never : RevealOutputChannelOn.Info
+      revealOutputChannelOn: traceServer === 'off' ? RevealOutputChannelOn.Never : RevealOutputChannelOn.Info,
+
+      middleware: {
+        resolveCompletionItem: resolveProvider
+      }
     }
 
     // Create the language client and start the client.
@@ -73,7 +79,7 @@ export class LspServer extends Dispose {
       'flutter analysis server',
       serverOptions,
       clientOptions,
-      isLspDebug
+      isLspDebug,
     );
 
     statusBar.init()

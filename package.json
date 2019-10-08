@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "0.0.1-dev2",
+  "version": "0.0.1-dev3",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -61,6 +61,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable hot reload after save"
+        },
+        "flutter.provider.enableSnippet": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable completion item snippet"
         }
       }
     },

@@ -22,6 +22,9 @@ Flutter support for (Neo)vim
 - `flutter.lsp.debug` Enable debug for language server
 - `flutter.sdk.dart-command` dart command
 - `flutter.provider.hot-reload` Enable hot reload after save
+- `flutter.provider.enableSnippet` Enable completion item snippet
+  - `import '';` => `import '${1}';${0}`
+  - `someName(…)` => `someName(${1})${0}`
 
 ## Commands
 
