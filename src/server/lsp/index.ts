@@ -8,10 +8,10 @@ import {
   services,
 } from 'coc.nvim';
 
-import {flutterSDK} from '../lib/sdk';
-import {logger} from '../util/logger';
-import {statusBar} from '../lib/status';
-import {Dispose} from '../util/dispose';
+import {flutterSDK} from '../../lib/sdk';
+import {logger} from '../../util/logger';
+import {statusBar} from '../../lib/status';
+import {Dispose} from '../../util/dispose';
 import {resolveProvider} from './resolveProvider';
 
 const log = logger.getlog('lsp-server')

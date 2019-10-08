@@ -6,7 +6,7 @@ import {
 import {logger, logLevel} from './util/logger';
 import {Commands} from './commands';
 import {Providers} from './provider';
-import {LspServer} from './lsp';
+import {LspServer} from './server/lsp';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('flutter')

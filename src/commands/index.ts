@@ -1,6 +1,4 @@
-import {Disposable} from 'coc.nvim'
-
-import {Run} from './run'
+import {Run} from './dev'
 import {Dispose} from '../util/dispose'
 
 export class Commands extends Dispose {

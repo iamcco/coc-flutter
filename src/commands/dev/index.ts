@@ -1,7 +1,7 @@
 import {workspace, commands, Disposable } from 'coc.nvim';
 
-import {FlutterCommand} from './command';
-import {devServer} from '../lib/dev-server';
+import {devServer} from '../../server/dev';
+import {Dispose} from '../../util/dispose';
 
 interface ICmd {
   cmd: string
@@ -77,16 +77,16 @@ const cmds: Record<string, ICmd> = {
   },
 }
 
-export class Run extends FlutterCommand {
+export class Run extends Dispose {
   private cmds: Disposable[] = []
 
   constructor() {
     super()
     const cmdId = `${cmdPrefix}.run`
-    this.subscriptions.push(
+    this.push(
       commands.registerCommand(cmdId, this.execute, this),
     )
-    this.subscriptions.push((function() {
+    this.push((function() {
       commands.titles.set(cmdId, 'Run flutter server')
       return {
         dispose() {
@@ -94,7 +94,7 @@ export class Run extends FlutterCommand {
         }
       }
     })())
-    this.subscriptions.push(devServer)
+    this.push(devServer)
   }
 
   async execute() {

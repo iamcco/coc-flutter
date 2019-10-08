@@ -1,9 +1,9 @@
-import {Uri, workspace, Disposable} from 'coc.nvim'
+import {Uri, workspace} from 'coc.nvim'
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process'
 import {Readable} from 'stream'
 
-import {findWorkspaceFolder} from '../util/fs'
-import {logger} from '../util/logger'
+import {findWorkspaceFolder} from '../../util/fs'
+import {logger} from '../../util/logger'
 
 const log = logger.getlog('server')
 

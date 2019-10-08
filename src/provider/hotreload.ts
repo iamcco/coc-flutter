@@ -1,7 +1,7 @@
 import {workspace, ConfigurationChangeEvent, Disposable} from 'coc.nvim'
 import {TextDocument} from 'vscode-languageserver-protocol';
 
-import {devServer} from '../lib/dev-server';
+import {devServer} from '../server/dev';
 
 export const registerHotReloadProvider = (): Disposable => {
   const enableHotReload = workspace.getConfiguration('flutter').get<boolean>('provider.hot-reload', true)
