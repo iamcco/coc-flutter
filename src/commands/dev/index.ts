@@ -1,16 +1,18 @@
-import {workspace, commands, Disposable } from 'coc.nvim';
+import {workspace, commands, Disposable} from 'coc.nvim';
 
 import {devServer} from '../../server/dev';
 import {Dispose} from '../../util/dispose';
+import {opener} from '../../util/opener';
 
-interface ICmd {
-  cmd: string
+export interface ICmd {
+  cmd?: string
   desc: string
+  callback?: (...params: any[]) => any
 }
 
 const cmdPrefix = 'flutter'
 
-const cmds: Record<string, ICmd> = {
+export const cmds: Record<string, ICmd> = {
   hotReload: {
     cmd: 'r',
     desc: 'Hot reload'
@@ -75,9 +77,16 @@ const cmds: Record<string, ICmd> = {
     cmd: 'q',
     desc: 'Quit server'
   },
+  openProfiler: {
+    desc: 'Observatory debugger and profiler web page',
+    callback: (run: Run) => {
+      run.openProfiler()
+    }
+  }
 }
 
 export class Run extends Dispose {
+  private profilerUrl: string | undefined
   private cmds: Disposable[] = []
 
   constructor() {
@@ -97,12 +106,11 @@ export class Run extends Dispose {
     this.push(devServer)
   }
 
-  async execute() {
+  private async execute() {
     if (!devServer.state) {
       await devServer.start()
-      devServer.on('error', this.onError)
-      devServer.on('exit', this.onExit)
-      devServer.on('close', this.onExit)
+      devServer.onError(this.onError)
+      devServer.onExit(this.onExit)
       devServer.onStdout(this.onStdout)
       devServer.onStderr(this.onStderr)
       this.registerCommands()
@@ -111,12 +119,12 @@ export class Run extends Dispose {
     }
   }
 
-  registerCommands() {
+  private registerCommands() {
     this.cmds.push(
       ...Object.keys(cmds).map(key => {
         const cmdId = `${cmdPrefix}.${key}`
         commands.titles.set(cmdId, cmds[key].desc)
-        const subscription = commands.registerCommand(cmdId, this.sendCommand(cmds[key]))
+        const subscription = commands.registerCommand(cmdId, this.execCmd(cmds[key]))
         return {
           dispose() {
             commands.titles.delete(cmdId)
@@ -127,7 +135,7 @@ export class Run extends Dispose {
     )
   }
 
-  unRegisterCommands() {
+  private unRegisterCommands() {
     if (this.cmds) {
       this.cmds.forEach(cmd => {
         cmd.dispose()
@@ -136,34 +144,55 @@ export class Run extends Dispose {
     this.cmds = []
   }
 
-  sendCommand(cmd: ICmd) {
-    return () => {
-      if (devServer.state) {
-        devServer.sendCommand(cmd.cmd)
-      } else {
-        workspace.showMessage('flutter server is not running!')
-      }
-    }
-  }
-
-  onError = (err: Error) => {
+  private onError = (err: Error) => {
     this.unRegisterCommands()
     workspace.showMessage(`${err.message}`, 'error')
   }
 
-  onExit = (code: number) => {
+  private onExit = (code: number) => {
     this.unRegisterCommands()
     if (code !== 0) {
       workspace.showMessage(`Flutter server exist with ${code}`, 'warning')
     }
   }
 
-  onStdout = (lines: string[]) => {
+  private onStdout = (lines: string[]) => {
+    lines.forEach(line => {
+      const m = line.match(/^\s*An Observatory debugger and profiler on .* is available at:\s*(https?:\/\/127\.0\.0\.1:\d+\/.+\/)$/)
+      if (m) {
+        this.profilerUrl = m[1]
+      }
+    })
     workspace.showMessage(`${lines.join('\n')}`)
   }
 
-  onStderr = (lines: string[]) => {
+  private onStderr = (lines: string[]) => {
     workspace.showMessage(`${lines.join('\n')}`)
+  }
+
+  execCmd(cmd: ICmd) {
+    return () => {
+      if (devServer.state) {
+        if (cmd.cmd) {
+          devServer.sendCommand(cmd.cmd)
+        }
+        if (cmd.callback) {
+          cmd.callback(this)
+        }
+      } else {
+        workspace.showMessage('Flutter server is not running!')
+      }
+    }
+  }
+
+  openProfiler() {
+    if (!this.profilerUrl) {
+      return
+    }
+    if (devServer.state) {
+      return opener(this.profilerUrl)
+    }
+    workspace.showMessage('Flutter server is not running!')
   }
 
   dispose() {

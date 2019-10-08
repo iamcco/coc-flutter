@@ -30,6 +30,8 @@ Flutter support for (Neo)vim
 
 ## Commands
 
+Open flutter only commands list: `CocList --input=flutter commands`
+
 **Global Commands**:
 
 - `flutter.run` Run flutter server
@@ -46,6 +48,7 @@ Flutter support for (Neo)vim
 - `flutter.hotReload` Hot reload
 - `flutter.hotRestart` Hot restart
 - `flutter.screenshot` To save a screenshot to flutter.png
+- `flutter.openProfiler` Open observatory debugger and profiler web page
 - `flutter.debugDumpAPP` You can dump the widget hierarchy of the app (debugDumpApp)
 - `flutter.elevationChecker` To toggle the elevation checker
 - `flutter.debugDumpLayerTree` For layers (debugDumpLayerTree)
@@ -71,5 +74,5 @@ Flutter support for (Neo)vim
   - [ ] `flutter screenshot`
 - [x] hot-reload after save
 - [ ] dev server
-  - [ ] open `An Observatory debugger and profiler` web page
+  - [x] open `An Observatory debugger and profiler` web page
   - [ ] dev server status

@@ -18,12 +18,12 @@ class DevServer {
   private onStdoutHandler: event[] = []
   private onStderrHandler: event[] = []
 
-  private onError = (err: Error) => {
+  private _onError = (err: Error) => {
     this.task = undefined
     log(`server error: ${err.message}`)
   }
 
-  private onExit = (code: number) => {
+  private _onExit = (code: number) => {
     this.task = undefined
     log(`server exit with: ${code}`)
   }
@@ -42,6 +42,10 @@ class DevServer {
         handler
       })
     }
+  }
+
+  private on(event: string, handler: (...params: any[]) => any) {
+    this.listener(event, handler, this.task, this.onHandler)
   }
 
   get state() : boolean {
@@ -66,9 +70,9 @@ class DevServer {
       cwd: workspaceFolder,
       detached: false
     })
-    this.task.on('close', this.onExit)
-    this.task.on('exit', this.onExit)
-    this.task.on('error', this.onError)
+    this.task.on('close', this._onExit)
+    this.task.on('exit', this._onExit)
+    this.task.on('error', this._onError)
 
     if (this.onHandler.length) {
       this.onHandler.forEach(item => {
@@ -90,8 +94,13 @@ class DevServer {
     }
   }
 
-  on(event: string, handler: (...params: any[]) => any) {
-    this.listener(event, handler, this.task, this.onHandler)
+  onExit(handler: (...params: any[]) => any) {
+    this.listener('exit', handler, this.task, this.onHandler)
+    this.listener('close', handler, this.task, this.onHandler)
+  }
+
+  onError(handler: (...params: any[]) => any) {
+    this.listener('error', handler, this.task, this.onHandler)
   }
 
   onStdout(handler: (lines: string[]) => void) {
@@ -118,7 +127,10 @@ class DevServer {
     )
   }
 
-  sendCommand(cmd: string) {
+  sendCommand(cmd?: string) {
+    if (!cmd) {
+      return
+    }
     if (this.task && this.task.stdin.writable) {
       this.task.stdin.write(cmd)
     } else {
