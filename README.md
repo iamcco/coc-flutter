@@ -10,6 +10,7 @@ Flutter support for (Neo)vim
 - Automatically finds SDKs from PATH
 - Automatic hot reloads on save
 - Support flutter dev server
+- Snippet enhance `flutter.provider.enableSnippet`
 
 ## Install
 
@@ -25,6 +26,7 @@ Flutter support for (Neo)vim
 - `flutter.provider.enableSnippet` Enable completion item snippet
   - `import '';` => `import '${1}';${0}`
   - `someName(…)` => `someName(${1})${0}`
+  - `setState(() {});` => `setState(() {\n\t${1}\n});${0}`
 
 ## Commands
 

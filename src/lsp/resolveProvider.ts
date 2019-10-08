@@ -5,10 +5,6 @@ import {InsertTextFormat, CompletionItemKind, CompletionItem, CancellationToken}
  * extend CompletionItem's label functionName(…) to functionName(${1})${0}
  */
 const funcCallRegex = /\(…\)$/
-/**
- * extend `import '';` to `import '${1}';${0}`
- */
-const importRegex = /^import\s+('');$/
 
 export const resolveProvider = (
   item: CompletionItem,
@@ -20,7 +16,7 @@ export const resolveProvider = (
       return item
     }
     const { label, insertText, insertTextFormat } = item
-    let m = label.match(funcCallRegex)
+    const m = label.match(funcCallRegex)
     if (m && insertTextFormat !== InsertTextFormat.Snippet) {
       item.kind = CompletionItemKind.Snippet
       item.textEdit = undefined
@@ -28,12 +24,23 @@ export const resolveProvider = (
       item.insertTextFormat = InsertTextFormat.Snippet
       return item
     }
-    m = label.match(importRegex)
-    if (m && insertTextFormat !== InsertTextFormat.Snippet) {
+    if (label === "import '';" && insertTextFormat !== InsertTextFormat.Snippet) {
       item.kind = CompletionItemKind.Snippet
       item.textEdit = undefined
       item.insertText = "import '${1}';${0}"
       item.insertTextFormat = InsertTextFormat.Snippet
+      return item
+    }
+    if (label === "setState(() {});" && insertTextFormat !== InsertTextFormat.Snippet) {
+      item.kind = CompletionItemKind.Snippet
+      item.textEdit = undefined
+      item.insertText = [
+        'setState(() {',
+        '\t${1}',
+        '});${0}'
+      ].join('\n')
+      item.insertTextFormat = InsertTextFormat.Snippet
+      return item
     }
     return item
   })

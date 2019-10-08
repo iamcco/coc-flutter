@@ -12,7 +12,6 @@ import {flutterSDK} from '../lib/sdk';
 import {logger} from '../util/logger';
 import {statusBar} from '../lib/status';
 import {Dispose} from '../util/dispose';
-import {CompletionItem, CompletionList, TextDocument, Position, CancellationToken} from 'vscode-languageserver-protocol';
 import {resolveProvider} from './resolveProvider';
 
 const log = logger.getlog('lsp-server')
@@ -69,7 +68,9 @@ export class LspServer extends Dispose {
       revealOutputChannelOn: traceServer === 'off' ? RevealOutputChannelOn.Never : RevealOutputChannelOn.Info,
 
       middleware: {
-        resolveCompletionItem: resolveProvider
+        resolveCompletionItem: config.get<boolean>('provider.enableSnippet', true)
+        ? resolveProvider
+        : undefined
       }
     }
 
