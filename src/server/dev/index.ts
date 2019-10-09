@@ -3,7 +3,9 @@ import {spawn, ChildProcessWithoutNullStreams} from 'child_process'
 import {Readable} from 'stream'
 
 import {findWorkspaceFolder} from '../../util/fs'
+import {lineBreak} from '../../util/constant';
 import {logger} from '../../util/logger'
+import {notification} from '../../lib/notification';
 
 const log = logger.getlog('server')
 
@@ -92,6 +94,8 @@ class DevServer {
       })
       this.onStderrHandler = []
     }
+
+    notification.show(['Running flutter dev server...'])
   }
 
   onExit(handler: (...params: any[]) => any) {
@@ -107,8 +111,11 @@ class DevServer {
     this.listener(
       'data',
       (chunk: Buffer) => {
-        const lines = chunk.toString().split('\n')
-        handler(lines)
+        const lines = chunk.toString().trim()
+        if (lines == '') {
+          return
+        }
+        handler(lines.split(lineBreak))
       },
       this.task && this.task.stdout,
       this.onStdoutHandler
@@ -119,8 +126,11 @@ class DevServer {
     this.listener(
       'data',
       (chunk: Buffer) => {
-        const lines = chunk.toString().split('\n')
-        handler(lines)
+        const lines = chunk.toString().trim()
+        if (lines == '') {
+          return
+        }
+        handler(lines.split(lineBreak))
       },
       this.task && this.task.stderr,
       this.onStderrHandler

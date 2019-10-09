@@ -12,6 +12,7 @@ export class Dispose {
       this.subscriptions.forEach(item => {
         item.dispose()
       })
+      this.subscriptions = []
     }
   }
 }

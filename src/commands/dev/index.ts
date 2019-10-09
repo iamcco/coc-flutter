@@ -3,6 +3,10 @@ import {workspace, commands, Disposable} from 'coc.nvim';
 import {devServer} from '../../server/dev';
 import {Dispose} from '../../util/dispose';
 import {opener} from '../../util/opener';
+import {notification} from '../../lib/notification';
+import {logger} from '../../util/logger';
+
+const log = logger.getlog('dev-command')
 
 export interface ICmd {
   cmd?: string
@@ -156,6 +160,15 @@ export class Run extends Dispose {
     }
   }
 
+  private isInvalidLine(lines: string[]) {
+    if (lines.length === 1) {
+      if (/^\s*[0-9,.]+m?s\s*$/.test(lines[0])) {
+        return true
+      }
+    }
+    return false
+  }
+
   private onStdout = (lines: string[]) => {
     lines.forEach(line => {
       const m = line.match(/^\s*An Observatory debugger and profiler on .* is available at:\s*(https?:\/\/127\.0\.0\.1:\d+\/.+\/)$/)
@@ -163,11 +176,18 @@ export class Run extends Dispose {
         this.profilerUrl = m[1]
       }
     })
-    workspace.showMessage(`${lines.join('\n')}`)
+    if (!this.isInvalidLine(lines)) {
+      notification.show(lines)
+    }
+    log(`stdout message: ${JSON.stringify(lines)}`)
   }
 
   private onStderr = (lines: string[]) => {
-    workspace.showMessage(`${lines.join('\n')}`)
+    if (!this.isInvalidLine(lines)) {
+      notification.show(lines)
+    }
+    notification.show(lines)
+    log(`stderr message: ${JSON.stringify(lines)}`)
   }
 
   execCmd(cmd: ICmd) {

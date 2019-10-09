@@ -73,6 +73,6 @@ Open flutter only commands list: `CocList --input=flutter commands`
   - [ ] `flutter upgrade`
   - [ ] `flutter screenshot`
 - [x] hot-reload after save
-- [ ] dev server
+- [x] dev server
   - [x] open `An Observatory debugger and profiler` web page
-  - [ ] dev server status
+  - [x] dev server status
