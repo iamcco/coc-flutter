@@ -160,13 +160,21 @@ export class Run extends Dispose {
     }
   }
 
-  private isInvalidLine(lines: string[]) {
-    if (lines.length === 1) {
-      if (/^\s*[0-9,.]+m?s\s*$/.test(lines[0])) {
-        return true
-      }
-    }
-    return false
+  /**
+   * do not display lines:
+   * -`             xxs`
+   * -`             xx.xxs`
+   * -`             xx,xxxms (!)`
+   * -`I/flutter ( xxx): xxxx`
+   */
+  private filterInvalidLines(lines: string[]): string[] {
+    return lines.filter(line => {
+      return !/^\s*[0-9,.]+m?s\s*(\(!\))?\s*$/.test(line)
+        && !/^I\/flutter\s+\(\s*\d+\):/.test(line)
+        && !line.startsWith('🔥  To hot reload')
+        && !line.startsWith('An Observatory debugger and profiler')
+        && !line.startsWith('For a more detailed help message, press "h"')
+    })
   }
 
   private onStdout = (lines: string[]) => {
@@ -176,17 +184,12 @@ export class Run extends Dispose {
         this.profilerUrl = m[1]
       }
     })
-    if (!this.isInvalidLine(lines)) {
-      notification.show(lines)
-    }
+    notification.show(this.filterInvalidLines(lines))
     log(`stdout message: ${JSON.stringify(lines)}`)
   }
 
   private onStderr = (lines: string[]) => {
-    if (!this.isInvalidLine(lines)) {
-      notification.show(lines)
-    }
-    notification.show(lines)
+    notification.show(this.filterInvalidLines(lines))
     log(`stderr message: ${JSON.stringify(lines)}`)
   }
 

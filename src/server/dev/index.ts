@@ -1,4 +1,4 @@
-import {Uri, workspace} from 'coc.nvim'
+import {Uri, workspace, OutputChannel} from 'coc.nvim'
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process'
 import {Readable} from 'stream'
 
@@ -6,6 +6,7 @@ import {findWorkspaceFolder} from '../../util/fs'
 import {lineBreak} from '../../util/constant';
 import {logger} from '../../util/logger'
 import {notification} from '../../lib/notification';
+import {Dispose} from '../../util/dispose';
 
 const log = logger.getlog('server')
 
@@ -14,11 +15,28 @@ interface event {
   handler: (...params: any[]) => any
 }
 
-class DevServer {
+class DevServer extends Dispose {
+  private outputChannel: OutputChannel | undefined
   private task: ChildProcessWithoutNullStreams | undefined
   private onHandler: event[] = []
   private onStdoutHandler: event[] = []
   private onStderrHandler: event[] = []
+
+  constructor() {
+    super()
+    this.push({
+      dispose: () => {
+        if (this.task) {
+          try {
+            this.task.kill()
+            this.task = undefined
+          } catch (error) {
+            log(`dispose server error: ${error.message}`)
+          }
+        }
+      }
+    })
+  }
 
   private _onError = (err: Error) => {
     this.task = undefined
@@ -50,6 +68,12 @@ class DevServer {
     this.listener(event, handler, this.task, this.onHandler)
   }
 
+  private devLog(message: string) {
+    if (this.outputChannel) {
+      this.outputChannel.append(message)
+    }
+  }
+
   get state() : boolean {
     return !!this.task && this.task.stdin.writable
   }
@@ -68,11 +92,19 @@ class DevServer {
     }
     log(`server start at: ${workspaceFolder}`)
 
+    notification.show('Start flutter dev server...')
+
+    if (this.outputChannel) {
+      this.outputChannel.clear()
+    } else {
+      this.outputChannel = workspace.createOutputChannel('flutter-dev-server')
+      this.push(this.outputChannel)
+    }
+
     this.task = spawn('flutter', ['run'], {
       cwd: workspaceFolder,
       detached: false
     })
-    this.task.on('close', this._onExit)
     this.task.on('exit', this._onExit)
     this.task.on('error', this._onError)
 
@@ -94,13 +126,10 @@ class DevServer {
       })
       this.onStderrHandler = []
     }
-
-    notification.show(['Running flutter dev server...'])
   }
 
   onExit(handler: (...params: any[]) => any) {
     this.listener('exit', handler, this.task, this.onHandler)
-    this.listener('close', handler, this.task, this.onHandler)
   }
 
   onError(handler: (...params: any[]) => any) {
@@ -111,7 +140,9 @@ class DevServer {
     this.listener(
       'data',
       (chunk: Buffer) => {
-        const lines = chunk.toString().trim()
+        let lines = chunk.toString()
+        this.devLog(lines)
+        lines = lines.trim()
         if (lines == '') {
           return
         }
@@ -126,7 +157,9 @@ class DevServer {
     this.listener(
       'data',
       (chunk: Buffer) => {
-        const lines = chunk.toString().trim()
+        let lines = chunk.toString()
+        this.devLog(lines)
+        lines = lines.trim()
         if (lines == '') {
           return
         }
@@ -145,17 +178,6 @@ class DevServer {
       this.task.stdin.write(cmd)
     } else {
       workspace.showMessage('Flutter server is not running!')
-    }
-  }
-
-  dispose = () => {
-    if (this.task) {
-      try {
-        this.task.kill()
-        this.task = undefined
-      } catch (error) {
-        log(`dispose server error: ${error.message}`)
-      }
     }
   }
 }

@@ -67,11 +67,15 @@ class Notification extends Dispose {
   }
 
   show(message: string | string[], showTime: number = messageDefaultShowTime) {
+    const messages = ([] as string[]).concat(message)
+    if (messages.length === 0) {
+      return
+    }
     if (this.tmp) {
       if (Date.now() - this.tmp.time > messageConcatTimeGap) {
         this.messages.push(
           new Message(
-            this.tmp.text.concat(message),
+            this.tmp.text.concat(messages),
             this.maxWidth,
             showTime
           )
@@ -81,12 +85,12 @@ class Notification extends Dispose {
           clearTimeout(this.tmpTimer)
         }
       } else {
-        this.tmp.text = this.tmp.text.concat(message)
+        this.tmp.text = this.tmp.text.concat(messages)
       }
     } else {
       this.tmp = {
         time: Date.now(),
-        text: ([] as string[]).concat(message)
+        text: messages
       }
       this.tmpTimer = setTimeout(() => {
         this.messages.push(
