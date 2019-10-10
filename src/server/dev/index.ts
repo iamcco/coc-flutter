@@ -2,13 +2,15 @@ import {Uri, workspace, OutputChannel} from 'coc.nvim'
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process'
 import {Readable} from 'stream'
 
-import {findWorkspaceFolder} from '../../util/fs'
-import {lineBreak} from '../../util/constant';
+import {findWorkspaceFolder, getFlutterWorkspaceFolder} from '../../util/fs'
+import {lineBreak} from '../../util/constant'
 import {logger} from '../../util/logger'
-import {notification} from '../../lib/notification';
-import {Dispose} from '../../util/dispose';
+import {notification} from '../../lib/notification'
+import {Dispose} from '../../util/dispose'
 
 const log = logger.getlog('server')
+
+const devLogName = 'flutter-dev'
 
 interface event {
   event: string
@@ -82,10 +84,7 @@ class DevServer extends Dispose {
     if (this.task && this.task.stdin.writable) {
       return
     }
-    const workspaceFolder = await findWorkspaceFolder(
-      Uri.parse(workspace.workspaceFolder.uri).fsPath,
-      ['**/pubspec.yaml']
-    )
+    const workspaceFolder = await getFlutterWorkspaceFolder()
     if (!workspaceFolder) {
       workspace.showMessage('Flutter project workspaceFolder not found!')
       return
@@ -97,8 +96,25 @@ class DevServer extends Dispose {
     if (this.outputChannel) {
       this.outputChannel.clear()
     } else {
-      this.outputChannel = workspace.createOutputChannel('flutter-dev-server')
+      this.outputChannel = workspace.createOutputChannel(devLogName)
       this.push(this.outputChannel)
+      const subscription = workspace.registerAutocmd({
+        event: ['BufEnter'],
+        request: true,
+        callback: async () => {
+          const doc = await workspace.document
+          const uri = Uri.parse(doc.uri)
+          if (uri && uri.fsPath && uri.fsPath.endsWith(devLogName)) {
+            const { nvim } = workspace
+            const win = await nvim.window
+            await win.setOption('wrap', false)
+            subscription.dispose()
+          }
+        }
+      })
+      this.push(
+        subscription
+      )
     }
 
     this.task = spawn('flutter', ['run'], {
@@ -178,6 +194,12 @@ class DevServer extends Dispose {
       this.task.stdin.write(cmd)
     } else {
       workspace.showMessage('Flutter server is not running!')
+    }
+  }
+
+  openDevLog() {
+    if (this.outputChannel) {
+      this.outputChannel.show()
     }
   }
 }

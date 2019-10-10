@@ -67,12 +67,10 @@ Open flutter only commands list: `CocList --input=flutter commands`
 - [ ] coc-list
   - [ ] devices list by `flutter devices`
 - [ ] watch pubspec.yaml and update package
+  - flutter pub get
 - [ ] flutter commands
   - [ ] `flutter create project-name`
   - [ ] `flutter doctor`
   - [ ] `flutter upgrade`
-  - [ ] `flutter screenshot`
 - [x] hot-reload after save
-- [x] dev server
-  - [x] open `An Observatory debugger and profiler` web page
-  - [x] dev server status
+- [ ] dev server output notification optimize

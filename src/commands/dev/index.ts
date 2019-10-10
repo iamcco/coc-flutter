@@ -5,16 +5,15 @@ import {Dispose} from '../../util/dispose';
 import {opener} from '../../util/opener';
 import {notification} from '../../lib/notification';
 import {logger} from '../../util/logger';
+import {cmdPrefix} from '../../util/constant';
 
 const log = logger.getlog('dev-command')
 
-export interface ICmd {
+interface ICmd {
   cmd?: string
   desc: string
   callback?: (...params: any[]) => any
 }
-
-const cmdPrefix = 'flutter'
 
 export const cmds: Record<string, ICmd> = {
   hotReload: {
@@ -27,15 +26,24 @@ export const cmds: Record<string, ICmd> = {
   },
   debugDumpAPP: {
     cmd: 'w',
-    desc: 'You can dump the widget hierarchy of the app (debugDumpApp)'
+    desc: 'You can dump the widget hierarchy of the app (debugDumpApp)',
+    callback: () => {
+      devServer.openDevLog()
+    }
   },
   debugDumpRenderTree: {
     cmd: 't',
-    desc: 'To dump the rendering tree of the app (debugDumpRenderTree)'
+    desc: 'To dump the rendering tree of the app (debugDumpRenderTree)',
+    callback: () => {
+      devServer.openDevLog()
+    }
   },
   debugDumpLayerTree: {
     cmd: 'L',
-    desc: 'For layers (debugDumpLayerTree)'
+    desc: 'For layers (debugDumpLayerTree)',
+    callback: () => {
+      devServer.openDevLog()
+    }
   },
   debugDumpSemanticsTraversalOrder: {
     cmd: 'S',
@@ -83,13 +91,13 @@ export const cmds: Record<string, ICmd> = {
   },
   openProfiler: {
     desc: 'Observatory debugger and profiler web page',
-    callback: (run: Run) => {
+    callback: (run: Dev) => {
       run.openProfiler()
     }
   }
 }
 
-export class Run extends Dispose {
+export class Dev extends Dispose {
   private profilerUrl: string | undefined
   private cmds: Disposable[] = []
 
@@ -108,9 +116,11 @@ export class Run extends Dispose {
       }
     })())
     this.push(devServer)
+    log('register dev command')
   }
 
   private async execute() {
+    log(`run dev server, devServer state: ${devServer.state}`)
     if (!devServer.state) {
       await devServer.start()
       devServer.onError(this.onError)
@@ -124,6 +134,7 @@ export class Run extends Dispose {
   }
 
   private registerCommands() {
+    log('register commands')
     this.cmds.push(
       ...Object.keys(cmds).map(key => {
         const cmdId = `${cmdPrefix}.${key}`
@@ -140,6 +151,7 @@ export class Run extends Dispose {
   }
 
   private unRegisterCommands() {
+    log('unregister commands')
     if (this.cmds) {
       this.cmds.forEach(cmd => {
         cmd.dispose()
@@ -149,11 +161,13 @@ export class Run extends Dispose {
   }
 
   private onError = (err: Error) => {
+    log(`devServer error: ${err.message}\n${err.stack}`)
     this.unRegisterCommands()
     workspace.showMessage(`${err.message}`, 'error')
   }
 
   private onExit = (code: number) => {
+    log(`devServer exit with: ${code}`)
     this.unRegisterCommands()
     if (code !== 0) {
       workspace.showMessage(`Flutter server exist with ${code}`, 'warning')
@@ -162,15 +176,20 @@ export class Run extends Dispose {
 
   /**
    * do not display lines:
-   * -`             xxs`
-   * -`             xx.xxs`
-   * -`             xx,xxxms (!)`
-   * -`I/flutter ( xxx): xxxx`
+   * - `             xxs`
+   * - `             xx.xxs`
+   * - `             xx,xxxms (!)`
+   * - `I/flutter ( xxx): xxxx`
+   * - `I/le.xxxx( xxxx):`
+   * - `🔥  To hot reload xxx`
+   * - `An Observatory debugger and profiler xxx`
+   * - `For a more detailed help message, press "h" xxx`
    */
   private filterInvalidLines(lines: string[]): string[] {
     return lines.filter(line => {
       return !/^\s*[0-9,.]+m?s\s*(\(!\))?\s*$/.test(line)
-        && !/^I\/flutter\s+\(\s*\d+\):/.test(line)
+        && !/^I\/flutter\s*\(\s*\d+\):/.test(line)
+        && !/^I\/le\.\w+\s*\(\s*\d+\):/.test(line)
         && !line.startsWith('🔥  To hot reload')
         && !line.startsWith('An Observatory debugger and profiler')
         && !line.startsWith('For a more detailed help message, press "h"')
@@ -185,12 +204,10 @@ export class Run extends Dispose {
       }
     })
     notification.show(this.filterInvalidLines(lines))
-    log(`stdout message: ${JSON.stringify(lines)}`)
   }
 
   private onStderr = (lines: string[]) => {
     notification.show(this.filterInvalidLines(lines))
-    log(`stderr message: ${JSON.stringify(lines)}`)
   }
 
   execCmd(cmd: ICmd) {

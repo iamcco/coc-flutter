@@ -23,9 +23,10 @@
   "activationEvents": [
     "onLanguage:dart",
     "onCommand:flutter.run",
-    "onCommand:flutter.createProject",
     "onCommand:flutter.doctor",
-    "onCommand:flutter.upgrade"
+    "onCommand:flutter.upgrade",
+    "onCommand:flutter.createProject",
+    "onCommand:flutter.pub.get"
   ],
   "contributes": {
     "configuration": {
@@ -80,11 +81,15 @@
       },
       {
         "command": "flutter.doctor",
-        "title": "Run: flutter doctor"
+        "title": "flutter doctor"
       },
       {
         "command": "flutter.upgrade",
-        "title": "Run: flutter upgrade"
+        "title": "flutter upgrade"
+      },
+      {
+        "command": "flutter.pub.get",
+        "title": "flutter pub get"
       }
     ]
   },
