@@ -70,7 +70,7 @@ Open flutter only commands list: `CocList --input=flutter commands`
   - flutter pub get
 - [ ] flutter commands
   - [ ] `flutter create project-name`
-  - [ ] `flutter doctor`
-  - [ ] `flutter upgrade`
+  - [x] `flutter doctor`
+  - [x] `flutter upgrade`
 - [x] hot-reload after save
 - [ ] dev server output notification optimize

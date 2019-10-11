@@ -15,7 +15,8 @@ interface ICmd {
 
 const pubPrefix = `${cmdPrefix}.pub`
 
-const formatMessage = (text: string): string => text.trim().replace(/\s+/g, ' ')
+const formatMessage = (text: string): string[] =>
+  text.trim().replace(/\s+/g, ' ').split(lineBreak)
 
 const cmds: Record<string, ICmd> = {
   get: {

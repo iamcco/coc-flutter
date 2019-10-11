@@ -1,16 +1,14 @@
-import {Uri, workspace, OutputChannel} from 'coc.nvim'
+import {workspace, OutputChannel} from 'coc.nvim'
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process'
 import {Readable} from 'stream'
 
-import {findWorkspaceFolder, getFlutterWorkspaceFolder} from '../../util/fs'
+import {getFlutterWorkspaceFolder} from '../../util/fs'
 import {lineBreak} from '../../util/constant'
 import {logger} from '../../util/logger'
 import {notification} from '../../lib/notification'
 import {Dispose} from '../../util/dispose'
 
 const log = logger.getlog('server')
-
-const devLogName = 'flutter-dev'
 
 interface event {
   event: string
@@ -96,25 +94,7 @@ class DevServer extends Dispose {
     if (this.outputChannel) {
       this.outputChannel.clear()
     } else {
-      this.outputChannel = workspace.createOutputChannel(devLogName)
-      this.push(this.outputChannel)
-      const subscription = workspace.registerAutocmd({
-        event: ['BufEnter'],
-        request: true,
-        callback: async () => {
-          const doc = await workspace.document
-          const uri = Uri.parse(doc.uri)
-          if (uri && uri.fsPath && uri.fsPath.endsWith(devLogName)) {
-            const { nvim } = workspace
-            const win = await nvim.window
-            await win.setOption('wrap', false)
-            subscription.dispose()
-          }
-        }
-      })
-      this.push(
-        subscription
-      )
+      this.outputChannel = logger.devOutchannel
     }
 
     this.task = spawn('flutter', ['run'], {
