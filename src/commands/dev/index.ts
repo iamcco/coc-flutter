@@ -95,6 +95,14 @@ export const cmds: Record<string, ICmd> = {
     callback: (run: Dev) => {
       run.openProfiler()
     }
+  },
+  openDevLog: {
+    desc: 'Open flutter dev server log',
+    callback: () => {
+      if (devServer.state) {
+        devServer.openDevLog()
+      }
+    }
   }
 }
 
@@ -136,7 +144,7 @@ export class Dev extends Dispose {
     log('register commands')
     this.cmds.push(
       ...Object.keys(cmds).map(key => {
-        const cmdId = `${cmdPrefix}.${key}`
+        const cmdId = `${cmdPrefix}.dev.${key}`
         commands.titles.set(cmdId, cmds[key].desc)
         const subscription = commands.registerCommand(cmdId, this.execCmd(cmds[key]))
         return {

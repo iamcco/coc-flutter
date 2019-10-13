@@ -85,10 +85,10 @@ export class LspServer extends Dispose {
 
     statusBar.init()
     this.push(statusBar)
-    statusBar.show('Flutter', true)
 
     client.onReady()
       .then(() => {
+        statusBar.show('Flutter')
         statusBar.ready()
         log('analysis server ready!')
       })
