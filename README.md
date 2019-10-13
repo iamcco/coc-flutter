@@ -13,10 +13,20 @@ Flutter support for (Neo)vim
 - Automatically run `flutter pub get` when `pubspec.yaml` change
 - Support flutter dev server
 - Snippet enhance `flutter.provider.enableSnippet`
+- Devices List
+- Emulators List
 
 ## Install
 
 `:CocInstall coc-flutter`
+
+## coc-list sources
+
+- FlutterDevices
+  > `:CocList FlutterDevices`
+- FlutterEmulators
+  > `:CocList FlutterEmulators`
+
 
 ## Settings
 
@@ -38,10 +48,12 @@ Open flutter only commands list: `CocList --input=flutter commands`
 **Global Commands**:
 
 - `flutter.run` Run flutter dev server
-- `flutter.create` Create flutter project using: flutter create
-- `flutter.doctor` Run: flutter doctor
-- `flutter.upgrade` Run: flutter upgrade
-- `flutter.pub.get` Run: flutter pub get
+- `flutter.create` Create flutter project using: `flutter create`
+- `flutter.doctor` Run: `flutter doctor`
+- `flutter.upgrade` Run: `flutter upgrade`
+- `flutter.pub.get` Run: `flutter pub get`
+- `flutter.devices` open devices list
+- `flutter.emulators` open emulators list
 
 **Dev Server Commands**:
 
@@ -66,7 +78,8 @@ Open flutter only commands list: `CocList --input=flutter commands`
 - `flutter.dev.debugDumpSemanticsHitTestOrder` Accessibility (debugDumpSemantics) for inverse hit test order
 - `flutter.dev.debugDumpSemanticsTraversalOrder` Accessibility (debugDumpSemantics) for traversal order
 
-## TODO
+### Buy Me A Coffee ☕️
 
-- [ ] coc-list
-  - [ ] devices list by `flutter devices`
+![btc](https://img.shields.io/keybase/btc/iamcco.svg?style=popout-square)
+
+![image](https://user-images.githubusercontent.com/5492542/42771079-962216b0-8958-11e8-81c0-520363ce1059.png)

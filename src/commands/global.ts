@@ -1,7 +1,7 @@
-import {commands, workspace} from 'coc.nvim';
+import {commands, workspace, listManager} from 'coc.nvim';
 
 import {Dispose} from '../util/dispose';
-import {cmdPrefix, lineBreak} from '../util/constant';
+import {cmdPrefix} from '../util/constant';
 import {execCommand, getFlutterWorkspaceFolder} from '../util/fs';
 import {logger} from '../util/logger';
 import {notification} from '../lib/notification';
@@ -13,15 +13,18 @@ interface ICmd {
   name?: string
   cmd: string
   desc: string
-  execute: (cmd: ICmd) => Promise<void>
+  execute: (cmd: ICmd, ...args: string[]) => Promise<void>
   getArgs?: () => Promise<string[]>
 }
 
 const getCmd = () => {
-  return async ({ cmd, getArgs }: ICmd) => {
+  return async ({ cmd, getArgs }: ICmd, ...inputArgs: string[]) => {
     let args: string[] = []
     if (getArgs) {
       args = await getArgs()
+    }
+    if (inputArgs.length) {
+      args = args.concat(inputArgs)
     }
     const { err, stdout, stderr } = await execCommand(
       `flutter ${cmd} ${args.join(' ')}`
@@ -80,6 +83,20 @@ const cmds: ICmd[] = [
         notification.show(formatMessage(stderr))
       }
     }
+  },
+  {
+    cmd: 'devices',
+    desc: 'open devices list',
+    execute: async () => {
+      workspace.nvim.command('CocList FlutterDevices')
+    }
+  },
+  {
+    cmd: 'emulators',
+    desc: 'open emulators list',
+    execute: async () => {
+      workspace.nvim.command('CocList FlutterEmulators')
+    }
   }
 ]
 
@@ -90,12 +107,12 @@ export class Global extends Dispose {
       const { desc, execute, name } = cmd
       const cmdId = `${cmdPrefix}.${name || cmd.cmd}`
       this.push(
-        commands.registerCommand(cmdId, async () => {
+        commands.registerCommand(cmdId, async (...args: string[]) => {
           const statusBar = workspace.createStatusBarItem(0, { progress: true })
           this.push(statusBar)
           statusBar.text = desc
           statusBar.show()
-          await execute(cmd)
+          await execute(cmd, ...args)
           this.remove(statusBar)
         })
       )

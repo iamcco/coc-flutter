@@ -128,9 +128,9 @@ export class Dev extends Dispose {
     log('register dev command')
   }
 
-  private async execute() {
+  private async execute(...args: string[]) {
     log(`run dev server, devServer state: ${devServer.state}`)
-    const state = await devServer.start()
+    const state = await devServer.start(args)
     if (state) {
       devServer.onError(this.onError)
       devServer.onExit(this.onExit)

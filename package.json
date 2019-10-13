@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "0.0.1-dev5",
+  "version": "1.0.0",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -26,7 +26,9 @@
     "onCommand:flutter.doctor",
     "onCommand:flutter.upgrade",
     "onCommand:flutter.create",
-    "onCommand:flutter.pub.get"
+    "onCommand:flutter.pub.get",
+    "onCommand:flutter.devices",
+    "onCommand:flutter.emulators"
   ],
   "contributes": {
     "configuration": {
@@ -90,12 +92,21 @@
       {
         "command": "flutter.pub.get",
         "title": "flutter pub get"
+      },
+      {
+        "command": "flutter.devices",
+        "title": "open devices list"
+      },
+      {
+        "command": "flutter.emulators",
+        "title": "open emulators list"
       }
     ]
   },
   "devDependencies": {
     "@types/node": "^12.7.1",
     "coc.nvim": "^0.0.74",
+    "colors": "^1.4.0",
     "fast-glob": "^3.1.0",
     "rimraf": "^3.0.0",
     "ts-loader": "^6.0.4",

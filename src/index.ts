@@ -7,6 +7,7 @@ import {logger, logLevel} from './util/logger';
 import {Commands} from './commands';
 import {Providers} from './provider';
 import {LspServer} from './server/lsp';
+import {SourceList} from './sources';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('flutter')
@@ -29,6 +30,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
   // register providers
   context.subscriptions.push(
     new Providers()
+  )
+
+  // register sources
+  context.subscriptions.push(
+    new SourceList()
   )
 
   // register lsp server

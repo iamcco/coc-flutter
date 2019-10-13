@@ -54,7 +54,7 @@ class DevServer extends Dispose {
     return !!this.task && this.task.stdin.writable
   }
 
-  async start (): Promise<boolean> {
+  async start (args: string[]): Promise<boolean> {
     if (this.task && this.task.stdin.writable) {
       notification.show('Flutter dev server is running!')
       return false
@@ -77,7 +77,7 @@ class DevServer extends Dispose {
       this.outputChannel = logger.devOutchannel
     }
 
-    this.task = spawn('flutter', ['run'], {
+    this.task = spawn('flutter', ['run'].concat(args), {
       cwd: workspaceFolder,
       detached: false
     })
