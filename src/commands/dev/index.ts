@@ -1,4 +1,4 @@
-import {workspace, commands, Disposable} from 'coc.nvim';
+import {commands, Disposable} from 'coc.nvim';
 
 import {devServer} from '../../server/dev';
 import {Dispose} from '../../util/dispose';
@@ -121,15 +121,13 @@ export class Dev extends Dispose {
 
   private async execute() {
     log(`run dev server, devServer state: ${devServer.state}`)
-    if (!devServer.state) {
-      await devServer.start()
+    const state = await devServer.start()
+    if (state) {
       devServer.onError(this.onError)
       devServer.onExit(this.onExit)
       devServer.onStdout(this.onStdout)
       devServer.onStderr(this.onStderr)
       this.registerCommands()
-    } else {
-      workspace.showMessage(`Flutter server is running!`)
     }
   }
 
@@ -163,14 +161,14 @@ export class Dev extends Dispose {
   private onError = (err: Error) => {
     log(`devServer error: ${err.message}\n${err.stack}`)
     this.unRegisterCommands()
-    workspace.showMessage(`${err.message}`, 'error')
+    notification.show(`${err.message}`)
   }
 
   private onExit = (code: number) => {
     log(`devServer exit with: ${code}`)
     this.unRegisterCommands()
     if (code !== 0) {
-      workspace.showMessage(`Flutter server exist with ${code}`, 'warning')
+      notification.show(`Flutter server exist with ${code}`)
     }
   }
 
@@ -220,7 +218,7 @@ export class Dev extends Dispose {
           cmd.callback(this)
         }
       } else {
-        workspace.showMessage('Flutter server is not running!')
+        notification.show('Flutter server is not running!')
       }
     }
   }
@@ -232,7 +230,7 @@ export class Dev extends Dispose {
     if (devServer.state) {
       return opener(this.profilerUrl)
     }
-    workspace.showMessage('Flutter server is not running!')
+    notification.show('Flutter server is not running!')
   }
 
   dispose() {

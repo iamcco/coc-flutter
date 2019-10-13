@@ -1,6 +1,5 @@
 import {Dispose} from '../util/dispose'
 import {Dev} from './dev'
-import {Pub} from './pub'
 import {Global} from './global'
 
 export class Commands extends Dispose {
@@ -8,7 +7,6 @@ export class Commands extends Dispose {
     super()
     this.push(
       new Dev(),
-      new Pub(),
       new Global()
     )
   }

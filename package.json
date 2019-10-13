@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "0.0.1-dev4",
+  "version": "0.0.1-dev5",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "onCommand:flutter.run",
     "onCommand:flutter.doctor",
     "onCommand:flutter.upgrade",
-    "onCommand:flutter.createProject",
+    "onCommand:flutter.create",
     "onCommand:flutter.pub.get"
   ],
   "contributes": {
@@ -76,7 +76,7 @@
         "title": "Run flutter server"
       },
       {
-        "command": "flutter.createProject",
+        "command": "flutter.create",
         "title": "Create flutter project using: flutter create project-name"
       },
       {

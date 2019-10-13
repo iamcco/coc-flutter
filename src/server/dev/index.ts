@@ -1,6 +1,5 @@
-import {workspace, OutputChannel} from 'coc.nvim'
+import {OutputChannel} from 'coc.nvim'
 import {spawn, ChildProcessWithoutNullStreams} from 'child_process'
-import {Readable} from 'stream'
 
 import {getFlutterWorkspaceFolder} from '../../util/fs'
 import {lineBreak} from '../../util/constant'
@@ -10,17 +9,12 @@ import {Dispose} from '../../util/dispose'
 
 const log = logger.getlog('server')
 
-interface event {
-  event: string
-  handler: (...params: any[]) => any
-}
+type callback = (...params: any[]) => void
 
 class DevServer extends Dispose {
   private outputChannel: OutputChannel | undefined
   private task: ChildProcessWithoutNullStreams | undefined
-  private onHandler: event[] = []
-  private onStdoutHandler: event[] = []
-  private onStderrHandler: event[] = []
+  private onHandler: callback[] = []
 
   constructor() {
     super()
@@ -48,26 +42,6 @@ class DevServer extends Dispose {
     log(`server exit with: ${code}`)
   }
 
-  private listener(
-    event: string,
-    handler: (...params: any[]) => any,
-    target: ChildProcessWithoutNullStreams | Readable | undefined,
-    tmp: event[]
-  ) {
-    if (target) {
-      target.on(event, handler)
-    } else {
-      tmp.push({
-        event,
-        handler
-      })
-    }
-  }
-
-  private on(event: string, handler: (...params: any[]) => any) {
-    this.listener(event, handler, this.task, this.onHandler)
-  }
-
   private devLog(message: string) {
     if (this.outputChannel) {
       this.outputChannel.append(message)
@@ -78,14 +52,15 @@ class DevServer extends Dispose {
     return !!this.task && this.task.stdin.writable
   }
 
-  async start () {
+  async start (): Promise<boolean> {
     if (this.task && this.task.stdin.writable) {
-      return
+      notification.show('Flutter dev server is running!')
+      return false
     }
     const workspaceFolder = await getFlutterWorkspaceFolder()
     if (!workspaceFolder) {
-      workspace.showMessage('Flutter project workspaceFolder not found!')
-      return
+      notification.show('Flutter project workspaceFolder not found!')
+      return false
     }
     log(`server start at: ${workspaceFolder}`)
 
@@ -105,37 +80,36 @@ class DevServer extends Dispose {
     this.task.on('error', this._onError)
 
     if (this.onHandler.length) {
-      this.onHandler.forEach(item => {
-        this.on(item.event, item.handler)
-      })
+      this.onHandler.forEach(cb => cb())
       this.onHandler = []
     }
-    if (this.onStdoutHandler.length) {
-      this.onStdoutHandler.forEach(item => {
-        this.onStdout(item.handler)
-      })
-      this.onStdoutHandler = []
-    }
-    if (this.onStderrHandler.length) {
-      this.onStderrHandler.forEach(item => {
-        this.onStdout(item.handler)
-      })
-      this.onStderrHandler = []
-    }
+    return true
   }
 
   onExit(handler: (...params: any[]) => any) {
-    this.listener('exit', handler, this.task, this.onHandler)
+    const callback = () => {
+      this.task!.on('exit', handler)
+    }
+    if (this.task) {
+      callback()
+    } else {
+      this.onHandler.push(callback)
+    }
   }
 
   onError(handler: (...params: any[]) => any) {
-    this.listener('error', handler, this.task, this.onHandler)
+    if (this.task) {
+      this.task.on('error', handler)
+    } else {
+      this.onHandler.push(() => {
+        this.task!.on('error', handler)
+      })
+    }
   }
 
   onStdout(handler: (lines: string[]) => void) {
-    this.listener(
-      'data',
-      (chunk: Buffer) => {
+    const callback = () => {
+      this.task!.stdout.on('data', (chunk: Buffer) => {
         let lines = chunk.toString()
         this.devLog(lines)
         lines = lines.trim()
@@ -143,16 +117,18 @@ class DevServer extends Dispose {
           return
         }
         handler(lines.split(lineBreak))
-      },
-      this.task && this.task.stdout,
-      this.onStdoutHandler
-    )
+      })
+    }
+    if (this.task && this.task.stdout) {
+      callback()
+    } else {
+      this.onHandler.push(callback)
+    }
   }
 
   onStderr(handler: (lines: string[]) => void) {
-    this.listener(
-      'data',
-      (chunk: Buffer) => {
+    const callback = () => {
+      this.task!.stderr.on('data', (chunk: Buffer) => {
         let lines = chunk.toString()
         this.devLog(lines)
         lines = lines.trim()
@@ -160,10 +136,13 @@ class DevServer extends Dispose {
           return
         }
         handler(lines.split(lineBreak))
-      },
-      this.task && this.task.stderr,
-      this.onStderrHandler
-    )
+      })
+    }
+    if (this.task && this.task.stderr) {
+      callback()
+    } else {
+      this.onHandler.push(callback)
+    }
   }
 
   sendCommand(cmd?: string) {
@@ -173,7 +152,7 @@ class DevServer extends Dispose {
     if (this.task && this.task.stdin.writable) {
       this.task.stdin.write(cmd)
     } else {
-      workspace.showMessage('Flutter server is not running!')
+      notification.show('Flutter server is not running!')
     }
   }
 
