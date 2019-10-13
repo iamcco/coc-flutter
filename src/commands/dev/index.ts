@@ -6,6 +6,7 @@ import {opener} from '../../util/opener';
 import {notification} from '../../lib/notification';
 import {logger} from '../../util/logger';
 import {cmdPrefix} from '../../util/constant';
+import {reduceSpace} from '../../util';
 
 const log = logger.getlog('dev-command')
 
@@ -167,31 +168,30 @@ export class Dev extends Dispose {
   private onExit = (code: number) => {
     log(`devServer exit with: ${code}`)
     this.unRegisterCommands()
-    if (code !== 0) {
+    if (code !== 0 && code !== 1) {
       notification.show(`Flutter server exist with ${code}`)
     }
   }
 
   /**
    * do not display lines:
-   * - `             xxs`
-   * - `             xx.xxs`
-   * - `             xx,xxxms (!)`
-   * - `I/flutter ( xxx): xxxx`
-   * - `I/le.xxxx( xxxx):`
+   * - `I/xxx`
+   * - `D/xxx`
    * - `🔥  To hot reload xxx`
    * - `An Observatory debugger and profiler xxx`
    * - `For a more detailed help message, press "h" xxx`
    */
   private filterInvalidLines(lines: string[]): string[] {
-    return lines.filter(line => {
-      return !/^\s*[0-9,.]+m?s\s*(\(!\))?\s*$/.test(line)
-        && !/^I\/flutter\s*\(\s*\d+\):/.test(line)
-        && !/^I\/le\.\w+\s*\(\s*\d+\):/.test(line)
-        && !line.startsWith('🔥  To hot reload')
-        && !line.startsWith('An Observatory debugger and profiler')
-        && !line.startsWith('For a more detailed help message, press "h"')
-    })
+    return lines
+      .map(line => reduceSpace(line))
+      .filter(line => {
+        return line !== ''
+          && !/^I\//.test(line)
+          && !/^D\//.test(line)
+          && !line.startsWith('🔥 To hot reload')
+          && !line.startsWith('An Observatory debugger and profiler')
+          && !line.startsWith('For a more detailed help message, press "h"')
+      })
   }
 
   private onStdout = (lines: string[]) => {

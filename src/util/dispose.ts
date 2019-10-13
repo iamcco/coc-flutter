@@ -1,7 +1,7 @@
 import {Disposable} from 'coc.nvim';
 
 export class Dispose {
-  private subscriptions: Disposable[] = []
+  public subscriptions: Disposable[] = []
 
   push(...disposes: Disposable[]) {
     this.subscriptions.push(...disposes)

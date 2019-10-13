@@ -6,21 +6,16 @@ import {Message} from './message'
 const messageMaxWidth = 60
 const detectTimeGap = 1000 / 30
 const messageDefaultShowTime = 3000
-const messageConcatTimeGap = 0
 
 class Notification extends Dispose {
+  private isSupportFloat: boolean = false
   // top to the viewpoint
   private top: number = 1
   private maxWidth: number = messageMaxWidth
-  private tmp: {
-    time: number
-    text: string[]
-  } | undefined
   private messages: Message[] = []
   private display: Message[] = []
   private timeGap: number = detectTimeGap
   private timer: NodeJS.Timer | undefined
-  private tmpTimer: NodeJS.Timer | undefined
 
   constructor() {
     super()
@@ -29,6 +24,7 @@ class Notification extends Dispose {
 
   private async init() {
     const { nvim } = workspace
+    this.isSupportFloat = !!(await nvim.call('has', 'float'))
     const screenWidth = await nvim.getOption('columns') as number
     this.maxWidth = Math.min(this.maxWidth, screenWidth)
   }
@@ -71,47 +67,22 @@ class Notification extends Dispose {
     if (messages.length === 0) {
       return
     }
-    if (this.tmp) {
-      if (Date.now() - this.tmp.time > messageConcatTimeGap) {
-        this.messages.push(
-          new Message(
-            this.tmp.text.concat(messages),
-            this.maxWidth,
-            showTime
-          )
-        )
-        this.tmp = undefined
-        if (this.tmpTimer) {
-          clearTimeout(this.tmpTimer)
-        }
-      } else {
-        this.tmp.text = this.tmp.text.concat(messages)
-      }
-    } else {
-      this.tmp = {
-        time: Date.now(),
-        text: messages
-      }
-      this.tmpTimer = setTimeout(() => {
-        this.messages.push(
-          new Message(
-            this.tmp!.text,
-            this.maxWidth,
-            showTime
-          )
-        )
-        this.tmp = undefined
-        this.detect()
-      }, messageConcatTimeGap)
+    if (!this.isSupportFloat) {
+      return workspace.showMessage(messages.join('\n'))
     }
+    this.messages.push(
+      new Message(
+        messages,
+        this.maxWidth,
+        showTime
+      )
+    )
+    this.detect()
   }
 
   dispose() {
     if (this.timer) {
       clearTimeout(this.timer)
-    }
-    if (this.tmpTimer) {
-      clearTimeout(this.tmpTimer)
     }
     this.push(...this.display)
     this.messages = []

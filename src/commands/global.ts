@@ -5,6 +5,7 @@ import {cmdPrefix, lineBreak} from '../util/constant';
 import {execCommand, getFlutterWorkspaceFolder} from '../util/fs';
 import {logger} from '../util/logger';
 import {notification} from '../lib/notification';
+import {formatMessage} from '../util';
 
 const log = logger.getlog('global-commands')
 
@@ -41,9 +42,6 @@ const getCmd = () => {
     devLog.show()
   }
 }
-
-const formatMessage = (text: string): string[] =>
-  text.trim().replace(/\s+/g, ' ').split(lineBreak)
 
 const cmds: ICmd[] = [
   {

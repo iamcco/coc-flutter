@@ -9,6 +9,7 @@ Flutter support for (Neo)vim
 - LSP features is power by [analysis_server](https://github.com/dart-lang/sdk/blob/master/pkg/analysis_server/tool/lsp_spec/README.md)
 - Automatically finds SDKs from PATH
 - Automatic hot reloads on save
+- Automatically run `flutter pub get` when `pubspec.yaml` change
 - Support flutter dev server
 - Snippet enhance `flutter.provider.enableSnippet`
 
@@ -63,9 +64,5 @@ Open flutter only commands list: `CocList --input=flutter commands`
 
 ## TODO
 
-- [x] analysis server
 - [ ] coc-list
   - [ ] devices list by `flutter devices`
-- [ ] watch pubspec.yaml and update package
-  - flutter pub get
-- [ ] dev server output notification optimize

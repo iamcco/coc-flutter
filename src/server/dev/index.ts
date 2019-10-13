@@ -12,6 +12,8 @@ const log = logger.getlog('server')
 type callback = (...params: any[]) => void
 
 class DevServer extends Dispose {
+  private stdoutOutput: string = ''
+  private stderrOutput: string = ''
   private outputChannel: OutputChannel | undefined
   private task: ChildProcessWithoutNullStreams | undefined
   private onHandler: callback[] = []
@@ -62,9 +64,12 @@ class DevServer extends Dispose {
       notification.show('Flutter project workspaceFolder not found!')
       return false
     }
-    log(`server start at: ${workspaceFolder}`)
 
+    log(`server start at: ${workspaceFolder}`)
     notification.show('Start flutter dev server...')
+
+    this.stdoutOutput = ''
+    this.stderrOutput = ''
 
     if (this.outputChannel) {
       this.outputChannel.clear()
@@ -110,13 +115,19 @@ class DevServer extends Dispose {
   onStdout(handler: (lines: string[]) => void) {
     const callback = () => {
       this.task!.stdout.on('data', (chunk: Buffer) => {
-        let lines = chunk.toString()
-        this.devLog(lines)
-        lines = lines.trim()
-        if (lines == '') {
-          return
+        let text = chunk.toString()
+        this.devLog(text)
+        this.stdoutOutput += text
+        const lines = this.stdoutOutput.split(lineBreak)
+        if (lines.length > 1) {
+          if (lines[lines.length - 1] === '') {
+            lines.pop()
+            this.stdoutOutput = ''
+          } else {
+            this.stdoutOutput = lines.pop()!
+          }
+          handler(lines)
         }
-        handler(lines.split(lineBreak))
       })
     }
     if (this.task && this.task.stdout) {
@@ -129,13 +140,19 @@ class DevServer extends Dispose {
   onStderr(handler: (lines: string[]) => void) {
     const callback = () => {
       this.task!.stderr.on('data', (chunk: Buffer) => {
-        let lines = chunk.toString()
-        this.devLog(lines)
-        lines = lines.trim()
-        if (lines == '') {
-          return
+        let text = chunk.toString()
+        this.devLog(text)
+        this.stderrOutput += text
+        const lines = this.stderrOutput.split(lineBreak)
+        if (lines.length > 1) {
+          if (lines[lines.length - 1] === '') {
+            lines.pop()
+            this.stderrOutput = ''
+          } else {
+            this.stderrOutput = lines.pop()!
+          }
+          handler(lines)
         }
-        handler(lines.split(lineBreak))
       })
     }
     if (this.task && this.task.stderr) {
