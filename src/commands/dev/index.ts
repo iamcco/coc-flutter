@@ -183,6 +183,7 @@ export class Dev extends Dispose {
 
   /**
    * do not display lines:
+   * - `W/xxx`
    * - `I/xxx`
    * - `D/xxx`
    * - `🔥  To hot reload xxx`
@@ -194,8 +195,7 @@ export class Dev extends Dispose {
       .map(line => reduceSpace(line))
       .filter(line => {
         return line !== ''
-          && !/^I\//.test(line)
-          && !/^D\//.test(line)
+          && !/^[DIW]\//.test(line)
           && !line.startsWith('🔥 To hot reload')
           && !line.startsWith('An Observatory debugger and profiler')
           && !line.startsWith('For a more detailed help message, press "h"')

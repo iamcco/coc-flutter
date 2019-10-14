@@ -51,8 +51,6 @@ export class LspServer extends Dispose {
       debug: execOptions
     }
 
-    const traceServer = config.get<'off' | 'messages' | 'verbose'>('trace.server', 'off')
-
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
       // FIXME: https://github.com/dart-lang/sdk/issues/38490#issuecomment-537450963
@@ -64,8 +62,10 @@ export class LspServer extends Dispose {
         language: 'dart'
       }],
 
+      // lsp outchannel use same as logger
       outputChannel: logger.outchannel,
-      revealOutputChannelOn: traceServer === 'off' ? RevealOutputChannelOn.Never : RevealOutputChannelOn.Info,
+      // do not automatically open outchannel
+      revealOutputChannelOn: RevealOutputChannelOn.Never,
 
       middleware: {
         resolveCompletionItem: config.get<boolean>('provider.enableSnippet', true)
