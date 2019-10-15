@@ -2,8 +2,9 @@ import fs from 'fs';
 import {sep, dirname, join} from 'path';
 import { exec, ExecOptions } from 'child_process';
 import fastGlob from 'fast-glob';
-import {rejects} from 'assert';
 import {Uri, workspace} from 'coc.nvim';
+import {Stats} from '@nodelib/fs.scandir/out/types';
+import {ErrnoException} from '@nodelib/fs.stat/out/types';
 
 export const exists = async (path: string): Promise<boolean> =>  {
   return new Promise((resolve) => {
@@ -68,4 +69,32 @@ export const execCommand = (command: string, options: ExecOptions = {}): Promise
       }
     ).on('exit', (co: number) => co && (code = co))
   })
+}
+
+export const isSymbolLink = async (path: string): Promise<
+  { err: ErrnoException | null, stats: boolean}
+  > => {
+  return new Promise((resolve) => {
+    fs.lstat(path, (err: ErrnoException | null, stats: Stats) => {
+      resolve({
+        err,
+        stats: stats && stats.isSymbolicLink()
+      })
+    })
+  })
+}
+
+export const getRealPath = async (path: string): Promise<string> => {
+  const { err, stats } = await isSymbolLink(path)
+  if (!err && stats) {
+    return new Promise((resolve) => {
+      fs.realpath(path, (err: ErrnoException | null, realPath: string) => {
+        if (err) {
+          return resolve(path)
+        }
+        resolve(realPath)
+      })
+    })
+  }
+  return path
 }

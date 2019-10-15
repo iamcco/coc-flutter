@@ -2,7 +2,7 @@ import {join, dirname} from 'path';
 import {WorkspaceConfiguration} from 'coc.nvim';
 import which from 'which';
 import {logger} from '../util/logger';
-import {exists} from '../util/fs';
+import {exists, getRealPath} from '../util/fs';
 
 const log = logger.getlog('sdk')
 
@@ -33,16 +33,27 @@ class FlutterSDK {
   async init(config: WorkspaceConfiguration): Promise<void> {
     this._dartCommand = config.get<string>('sdk.dart-command', 'dart')
     try {
-      const dartPath = await which('dart')
-      if (dartPath) {
-        this._dartHome = dirname(
-          dirname(dartPath)
+      // cache/dart-sdk/bin/dart
+      let flutterPath = await which('flutter')
+      if (flutterPath) {
+        flutterPath = await getRealPath(flutterPath)
+        this._dartHome = join(
+          dirname(dirname(flutterPath)),
+          'bin',
+          'cache',
+          'dart-sdk',
         )
         this._analyzerSnapshotPath = join(this._dartHome, ANALYZER_SNAPSHOT_NAME)
         this._state = await exists(this._analyzerSnapshotPath)
-        return
       }
-      throw new Error('Dart SDK not found!')
+      if (!this._state) {
+        log('Dart SDK not found!')
+        log(JSON.stringify({
+          flutterPath,
+          dartHome: this._dartHome,
+          analyzerSnapshotPath: this._analyzerSnapshotPath
+        }, null, 2))
+      }
     } catch (error) {
       log(error.message || 'find dart sdk error!')
       log(error.stack)
