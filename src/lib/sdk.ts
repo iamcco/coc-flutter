@@ -38,8 +38,7 @@ class FlutterSDK {
       if (flutterPath) {
         flutterPath = await getRealPath(flutterPath)
         this._dartHome = join(
-          dirname(dirname(flutterPath)),
-          'bin',
+          dirname(flutterPath),
           'cache',
           'dart-sdk',
         )
