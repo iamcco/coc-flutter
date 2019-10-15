@@ -189,6 +189,9 @@ export class Dev extends Dispose {
    * - `🔥  To hot reload xxx`
    * - `An Observatory debugger and profiler xxx`
    * - `For a more detailed help message, press "h" xxx`
+   * - `Initializing hot reload...`
+   * - `Performing hot reload...`
+   * - `Reloaded 1 of 469 libraries in 261ms.`
    */
   private filterInvalidLines(lines: string[]): string[] {
     return lines
@@ -199,6 +202,9 @@ export class Dev extends Dispose {
           && !line.startsWith('🔥 To hot reload')
           && !line.startsWith('An Observatory debugger and profiler')
           && !line.startsWith('For a more detailed help message, press "h"')
+          && !line.startsWith('Initializing hot reload')
+          && !line.startsWith('Performing hot reload')
+          && !line.startsWith('Reloaded ')
       })
   }
 
@@ -213,7 +219,7 @@ export class Dev extends Dispose {
   }
 
   private onStderr = (lines: string[]) => {
-    notification.show(this.filterInvalidLines(lines))
+    // TODO: stderr output
   }
 
   execCmd(cmd: ICmd) {
