@@ -7,6 +7,19 @@ Flutter support for (Neo)vim
 ## Features
 
 - LSP features is power by [analysis_server](https://github.com/dart-lang/sdk/blob/master/pkg/analysis_server/tool/lsp_spec/README.md)
+  - autocomplete
+  - diagnostics
+  - format
+  - rename
+  - hover document
+  - signature help
+  - go to definition
+  - go to implementation
+  - go to references
+  - document highlight
+  - document symbol
+  - code actions
+  - [more detail](https://github.com/dart-lang/sdk/blob/master/pkg/analysis_server/tool/lsp_spec/README.md)
   > need flutter sdk and add to `PATH` environment
 - Automatically finds SDKs from PATH
 - Automatic hot reloads on save
@@ -40,6 +53,14 @@ Flutter support for (Neo)vim
   - `import '';` => `import '${1}';${0}`
   - `someName(…)` => `someName(${1})${0}`
   - `setState(() {});` => `setState(() {\n\t${1}\n});${0}`
+
+**Enable format on save**:
+
+``` jsonc
+"coc.preferences.formatOnSaveFiletypes": [
+  "dart"
+],
+```
 
 ## Commands
 
