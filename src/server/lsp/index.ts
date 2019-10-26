@@ -18,10 +18,15 @@ import {ClosingLabels} from './closingLabels';
 const log = logger.getlog('lsp-server')
 
 export class LspServer extends Dispose {
+  private _client: LanguageClient | undefined
 
   constructor() {
     super()
     this.init()
+  }
+
+  public get client() : LanguageClient | undefined {
+    return this._client
   }
 
   async init() {
@@ -92,6 +97,7 @@ export class LspServer extends Dispose {
       clientOptions,
       isLspDebug,
     );
+    this._client = client
 
     statusBar.init()
     this.push(statusBar)

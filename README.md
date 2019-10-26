@@ -82,6 +82,10 @@ Open flutter only commands list: `CocList --input=flutter commands`
 - `flutter.devices` open devices list
 - `flutter.emulators` open emulators list
 
+**LSP Commands**
+
+- `flutter.gotoSuper` jump to the location of the super definition of the class or method
+
 **Dev Server Commands**:
 
 > available when dev server running

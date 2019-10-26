@@ -22,9 +22,13 @@ export async function activate(context: ExtensionContext): Promise<void> {
   // logger init
   logger.init(config.get<logLevel>('trace.server', 'off'))
 
+  // register lsp server
+  const lsp = new LspServer()
+  context.subscriptions.push(lsp)
+
   // register commands
   context.subscriptions.push(
-    new Commands()
+    new Commands(lsp)
   )
 
   // register providers
@@ -35,10 +39,5 @@ export async function activate(context: ExtensionContext): Promise<void> {
   // register sources
   context.subscriptions.push(
     new SourceList()
-  )
-
-  // register lsp server
-  context.subscriptions.push(
-    new LspServer()
   )
 }
