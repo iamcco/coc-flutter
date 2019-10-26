@@ -1,13 +1,16 @@
-import {StatusBarItem, workspace} from 'coc.nvim';
+import {StatusBarItem, workspace, LanguageClient} from 'coc.nvim';
 import {Dispose} from '../util/dispose';
 
 class StatusBar extends Dispose {
   private isLSPReady: boolean = false
   private statusBar: StatusBarItem | undefined
 
-  ready() {
+  ready(client: LanguageClient) {
     this.isLSPReady = true
-    this.progress(false)
+    // register analyzer status
+    client.onNotification('$/analyzerStatus', (params: { isAnalyzing: boolean }) => {
+      statusBar.progress(params.isAnalyzing)
+    })
   }
 
   init() {
@@ -32,10 +35,12 @@ class StatusBar extends Dispose {
     )
   }
 
-  show(message: string, isProgress: boolean = false) {
+  show(message: string, isProgress?: boolean) {
     if (this.statusBar) {
       this.statusBar.text = message
-      this.statusBar.isProgress = isProgress
+      if (isProgress !== undefined) {
+        this.statusBar.isProgress = isProgress
+      }
       this.statusBar.show()
     }
   }

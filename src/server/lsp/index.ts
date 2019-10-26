@@ -98,14 +98,14 @@ export class LspServer extends Dispose {
 
     client.onReady()
       .then(() => {
+        log('analysis server ready!')
         if (initialization.closingLabels) {
           // register closing label
           this.push(new ClosingLabels(client))
         }
         // update flsp status
-        statusBar.show('Flutter')
-        statusBar.ready()
-        log('analysis server ready!')
+        statusBar.show('Flutter', true)
+        statusBar.ready(client)
       })
       .catch((error: Error) => {
         statusBar.hide()
