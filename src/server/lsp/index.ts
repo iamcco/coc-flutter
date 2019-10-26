@@ -13,6 +13,7 @@ import {logger} from '../../util/logger';
 import {statusBar} from '../../lib/status';
 import {Dispose} from '../../util/dispose';
 import {resolveProvider} from './resolveProvider';
+import {ClosingLabels} from './closingLabels';
 
 const log = logger.getlog('lsp-server')
 
@@ -97,6 +98,11 @@ export class LspServer extends Dispose {
 
     client.onReady()
       .then(() => {
+        if (initialization.closingLabels) {
+          // register closing label
+          this.push(new ClosingLabels(client))
+        }
+        // update flsp status
         statusBar.show('Flutter')
         statusBar.ready()
         log('analysis server ready!')

@@ -50,8 +50,8 @@ Flutter support for (Neo)vim
   > When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder.
 - `flutter.lsp.initialization.suggestFromUnimportedLibraries`: defalut: `true`
   > When set to false, completion will not include synbols that are not already imported into the current file
-- `flutter.lsp.initialization.closingLabels`: defalut: `true`
-  > When set to true, dart/textDocument/publishClosingLabels notifications will be sent with information to render editor closing labels.
+- [`flutter.lsp.initialization.closingLabels`](#closing-labels): defalut: `true`
+  > When set to true, will display closing labels at end of closing, only neovim support.
 - `flutter.sdk.dart-command` dart command, default: `dart`
 - `flutter.provider.hot-reload` Enable hot reload after save, default: `true`
   > only when there are no errors for the save file
@@ -104,6 +104,17 @@ Open flutter only commands list: `CocList --input=flutter commands`
 - `flutter.dev.showWidgetInspectorOverride` To toggle the widget inspector (WidgetsApp.showWidgetInspectorOverride)
 - `flutter.dev.debugDumpSemanticsHitTestOrder` Accessibility (debugDumpSemantics) for inverse hit test order
 - `flutter.dev.debugDumpSemanticsTraversalOrder` Accessibility (debugDumpSemantics) for traversal order
+
+### Closing Labels
+
+when `flutter.lsp.initialization.closingLabels` is true,
+the closing labels will be display at end of closing.
+
+> this feature only support neovim since vim do not support virtual text
+
+| disabled | enabled |
+| -------- | ------- |
+| <img height="300px" src="https://user-images.githubusercontent.com/5492542/67616073-f0812b00-f806-11e9-8e5c-ac42ab3a293c.png" /> | <img height="300px" src="https://user-images.githubusercontent.com/5492542/67616063-c16ab980-f806-11e9-8522-1c89217096e0.png" />
 
 ### Buy Me A Coffee ☕️
 

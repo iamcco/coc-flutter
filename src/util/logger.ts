@@ -4,7 +4,6 @@ import {Dispose} from './dispose';
 
 export type logLevel = 'off' | 'messages' | 'verbose'
 
-
 class Logger extends Dispose {
   private _outchannel: OutputChannel | undefined
   private _devOutchannel: OutputChannel | undefined
