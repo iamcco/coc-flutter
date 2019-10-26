@@ -55,6 +55,21 @@
           "default": false,
           "description": "Enable debug for language server"
         },
+        "flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles": {
+          "type": "boolean",
+          "default": false,
+          "description": "When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder."
+        },
+        "flutter.lsp.initialization.suggestFromUnimportedLibraries": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to false, completion will not include synbols that are not already imported into the current file"
+        },
+        "flutter.lsp.initialization.closingLabels": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to true, dart/textDocument/publishClosingLabels notifications will be sent with information to render editor closing labels."
+        },
         "flutter.sdk.dart-command": {
           "type": "string",
           "default": "dart",

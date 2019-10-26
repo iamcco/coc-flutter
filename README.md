@@ -46,6 +46,12 @@ Flutter support for (Neo)vim
 - `flutter.trace.server` Trace level of log, default: `off`
 - `flutter.enabled` Enable coc-flutter extension, default: `true`
 - `flutter.lsp.debug` Enable debug for language server, default: `false`
+- `flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles`: defalut: `false`
+  > When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder.
+- `flutter.lsp.initialization.suggestFromUnimportedLibraries`: defalut: `true`
+  > When set to false, completion will not include synbols that are not already imported into the current file
+- `flutter.lsp.initialization.closingLabels`: defalut: `true`
+  > When set to true, dart/textDocument/publishClosingLabels notifications will be sent with information to render editor closing labels.
 - `flutter.sdk.dart-command` dart command, default: `dart`
 - `flutter.provider.hot-reload` Enable hot reload after save, default: `true`
   > only when there are no errors for the save file

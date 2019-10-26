@@ -51,6 +51,13 @@ export class LspServer extends Dispose {
       debug: execOptions
     }
 
+    // lsp initialization
+    const initialization = config.get('lsp.initialization', {
+      onlyAnalyzeProjectsWithOpenFiles: false,
+      suggestFromUnimportedLibraries: true,
+      closingLabels: true
+    })
+
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
       // FIXME: https://github.com/dart-lang/sdk/issues/38490#issuecomment-537450963
@@ -61,6 +68,8 @@ export class LspServer extends Dispose {
         scheme: 'file',
         language: 'dart'
       }],
+
+      initializationOptions: initialization,
 
       // lsp outchannel use same as logger
       outputChannel: logger.outchannel,
