@@ -1,5 +1,5 @@
-export const lineBreak = /\r?\n/
+export const lineBreak = /\r?\n/;
 
-export const cmdPrefix = 'flutter'
+export const cmdPrefix = 'flutter';
 
-export const devLogName = 'flutter-dev'
+export const devLogName = 'flutter-dev';

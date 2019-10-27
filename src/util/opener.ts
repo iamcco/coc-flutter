@@ -1,15 +1,12 @@
 /*
  * fork from https://github.com/domenic/opener
  */
-import childProcess from 'child_process'
-import os from 'os'
+import childProcess from 'child_process';
+import os from 'os';
 
-export function opener(
-  args: string | string[],
-  tool?: string,
-) {
-  args = ([] as string[]).concat(args)
-  let platform = process.platform
+export function opener(args: string | string[], tool?: string) {
+  args = ([] as string[]).concat(args);
+  let platform = process.platform;
 
   // Attempt to detect Windows Subystem for Linux (WSL).
   // WSL  itself as Linux (which works in most cases), but in
@@ -17,30 +14,30 @@ export function opener(
   // The "Windows-way" of opening things through cmd.exe works just fine here,
   // whereas using xdg-open does not, since there is no X Windows in WSL.
   if (platform === 'linux' && os.release().indexOf('Microsoft') !== -1) {
-    platform = 'win32'
+    platform = 'win32';
   }
 
   // http://stackoverflow.com/q/1480971/3191, but see below for Windows.
-  let command: string
+  let command: string;
   switch (platform) {
     case 'win32': {
-      command = 'cmd.exe'
+      command = 'cmd.exe';
       if (tool) {
-        args.unshift(tool)
+        args.unshift(tool);
       }
-      break
+      break;
     }
     case 'darwin': {
-      command = 'open'
+      command = 'open';
       if (tool) {
-        args.unshift(tool)
-        args.unshift('-a')
+        args.unshift(tool);
+        args.unshift('-a');
       }
-      break
+      break;
     }
     default: {
-      command = tool || 'xdg-open'
-      break
+      command = tool || 'xdg-open';
+      break;
     }
   }
 
@@ -56,16 +53,12 @@ export function opener(
     //
     // Additionally, on Windows ampersand needs to be escaped when passed to "start"
     args = args.map(value => {
-      return value.replace(/&/g, '^&')
-    })
-    args = ['/c', 'start', '""'].concat(args)
+      return value.replace(/&/g, '^&');
+    });
+    args = ['/c', 'start', '""'].concat(args);
   }
 
-  return childProcess.spawn(
-    command,
-    args,
-    {
-      detached: true
-    }
-  )
+  return childProcess.spawn(command, args, {
+    detached: true,
+  });
 }
