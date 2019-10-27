@@ -22,4 +22,4 @@ jobs:
     - name: Lint codes
       run: |
         npm install
-        npm lint
+        npm run lint
