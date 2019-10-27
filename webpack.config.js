@@ -1,16 +1,16 @@
-const path = require('path')
+const path = require('path');
 
 /** @type {import('webpack').Configuration} */
 module.exports = {
   entry: './src/index.ts',
   target: 'node',
-  mode: 'none',
+  mode: 'production',
   resolve: {
     mainFields: ['module', 'main'],
-    extensions: ['.js', '.ts']
+    extensions: ['.js', '.ts'],
   },
   externals: {
-    'coc.nvim': 'commonjs coc.nvim'
+    'coc.nvim': 'commonjs coc.nvim',
   },
   module: {
     rules: [
@@ -19,20 +19,20 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'ts-loader'
-          }
-        ]
-      }
-    ]
+            loader: 'ts-loader',
+          },
+        ],
+      },
+    ],
   },
   output: {
     path: path.join(__dirname, 'out'),
     filename: 'index.js',
-    libraryTarget: 'commonjs'
+    libraryTarget: 'commonjs',
   },
   plugins: [],
   node: {
     __dirname: false,
-    __filename: false
-  }
-}
+    __filename: false,
+  },
+};
