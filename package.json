@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -79,8 +79,8 @@
         },
         "flutter.sdk.dart-command": {
           "type": "string",
-          "default": "dart",
-          "description": "dart command"
+          "default": "",
+          "description": "dart command, leave empty should just work"
         },
         "flutter.provider.hot-reload": {
           "type": "boolean",

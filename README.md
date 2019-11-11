@@ -52,7 +52,7 @@ Flutter support for (Neo)vim
   > When set to false, completion will not include synbols that are not already imported into the current file
 - [`flutter.lsp.initialization.closingLabels`](#closing-labels): defalut: `true`
   > When set to true, will display closing labels at end of closing, only neovim support.
-- `flutter.sdk.dart-command` dart command, default: `dart`
+- `flutter.sdk.dart-command` dart command, leave empty should just work, default: ` `
 - `flutter.provider.hot-reload` Enable hot reload after save, default: `true`
   > only when there are no errors for the save file
 - `flutter.provider.enableSnippet` Enable completion item snippet, default: true
