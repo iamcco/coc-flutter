@@ -24,7 +24,7 @@ class Notification extends Dispose {
 
   private async init() {
     const { nvim } = workspace;
-    this.isSupportFloat = !!(await nvim.call('has', 'float'));
+    this.isSupportFloat = !!(await nvim.call('exists', '*nvim_open_win'));
     const screenWidth = (await nvim.getOption('columns')) as number;
     this.maxWidth = Math.min(this.maxWidth, screenWidth);
   }
