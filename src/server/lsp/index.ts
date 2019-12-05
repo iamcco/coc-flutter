@@ -61,11 +61,16 @@ export class LspServer extends Dispose {
       closingLabels: true,
     });
 
+    /**
+     * disable disableDynamicRegister for version less then 2.6.0
+     * issue: https://github.com/dart-lang/sdk/issues/38490
+     */
+    const rightVersion = await flutterSDK.isVersionGreatOrEqualTo([2, 6, 0]);
+    log(`rightVersion ${rightVersion}`);
+
     // Options to control the language client
     const clientOptions: LanguageClientOptions = {
-      // FIXME: https://github.com/dart-lang/sdk/issues/38490#issuecomment-537450963
-      // only nightly build had fix the issue
-      disableDynamicRegister: true,
+      disableDynamicRegister: !rightVersion,
       // Register the server for dart document
       documentSelector: [
         {
