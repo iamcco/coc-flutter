@@ -14,6 +14,8 @@ import { statusBar } from '../../lib/status';
 import { Dispose } from '../../util/dispose';
 import { resolveProvider } from './resolveProvider';
 import { ClosingLabels } from './closingLabels';
+import { SignatureHelpProvider } from './signatureHelp';
+import { completionProvider } from './completionProvider';
 
 const log = logger.getlog('lsp-server');
 
@@ -87,6 +89,7 @@ export class LspServer extends Dispose {
       revealOutputChannelOn: RevealOutputChannelOn.Never,
 
       middleware: {
+        provideCompletionItem: completionProvider,
         resolveCompletionItem: config.get<boolean>('provider.enableSnippet', true) ? resolveProvider : undefined,
       },
     };
@@ -106,6 +109,8 @@ export class LspServer extends Dispose {
           // register closing label
           this.push(new ClosingLabels(client));
         }
+        // https://github.com/iamcco/coc-flutter/issues/8
+        this.push(new SignatureHelpProvider(client));
         // update flsp status
         statusBar.show('Flutter', true);
         statusBar.ready(client);
