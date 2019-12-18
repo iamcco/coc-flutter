@@ -1,4 +1,5 @@
 import { OutputChannel } from 'coc.nvim';
+import os from 'os';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
 import { getFlutterWorkspaceFolder } from '../../util/fs';
@@ -80,6 +81,7 @@ class DevServer extends Dispose {
     this.task = spawn('flutter', ['run'].concat(args), {
       cwd: workspaceFolder,
       detached: false,
+      shell: os.platform() === 'win32' ? true : undefined
     });
     this.task.on('exit', this._onExit);
     this.task.on('error', this._onError);
