@@ -109,8 +109,11 @@ export class LspServer extends Dispose {
           // register closing label
           this.push(new ClosingLabels(client));
         }
-        // https://github.com/iamcco/coc-flutter/issues/8
-        this.push(new SignatureHelpProvider(client));
+        // FIXME
+        setTimeout(() => {
+          // https://github.com/iamcco/coc-flutter/issues/8
+          this.push(new SignatureHelpProvider(client));
+        }, 2000);
         // update flsp status
         statusBar.show('Flutter', true);
         statusBar.ready(client);

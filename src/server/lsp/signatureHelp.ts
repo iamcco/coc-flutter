@@ -8,7 +8,12 @@ export class SignatureHelpProvider extends Dispose {
     super();
     this.push(
       languages.registerSignatureHelpProvider(
-        ['dart'],
+        [
+          {
+            language: 'dart',
+            scheme: 'file',
+          },
+        ],
         {
           async provideSignatureHelp(
             document: TextDocument,
