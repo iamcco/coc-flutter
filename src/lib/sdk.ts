@@ -38,6 +38,7 @@ class FlutterSDK {
       if (stderr) {
         const m = stderr.match(/version:\s+(\d+)\.(\d+)\.(\d+)/);
         if (m) {
+          log(`dart version: v${m[1]}.${m[2]}.${m[3]}`);
           return [parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])];
         }
       }
@@ -119,6 +120,12 @@ class FlutterSDK {
     this._state = await exists(this._analyzerSnapshotPath);
     if (!this._dartCommand) {
       this._dartCommand = join(this.dartHome, DART_COMMAND);
+      if (os.platform() === 'win32') {
+        const isCommandExists = await exists(this._dartCommand);
+        if (!isCommandExists) {
+          this._dartCommand = this._dartCommand.replace(/bat$/, 'exe');
+        }
+      }
     }
     log(`dart command path => ${this._dartCommand}`);
   }
