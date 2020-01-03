@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -38,6 +38,14 @@
     "onCommand:flutter.emulators"
   ],
   "contributes": {
+    "rootPatterns": [
+      {
+        "filetype": "dart",
+        "patterns": [
+          "pubspec.yaml"
+        ]
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "flutter configuration",
@@ -64,7 +72,7 @@
         },
         "flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder."
         },
         "flutter.lsp.initialization.suggestFromUnimportedLibraries": {

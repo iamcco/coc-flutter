@@ -58,7 +58,7 @@ export class LspServer extends Dispose {
 
     // lsp initialization
     const initialization = config.get('lsp.initialization', {
-      onlyAnalyzeProjectsWithOpenFiles: false,
+      onlyAnalyzeProjectsWithOpenFiles: true,
       suggestFromUnimportedLibraries: true,
       closingLabels: true,
     });
@@ -114,7 +114,7 @@ export class LspServer extends Dispose {
           // https://github.com/iamcco/coc-flutter/issues/8
           this.push(new SignatureHelpProvider(client));
         }, 2000);
-        // update flsp status
+        // update lsp status
         statusBar.show('Flutter', true);
         statusBar.ready(client);
       })
