@@ -20,7 +20,7 @@ Flutter support for (Neo)vim
   - document symbol
   - code actions
   - [more detail](https://github.com/dart-lang/sdk/blob/master/pkg/analysis_server/tool/lsp_spec/README.md)
-  > need flutter sdk and add to `PATH` environment
+    > need flutter sdk and add to `PATH` environment
 - Automatically finds SDKs from PATH
 - Automatic hot reloads on save
 - Automatically run `flutter pub get` when `pubspec.yaml` change
@@ -40,7 +40,6 @@ Flutter support for (Neo)vim
 - FlutterEmulators
   > `:CocList FlutterEmulators`
 
-
 ## Settings
 
 - `flutter.trace.server` Trace level of log, default: `off`
@@ -52,7 +51,9 @@ Flutter support for (Neo)vim
   > When set to false, completion will not include synbols that are not already imported into the current file
 - [`flutter.lsp.initialization.closingLabels`](#closing-labels): defalut: `true`
   > When set to true, will display closing labels at end of closing, only neovim support.
-- `flutter.sdk.dart-command` dart command, leave empty should just work, default: ` `
+- `flutter.sdk.dart-command` dart command, leave empty should just work, default: `''`
+- `flutter.sdk.dart-lookup` command to find dart executable location, used to infer dart-sdk location, default: `''`
+- `flutter.sdk.flutter-lookup` command to find flutter executable location, used to infer location of dart-sdk in flutter cache: `''`
 - `flutter.provider.hot-reload` Enable hot reload after save, default: `true`
   > only when there are no errors for the save file
 - `flutter.provider.enableSnippet` Enable completion item snippet, default: true
@@ -62,7 +63,7 @@ Flutter support for (Neo)vim
 
 **Enable format on save**:
 
-``` jsonc
+```jsonc
 "coc.preferences.formatOnSaveFiletypes": [
   "dart"
 ],
@@ -116,9 +117,9 @@ the closing labels will be display at end of closing.
 
 > this feature only support neovim since vim do not support virtual text
 
-| disabled | enabled |
-| -------- | ------- |
-| <img height="300px" src="https://user-images.githubusercontent.com/5492542/67616073-f0812b00-f806-11e9-8e5c-ac42ab3a293c.png" /> | <img height="300px" src="https://user-images.githubusercontent.com/5492542/67616063-c16ab980-f806-11e9-8522-1c89217096e0.png" />
+| disabled                                                                                                                         | enabled                                                                                                                          |
+| -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| <img height="300px" src="https://user-images.githubusercontent.com/5492542/67616073-f0812b00-f806-11e9-8e5c-ac42ab3a293c.png" /> | <img height="300px" src="https://user-images.githubusercontent.com/5492542/67616063-c16ab980-f806-11e9-8522-1c89217096e0.png" /> |
 
 ### Buy Me A Coffee ☕️
 
