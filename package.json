@@ -90,6 +90,16 @@
           "default": "",
           "description": "dart command, leave empty should just work"
         },
+        "flutter.sdk.dart-lookup": {
+          "type": "string",
+          "default": "",
+          "description": "command to find dart executable location, used to infer dart-sdk location"
+        },
+        "flutter.sdk.flutter-lookup": {
+          "type": "string",
+          "default": "",
+          "description": "command to find flutter executable location, used to infer location of dart-sdk in flutter cache"
+        },
         "flutter.provider.hot-reload": {
           "type": "boolean",
           "default": true,

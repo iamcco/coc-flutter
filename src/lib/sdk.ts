@@ -56,13 +56,16 @@ class FlutterSDK {
 
   async init(config: WorkspaceConfiguration): Promise<void> {
     this._dartCommand = config.get<string>('sdk.dart-command', '');
+    const flutterLookup = config.get<string>('sdk.flutter-lookup', '');
+    const dartLookup = config.get<string>('sdk.dart-lookup', '');
+
     try {
       // dart sdk from flutter sdk
-      // => cache/dart-sdk/bin/dart
-      await this.initDarkSdkHomeFromFlutter();
+      // => cache/dart-sdk
+      await this.initDarkSdkHomeFromFlutter(flutterLookup);
       // if do not have flutter sdk, detect dart sdk
       if (!this._dartHome) {
-        await this.initDarkSdkHome();
+        await this.initDarkSdkHome(dartLookup);
       }
       await this.initDartSdk();
       if (!this._state) {
@@ -84,10 +87,21 @@ class FlutterSDK {
     }
   }
 
-  private async initDarkSdkHomeFromFlutter() {
+  private async initDarkSdkHomeFromFlutter(flutterLookup: string) {
     try {
-      let flutterPath = await which('flutter');
+      let flutterPath: string;
+
+      if (flutterLookup.length == 0) {
+        flutterPath = await which('flutter');
+      } else {
+        const { stdout } = await execCommand(flutterLookup);
+        flutterPath = stdout;
+        if (stdout.length == 0) {
+          throw new Error('flutter lookup returned empty string');
+        }
+      }
       log(`which flutter command => ${flutterPath}`);
+
       if (flutterPath) {
         flutterPath = await getRealPath(flutterPath);
         log(`flutter command path => ${flutterPath}`);
@@ -95,14 +109,25 @@ class FlutterSDK {
         log(`dart sdk home => ${this._dartHome}`);
       }
     } catch (error) {
-      log('flutter command not found!');
+      log(`flutter command not found: ${error.message}`);
     }
   }
 
-  private async initDarkSdkHome() {
+  private async initDarkSdkHome(dartLookup: string) {
     try {
-      let dartPath = await which('dart');
+      let dartPath: string;
+
+      if (dartLookup.length == 0) {
+        dartPath = await which('dart');
+      } else {
+        const { stdout } = await execCommand(dartLookup);
+        dartPath = stdout;
+        if (stdout.length == 0) {
+          throw new Error('dart lookup returned empty string');
+        }
+      }
       log(`which dart command => ${dartPath}`);
+
       if (dartPath) {
         dartPath = await getRealPath(dartPath);
         log(`dart command path => ${dartPath}`);
@@ -110,7 +135,7 @@ class FlutterSDK {
         log(`dart sdk home => ${this._dartHome}`);
       }
     } catch (error) {
-      log('dart command not found');
+      log(`dart command not found: ${error.message}`);
     }
   }
 
