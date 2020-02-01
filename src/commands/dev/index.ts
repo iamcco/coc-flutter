@@ -246,7 +246,12 @@ export class Dev extends Dispose {
       return;
     }
     if (devServer.state) {
-      return opener(this.profilerUrl);
+      try {
+        return opener(this.profilerUrl);
+      } catch (error) {
+        log(`Open browser fail: ${error.message}\n${error.stack}`);
+        notification.show(`Open browser fail: ${error.message || error}`);
+      }
     }
     notification.show('Flutter server is not running!');
   }

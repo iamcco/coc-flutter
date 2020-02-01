@@ -60,5 +60,6 @@ export function opener(args: string | string[], tool?: string) {
 
   return childProcess.spawn(command, args, {
     detached: true,
+    shell: os.platform() === 'win32' ? true : undefined,
   });
 }
