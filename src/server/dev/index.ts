@@ -81,7 +81,7 @@ class DevServer extends Dispose {
     this.task = spawn('flutter', ['run'].concat(args), {
       cwd: workspaceFolder,
       detached: false,
-      shell: os.platform() === 'win32' ? true : undefined
+      shell: os.platform() === 'win32' ? true : undefined,
     });
     this.task.on('exit', this._onExit);
     this.task.on('error', this._onError);
