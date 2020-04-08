@@ -42,7 +42,7 @@ export class FloatWindow extends Dispose {
     await win.setOption('cursorcolumn', false);
     await win.setOption('conceallevel', 2);
     await win.setOption('signcolumn', 'no');
-    await win.setOption('foldcolumn', 1);
+    await win.setOption('foldcolumn', '1');
     await win.setOption('winhighlight', 'FoldColumn:NormalFloat');
     await nvim.resumeNotification();
   }
