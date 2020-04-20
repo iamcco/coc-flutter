@@ -33,6 +33,8 @@ Flutter support for (Neo)vim
 
 `:CocInstall coc-flutter`
 
+> **NOTE**: install `dart-vim-plugin` plugin if your (neo)vim detect filetype incorrect
+
 ## coc-list sources
 
 - FlutterDevices
