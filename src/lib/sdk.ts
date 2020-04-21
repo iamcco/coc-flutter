@@ -64,7 +64,8 @@ class FlutterSDK {
       // => cache/dart-sdk
       await this.initDarkSdkHomeFromFlutter(flutterLookup);
       // if do not have flutter sdk, detect dart sdk
-      if (!this._dartHome) {
+      const isPathExists = await exists(this._dartHome);
+      if (!isPathExists) {
         await this.initDarkSdkHome(dartLookup);
       }
       await this.initDartSdk();
