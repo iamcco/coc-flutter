@@ -205,7 +205,17 @@ export class Dev extends Dispose {
           !line.startsWith('For a more detailed help message, press "h"') &&
           !line.startsWith('Initializing hot reload') &&
           !line.startsWith('Performing hot reload') &&
-          !line.startsWith('Reloaded ')
+          !line.startsWith('Reloaded ') &&
+          !line.startsWith("Flutter run key commands.") &&
+          !line.startsWith("r Hot reload. 🔥🔥🔥") &&
+          !line.startsWith("R Hot restart.") &&
+          !line.startsWith("h Repeat this help message.") &&
+          !line.startsWith("d Detach (terminate \"flutter run\" but leave application running).") &&
+          !line.startsWith("c Clear the screen") &&
+          !line.startsWith("q Quit (terminate the application on the device).") &&
+          !line.startsWith("flutter: Another exception was thrown:") &&
+          !line.startsWith("An Observatory debugger and profiler on") &&
+          !/^flutter: #\d+ +.+$/.test(line)
         );
       });
   }
