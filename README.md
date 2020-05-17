@@ -49,7 +49,7 @@ Flutter support for (Neo)vim
 - `flutter.lsp.debug` Enable debug for language server, default: `false`
 - `flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles`: defalut: `false`
   > When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder.
-- `flutter.lsp.initialization.suggestFromUnimportedLibraries`: defalut: `true`
+- `flutter.lsp.initialization.suggestFromUnimportedLibraries`: default: `true`
   > When set to false, completion will not include synbols that are not already imported into the current file
 - [`flutter.lsp.initialization.closingLabels`](#closing-labels): defalut: `true`
   > When set to true, will display closing labels at end of closing, only neovim support.
