@@ -47,11 +47,11 @@ Flutter support for (Neo)vim
 - `flutter.trace.server` Trace level of log, default: `off`
 - `flutter.enabled` Enable coc-flutter extension, default: `true`
 - `flutter.lsp.debug` Enable debug for language server, default: `false`
-- `flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles`: defalut: `false`
+- `flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles`: default: `false`
   > When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder.
-- `flutter.lsp.initialization.suggestFromUnimportedLibraries`: defalut: `true`
+- `flutter.lsp.initialization.suggestFromUnimportedLibraries`: default: `true`
   > When set to false, completion will not include synbols that are not already imported into the current file
-- [`flutter.lsp.initialization.closingLabels`](#closing-labels): defalut: `true`
+- [`flutter.lsp.initialization.closingLabels`](#closing-labels): default: `true`
   > When set to true, will display closing labels at end of closing, only neovim support.
 - `flutter.sdk.dart-command` dart command, leave empty should just work, default: `''`
 - `flutter.sdk.dart-lookup` command to find dart executable location, used to infer dart-sdk location, default: `''`
