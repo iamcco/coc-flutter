@@ -1,66 +1,89 @@
 import { ResolveCompletionItemSignature } from 'coc.nvim';
-import {
-  InsertTextFormat,
-  CompletionItemKind,
-  CompletionItem,
-  CancellationToken,
-} from 'vscode-languageserver-protocol';
+import { InsertTextFormat, CompletionItem, CancellationToken } from 'vscode-languageserver-protocol';
 
 /**
  * extend CompletionItem's label functionName(…) to functionName(${1})${0}
  */
-const funcCallRegex = /\(…\)$/;
+const funcCallRegex = /\(…?\)$/;
 const propertyRegex = /^([^ ]+?:\s+),$/;
 
 export const resolveProvider = (
-  item: CompletionItem,
+  oldItem: CompletionItem,
   token: CancellationToken,
   next: ResolveCompletionItemSignature,
 ) => {
-  return Promise.resolve(next(item, token)).then((item: CompletionItem | null | undefined) => {
+  // user new Object
+  const nextItem = {
+    ...oldItem,
+  };
+  if (nextItem.data && nextItem.data.custom) {
+    const custom = nextItem.data.custom;
+    if (!nextItem.textEdit && custom.textEdit) {
+      nextItem.textEdit = custom.textEdit;
+    }
+    if (custom.insertText && custom.insertTextFormat) {
+      nextItem.insertText = custom.insertText;
+      nextItem.insertTextFormat = custom.insertTextFormat;
+    }
+    if (nextItem.data.isCustom) {
+      delete nextItem.data;
+    } else {
+      delete nextItem.data.custom;
+    }
+  }
+  return Promise.resolve(next(nextItem, token)).then((item: CompletionItem | null | undefined) => {
     if (!item) {
       return item;
     }
     const { label, insertText, insertTextFormat } = item;
+    // improve import
     if (label === "import '';" && insertTextFormat !== InsertTextFormat.Snippet) {
-      item.kind = CompletionItemKind.Snippet;
       if (item.textEdit) {
-        item.textEdit.newText = "import '${1}';${0}";
-      } else {
-        item.insertText = "import '${1}';${0}";
+        delete item.textEdit;
       }
+      item.insertText = "import '${1}';${0}";
       item.insertTextFormat = InsertTextFormat.Snippet;
       return item;
     }
+
+    // improve setState
     if (label === 'setState(() {});' && insertTextFormat !== InsertTextFormat.Snippet) {
-      item.kind = CompletionItemKind.Snippet;
       if (item.textEdit) {
-        item.textEdit.newText = ['setState(() {', '\t${1}', '});${0}'].join('\n');
-      } else {
-        item.insertText = ['setState(() {', '\t${1}', '});${0}'].join('\n');
+        delete item.textEdit;
       }
+      item.insertText = ['setState(() {', '\t${1}', '});${0}'].join('\n');
       item.insertTextFormat = InsertTextFormat.Snippet;
       return item;
     }
+
+    // improve property${1:}
+    // snippet is not necessary here
+    if (insertText && insertText.endsWith('${1:}')) {
+      if (item.textEdit) {
+        delete item.textEdit;
+      }
+      item.insertTextFormat = InsertTextFormat.PlainText;
+      item.insertText = insertText.slice(0, -5);
+    }
+
+    // improve `key: ,`
     let m = label.match(propertyRegex);
-    if (m && insertTextFormat !== InsertTextFormat.Snippet) {
-      item.kind = CompletionItemKind.Snippet;
+    if (m) {
       if (item.textEdit) {
-        item.textEdit.newText = `${m[1]}\${1},\${0}`;
-      } else {
-        item.insertText = `${m[1]}\${1},\${0}`;
+        delete item.textEdit;
       }
+      item.insertText = `${m[1]}\${1},\${0}`;
       item.insertTextFormat = InsertTextFormat.Snippet;
       return item;
     }
+
+    // improve function(…?)
     m = label.match(funcCallRegex);
-    if (m && insertTextFormat !== InsertTextFormat.Snippet) {
-      item.kind = CompletionItemKind.Snippet;
+    if (m) {
       if (item.textEdit) {
-        item.textEdit.newText = `${insertText}(\${1})\${0}`;
-      } else {
-        item.insertText = `${insertText}(\${1})\${0}`;
+        delete item.textEdit;
       }
+      item.insertText = `${item.insertText}(\${1})\${0}`;
       item.insertTextFormat = InsertTextFormat.Snippet;
       return item;
     }
