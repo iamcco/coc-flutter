@@ -62,6 +62,8 @@ Flutter support for (Neo)vim
   - `import '';` => `import '${1}';${0}`
   - `someName(…)` => `someName(${1})${0}`
   - `setState(() {});` => `setState(() {\n\t${1}\n});${0}`
+- `flutter.openDevLogSplitCommand` Vim command to open dev log window, like: `botright 10split`, default: ''
+
 
 **Enable format on save**:
 

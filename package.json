@@ -111,6 +111,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable completion item snippet"
+        },
+        "flutter.openDevLogSplitCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Vim command to open dev log window, like: `botright 10split`"
         }
       }
     },

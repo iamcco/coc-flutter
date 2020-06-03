@@ -1,9 +1,9 @@
-import { OutputChannel } from 'coc.nvim';
+import { OutputChannel, workspace, Disposable } from 'coc.nvim';
 import os from 'os';
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
 
 import { getFlutterWorkspaceFolder } from '../../util/fs';
-import { lineBreak } from '../../util/constant';
+import { lineBreak, devLogName } from '../../util/constant';
 import { logger } from '../../util/logger';
 import { notification } from '../../lib/notification';
 import { Dispose } from '../../util/dispose';
@@ -18,6 +18,7 @@ class DevServer extends Dispose {
   private outputChannel: OutputChannel | undefined;
   private task: ChildProcessWithoutNullStreams | undefined;
   private onHandler: callback[] = [];
+  private isAutoScroll = false;
 
   constructor() {
     super();
@@ -175,10 +176,83 @@ class DevServer extends Dispose {
     }
   }
 
-  openDevLog() {
+  async openDevLog() {
+    const config = workspace.getConfiguration('flutter');
+    const cmd = config.get<string>('openDevLogSplitCommand', '');
     if (this.outputChannel) {
-      this.outputChannel.show();
+      if (!cmd) {
+        this.outputChannel.show();
+      } else {
+        const win = await workspace.nvim.window;
+        await workspace.nvim.command(`${cmd} output:///${devLogName}`);
+        workspace.nvim.call('win_gotoid', [win.id]);
+      }
     }
+    setTimeout(() => {
+      this.autoScrollLogWin();
+    }, 1000);
+  }
+
+  async autoScrollLogWin() {
+    if (this.isAutoScroll) {
+      return;
+    }
+    this.isAutoScroll = true;
+    const buffers = await workspace.nvim.buffers;
+    for (const buf of buffers) {
+      const name = await buf.name;
+      log(`bufName ${name}`);
+      if (name === `output:///${devLogName}`) {
+        const isAttach = await buf.attach(false);
+        if (!isAttach) {
+          log(`Attach buf ${name} error`);
+          this.isAutoScroll = false;
+          return;
+        }
+        this.isAutoScroll = true;
+        buf.listen('lines', async () => {
+          const wins = await workspace.nvim.windows;
+          if (!wins || !wins.length) {
+            return;
+          }
+          for (const win of wins) {
+            const b = await win.buffer;
+            const name = await b.name;
+            if (name === `output:///${devLogName}`) {
+              const lines = await buf.length;
+              const curWin = await workspace.nvim.window;
+              // do not scroll when log win get focus
+              if (win.id === curWin.id) {
+                return;
+              }
+              win.setCursor([lines, 0]);
+              break;
+            }
+          }
+        });
+        buf.listen('detach', () => {
+          if (this.isAutoScroll) {
+            log(`Unexpected detach buf ${name}`);
+            this.isAutoScroll = false;
+          }
+        });
+        this.push(
+          Disposable.create(() => {
+            if (this.isAutoScroll) {
+              this.isAutoScroll = false;
+              try {
+                buf.removeAllListeners();
+                buf.detach();
+              } catch (error) {
+                log(`Detach error ${error.message || error}`);
+              }
+            }
+          }),
+        );
+        break;
+      }
+    }
+    this.isAutoScroll = false;
   }
 }
 
