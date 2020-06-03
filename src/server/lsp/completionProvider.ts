@@ -27,8 +27,9 @@ export const completionProvider = async (
   } else {
     list = res as CompletionItem[];
   }
+  // reduce items since https://github.com/dart-lang/sdk/issues/42152
   if (list.length > 1000 && /[a-zA-Z]/i.test(character)) {
-    list = list.filter(item => item.label.indexOf(character) !== -1);
+    list = list.filter(item => new RegExp(character, 'i').test(item.label));
   }
   list = list.map(item => {
     if (!item.data) {
