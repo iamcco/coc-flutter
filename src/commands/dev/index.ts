@@ -112,25 +112,35 @@ export class Dev extends Dispose {
 
   constructor() {
     super();
-    const cmdId = `${cmdPrefix}.run`;
-    this.push(commands.registerCommand(cmdId, this.execute, this));
-    this.push(
-      (function() {
-        commands.titles.set(cmdId, 'Run flutter server');
-        return {
-          dispose() {
-            commands.titles.delete(cmdId);
-          },
-        };
-      })(),
-    );
+    ['run', 'attach'].forEach(cmd => {
+      const cmdId = `${cmdPrefix}.${cmd}`;
+      this.push(commands.registerCommand(cmdId, this[`${cmd}Server`], this));
+      this.push(
+        (function() {
+          commands.titles.set(cmdId, `${cmd} flutter server`);
+          return {
+            dispose() {
+              commands.titles.delete(cmdId);
+            },
+          };
+        })(),
+      );
+    });
     this.push(devServer);
     log('register dev command');
   }
 
-  private async execute(...args: string[]) {
-    log(`run dev server, devServer state: ${devServer.state}`);
-    const state = await devServer.start(args);
+  runServer(...args: string[]) {
+    this.execute('run', args);
+  }
+
+  attachServer(...args: string[]) {
+    this.execute('attach', args);
+  }
+
+  private async execute(cmd: string, args: string[]) {
+    log(`${cmd} dev server, devServer state: ${devServer.state}`);
+    const state = await devServer.start([cmd].concat(args));
     if (state) {
       devServer.onError(this.onError);
       devServer.onExit(this.onExit);
@@ -206,15 +216,15 @@ export class Dev extends Dispose {
           !line.startsWith('Initializing hot reload') &&
           !line.startsWith('Performing hot reload') &&
           !line.startsWith('Reloaded ') &&
-          !line.startsWith("Flutter run key commands.") &&
-          !line.startsWith("r Hot reload. 🔥🔥🔥") &&
-          !line.startsWith("R Hot restart.") &&
-          !line.startsWith("h Repeat this help message.") &&
-          !line.startsWith("d Detach (terminate \"flutter run\" but leave application running).") &&
-          !line.startsWith("c Clear the screen") &&
-          !line.startsWith("q Quit (terminate the application on the device).") &&
-          !line.startsWith("flutter: Another exception was thrown:") &&
-          !line.startsWith("An Observatory debugger and profiler on") &&
+          !line.startsWith('Flutter run key commands.') &&
+          !line.startsWith('r Hot reload. 🔥🔥🔥') &&
+          !line.startsWith('R Hot restart.') &&
+          !line.startsWith('h Repeat this help message.') &&
+          !line.startsWith('d Detach (terminate "flutter run" but leave application running).') &&
+          !line.startsWith('c Clear the screen') &&
+          !line.startsWith('q Quit (terminate the application on the device).') &&
+          !line.startsWith('flutter: Another exception was thrown:') &&
+          !line.startsWith('An Observatory debugger and profiler on') &&
           !/^flutter: #\d+ +.+$/.test(line)
         );
       });

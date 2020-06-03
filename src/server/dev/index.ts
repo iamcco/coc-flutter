@@ -79,7 +79,7 @@ class DevServer extends Dispose {
       this.outputChannel = logger.devOutchannel;
     }
 
-    this.task = spawn('flutter', ['run'].concat(args), {
+    this.task = spawn('flutter', args, {
       cwd: workspaceFolder,
       detached: false,
       shell: os.platform() === 'win32' ? true : undefined,
