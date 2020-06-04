@@ -1,16 +1,19 @@
 import { Disposable, workspace, commands } from 'coc.nvim';
-import { Dispose } from '../util/dispose';
+
+import { getFlutterWorkspaceFolder } from '../util/fs';
+import { logger } from '../util/logger';
+
+const log = logger.getlog('Pub provider');
 
 export const pubUpdateProvider = (): Disposable => {
-  const dispose = new Dispose();
-  const watch = workspace.createFileSystemWatcher('**/pubspec.yaml');
-  dispose.push(watch);
-  watch.onDidChange(
-    () => {
+  return workspace.onDidSaveTextDocument(async document => {
+    if (document.uri && document.uri.endsWith('pubspec.yaml')) {
+      const workspaceFolder = await getFlutterWorkspaceFolder();
+      if (!workspaceFolder) {
+        log('Flutter project not found!');
+        return;
+      }
       commands.executeCommand('flutter.pub.get');
-    },
-    null,
-    dispose.subscriptions,
-  );
-  return dispose;
+    }
+  });
 };
