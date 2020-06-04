@@ -12,30 +12,12 @@ export const resolveProvider = (
   token: CancellationToken,
   next: ResolveCompletionItemSignature,
 ) => {
-  // user new Object
-  const nextItem = {
-    ...oldItem,
-  };
-  if (nextItem.data && nextItem.data.custom) {
-    const custom = nextItem.data.custom;
-    if (!nextItem.textEdit && custom.textEdit) {
-      nextItem.textEdit = custom.textEdit;
-    }
-    if (custom.insertText && custom.insertTextFormat) {
-      nextItem.insertText = custom.insertText;
-      nextItem.insertTextFormat = custom.insertTextFormat;
-    }
-    if (nextItem.data.isCustom) {
-      delete nextItem.data;
-    } else {
-      delete nextItem.data.custom;
-    }
-  }
-  return Promise.resolve(next(nextItem, token)).then((item: CompletionItem | null | undefined) => {
+  return Promise.resolve(next(oldItem, token)).then((item: CompletionItem | null | undefined) => {
     if (!item) {
       return item;
     }
     const { label, insertText, insertTextFormat } = item;
+
     // improve import
     if (label === "import '';" && insertTextFormat !== InsertTextFormat.Snippet) {
       if (item.textEdit) {
@@ -56,16 +38,6 @@ export const resolveProvider = (
       return item;
     }
 
-    // improve property${1:}
-    // snippet is not necessary here
-    if (insertText && insertText.endsWith('${1:}')) {
-      if (item.textEdit) {
-        delete item.textEdit;
-      }
-      item.insertTextFormat = InsertTextFormat.PlainText;
-      item.insertText = insertText.slice(0, -5);
-    }
-
     // improve `key: ,`
     let m = label.match(propertyRegex);
     if (m) {
@@ -83,7 +55,7 @@ export const resolveProvider = (
       if (item.textEdit) {
         delete item.textEdit;
       }
-      item.insertText = `${item.insertText}(\${1})\${0}`;
+      item.insertText = `${insertText}(\${1})\${0}`;
       item.insertTextFormat = InsertTextFormat.Snippet;
       return item;
     }
