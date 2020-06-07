@@ -1,10 +1,10 @@
-import { ResolveCompletionItemSignature } from 'coc.nvim';
+import { ResolveCompletionItemSignature, workspace } from 'coc.nvim';
 import { InsertTextFormat, CompletionItem, CancellationToken } from 'vscode-languageserver-protocol';
 
 /**
  * extend CompletionItem's label functionName(…) to functionName(${1})${0}
  */
-const funcCallRegex = /\(…?\)$/;
+const funcCallRegex = /^(.*)\(…?\)$/;
 const propertyRegex = /^([^ ]+?:\s+),$/;
 
 export const resolveProvider = (
@@ -55,8 +55,9 @@ export const resolveProvider = (
       if (item.textEdit) {
         delete item.textEdit;
       }
-      item.insertText = `${insertText}(\${1})\${0}`;
+      item.insertText = `${m[1]}(\${1})\${0}`;
       item.insertTextFormat = InsertTextFormat.Snippet;
+      workspace.showMessage(`${item.insertText}--${item.insertTextFormat}`)
       return item;
     }
     return item;
