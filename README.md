@@ -80,6 +80,7 @@ Open flutter only commands list: `CocList --input=flutter commands`
 **Global Commands**:
 
 - `flutter.run` Run flutter dev server
+- `flutter.attach` Attach running application
 - `flutter.create` Create flutter project using: `flutter create`
 - `flutter.doctor` Run: `flutter doctor`
 - `flutter.upgrade` Run: `flutter upgrade`

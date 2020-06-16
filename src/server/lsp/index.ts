@@ -16,6 +16,7 @@ import { resolveProvider } from './resolveProvider';
 import { ClosingLabels } from './closingLabels';
 import { SignatureHelpProvider } from './signatureHelp';
 import { completionProvider } from './completionProvider';
+import { codeActionProvider } from './codeActionProvider';
 
 const log = logger.getlog('lsp-server');
 
@@ -91,6 +92,7 @@ export class LspServer extends Dispose {
       middleware: {
         provideCompletionItem: completionProvider,
         resolveCompletionItem: config.get<boolean>('provider.enableSnippet', true) ? resolveProvider : undefined,
+        provideCodeActions: codeActionProvider,
       },
     };
 

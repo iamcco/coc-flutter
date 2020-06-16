@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -123,6 +123,10 @@
       {
         "command": "flutter.run",
         "title": "Run flutter server"
+      },
+      {
+        "command": "flutter.attach",
+        "title": "Attach running application"
       },
       {
         "command": "flutter.create",
