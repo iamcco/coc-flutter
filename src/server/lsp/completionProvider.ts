@@ -6,8 +6,8 @@ import {
   Position,
   Range,
   CompletionList,
-  InsertTextFormat,
 } from 'vscode-languageserver-protocol';
+import { resolveCompleteItem } from './resolveCompleteItem';
 
 export const completionProvider = async (
   document: TextDocument,
@@ -30,21 +30,8 @@ export const completionProvider = async (
   if (list.length > 1000 && /[a-zA-Z]/i.test(character)) {
     list = list.filter(item => new RegExp(character, 'i').test(item.label));
   }
-  // the textEdit is not necessary from LSP
-  // snippet and textEdit from LSP do the same thing
-  // remove textEdit reduce the flicker
-  list = list.map(item => {
-    if (item.textEdit) {
-      delete item.textEdit;
-    }
-    // remove unnecessary snippet
-    // snippet xxxx${1:} === xxxx PlainText
-    if (item.insertTextFormat === InsertTextFormat.Snippet && item.insertText && item.insertText.endsWith('${1:}')) {
-      item.insertTextFormat = InsertTextFormat.PlainText;
-      item.insertText = item.insertText.slice(0, -5);
-    }
-    return item;
-  });
+  // resolve complete item
+  list = list.map(resolveCompleteItem);
   return (res as CompletionList).isIncomplete !== undefined
     ? {
         items: list,
