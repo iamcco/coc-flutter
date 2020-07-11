@@ -73,6 +73,27 @@ Flutter support for (Neo)vim
 ],
 ```
 
+## Code Actions
+
+Add below config mapping
+
+> this cofig should be in the coc.nvim README
+
+``` vim
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+```
+
+Applying codeAction to the selected region.
+
+Example: `<leader>aap` for current paragraph, `<leader>aw` for the current word
+
+Then you will see action list:
+
+- Wrap with Widget
+- Waap with Center
+- etc
+
 ## Commands
 
 Open flutter only commands list: `CocList --input=flutter commands`
