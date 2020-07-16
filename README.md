@@ -91,7 +91,7 @@ Example: `<leader>aap` for current paragraph, `<leader>aw` for the current word
 Then you will see action list:
 
 - Wrap with Widget
-- Waap with Center
+- Wrap with Center
 - etc
 
 ## Commands
