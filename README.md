@@ -77,7 +77,7 @@ Flutter support for (Neo)vim
 
 Add below config mapping
 
-> this cofig should be in the coc.nvim README
+> this config should be in the coc.nvim README
 
 ``` vim
 xmap <leader>a  <Plug>(coc-codeaction-selected)
