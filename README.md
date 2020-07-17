@@ -77,7 +77,7 @@ Flutter support for (Neo)vim
 
 Add below config mapping
 
-> this cofig should be in the coc.nvim README
+> this config should be in the coc.nvim README
 
 ``` vim
 xmap <leader>a  <Plug>(coc-codeaction-selected)
@@ -91,7 +91,7 @@ Example: `<leader>aap` for current paragraph, `<leader>aw` for the current word
 Then you will see action list:
 
 - Wrap with Widget
-- Waap with Center
+- Wrap with Center
 - etc
 
 ## Commands
