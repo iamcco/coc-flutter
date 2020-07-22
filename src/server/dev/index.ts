@@ -13,8 +13,6 @@ const log = logger.getlog('server');
 type callback = (...params: any[]) => void;
 
 class DevServer extends Dispose {
-  private stdoutOutput = '';
-  private stderrOutput = '';
   private outputChannel: OutputChannel | undefined;
   private task: ChildProcessWithoutNullStreams | undefined;
   private onHandler: callback[] = [];
@@ -70,9 +68,6 @@ class DevServer extends Dispose {
     log(`server start at: ${workspaceFolder}`);
     notification.show('Start flutter dev server...');
 
-    this.stdoutOutput = '';
-    this.stderrOutput = '';
-
     if (this.outputChannel) {
       this.outputChannel.clear();
     } else {
@@ -115,54 +110,27 @@ class DevServer extends Dispose {
     }
   }
 
-  onStdout(handler: (lines: string[]) => void) {
+  onData(channel: 'stdout' | 'stderr', handler: (lines: string[]) => void) {
     const callback = () => {
-      this.task!.stdout.on('data', (chunk: Buffer) => {
+      this.task![channel].on('data', (chunk: Buffer) => {
         const text = chunk.toString();
         this.devLog(text);
-        this.stdoutOutput += text;
-        const lines = this.stdoutOutput.split(lineBreak);
-        if (lines.length > 1) {
-          if (lines[lines.length - 1] === '') {
-            lines.pop();
-            this.stdoutOutput = '';
-          } else {
-            this.stdoutOutput = lines.pop()!;
-          }
-          handler(lines);
-        }
+        handler(text.split(lineBreak));
       });
     };
-    if (this.task && this.task.stdout) {
+    if (this.task && this.task[channel]) {
       callback();
     } else {
       this.onHandler.push(callback);
     }
   }
 
+  onStdout(handler: (lines: string[]) => void) {
+    this.onData('stdout', handler);
+  }
+
   onStderr(handler: (lines: string[]) => void) {
-    const callback = () => {
-      this.task!.stderr.on('data', (chunk: Buffer) => {
-        const text = chunk.toString();
-        this.devLog(text);
-        this.stderrOutput += text;
-        const lines = this.stderrOutput.split(lineBreak);
-        if (lines.length > 1) {
-          if (lines[lines.length - 1] === '') {
-            lines.pop();
-            this.stderrOutput = '';
-          } else {
-            this.stderrOutput = lines.pop()!;
-          }
-          handler(lines);
-        }
-      });
-    };
-    if (this.task && this.task.stderr) {
-      callback();
-    } else {
-      this.onHandler.push(callback);
-    }
+    this.onData('stderr', handler);
   }
 
   sendCommand(cmd?: string) {

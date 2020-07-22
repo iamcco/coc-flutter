@@ -6,7 +6,9 @@ import {
   RevealOutputChannelOn,
   LanguageClient,
   services,
+  Uri,
 } from 'coc.nvim';
+import { homedir } from 'os';
 
 import { flutterSDK } from '../../lib/sdk';
 import { logger } from '../../util/logger';
@@ -91,6 +93,23 @@ export class LspServer extends Dispose {
       middleware: {
         provideCompletionItem: config.get<boolean>('provider.enableSnippet', true) ? completionProvider : undefined,
         provideCodeActions: codeActionProvider,
+        workspace: {
+          didChangeWorkspaceFolders(data, next) {
+            if (data.added.length && flutterSDK.sdkHome !== '') {
+              const ignore = config
+                .get<string[]>('workspaceFolder.ignore', [])
+                .concat(flutterSDK.sdkHome)
+                .map(p => {
+                  p = p.replace(/^(~|\$HOME)/, homedir());
+                  return Uri.file(p).toString();
+                });
+              data.added = data.added.filter(fold => !ignore.some(i => fold.uri.startsWith(i)));
+            }
+            if (data.added.length || data.removed.length) {
+              next(data);
+            }
+          },
+        },
       },
     };
 

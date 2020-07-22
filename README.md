@@ -63,6 +63,8 @@ Flutter support for (Neo)vim
   - `someName(…)` => `someName(${1})${0}`
   - `setState(() {});` => `setState(() {\n\t${1}\n});${0}`
 - `flutter.openDevLogSplitCommand` Vim command to open dev log window, like: `botright 10split`, default: ''
+- `flutter.workspaceFolder.ignore` Path start within the list will not treat as workspaceFolder, default: []
+  - also flutter sdk will not treat as workspaceFolder, more detail issues [50](https://github.com/iamcco/coc-flutter/issues/50)
 
 
 **Enable format on save**:

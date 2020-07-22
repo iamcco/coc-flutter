@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -116,6 +116,11 @@
           "type": "string",
           "default": "",
           "description": "Vim command to open dev log window, like: `botright 10split`"
+        },
+        "flutter.workspaceFolder.ignore": {
+          "type": "string",
+          "default": [],
+          "description": "Path start within the list will not treat as workspaceFolder"
         }
       }
     },

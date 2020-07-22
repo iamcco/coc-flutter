@@ -11,10 +11,15 @@ const ANALYZER_SNAPSHOT_NAME = join('bin', 'snapshots', 'analysis_server.dart.sn
 const DART_COMMAND = join('bin', os.platform() === 'win32' ? 'dart.bat' : 'dart');
 
 class FlutterSDK {
+  private _sdkHOme = '';
   private _state = false;
   private _dartHome = '';
   private _analyzerSnapshotPath = '';
   private _dartCommand = '';
+
+  public get sdkHome(): string {
+    return this._sdkHOme;
+  }
 
   public get state(): boolean {
     return this._state;
@@ -105,6 +110,9 @@ class FlutterSDK {
 
       if (flutterPath) {
         flutterPath = await getRealPath(flutterPath);
+        if (flutterPath.endsWith(join('bin', 'flutter'))) {
+          this._sdkHOme = flutterPath.replace(join('bin', 'flutter'), '');
+        }
         log(`flutter command path => ${flutterPath}`);
         this._dartHome = join(dirname(flutterPath), 'cache', 'dart-sdk');
         log(`dart sdk home => ${this._dartHome}`);

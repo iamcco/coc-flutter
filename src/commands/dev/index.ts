@@ -6,7 +6,6 @@ import { opener } from '../../util/opener';
 import { notification } from '../../lib/notification';
 import { logger } from '../../util/logger';
 import { cmdPrefix } from '../../util/constant';
-import { reduceSpace } from '../../util';
 
 const log = logger.getlog('dev-command');
 
@@ -191,45 +190,6 @@ export class Dev extends Dispose {
     }
   };
 
-  /**
-   * do not display lines:
-   * - `W/xxx`
-   * - `I/xxx`
-   * - `D/xxx`
-   * - `🔥  To hot reload xxx`
-   * - `An Observatory debugger and profiler xxx`
-   * - `For a more detailed help message, press "h" xxx`
-   * - `Initializing hot reload...`
-   * - `Performing hot reload...`
-   * - `Reloaded 1 of 469 libraries in 261ms.`
-   */
-  private filterInvalidLines(lines: string[]): string[] {
-    return lines
-      .map(line => reduceSpace(line))
-      .filter(line => {
-        return (
-          line !== '' &&
-          !/^[DIW]\//.test(line) &&
-          !line.startsWith('🔥 To hot reload') &&
-          !line.startsWith('An Observatory debugger and profiler') &&
-          !line.startsWith('For a more detailed help message, press "h"') &&
-          !line.startsWith('Initializing hot reload') &&
-          !line.startsWith('Performing hot reload') &&
-          !line.startsWith('Reloaded ') &&
-          !line.startsWith('Flutter run key commands.') &&
-          !line.startsWith('r Hot reload. 🔥🔥🔥') &&
-          !line.startsWith('R Hot restart.') &&
-          !line.startsWith('h Repeat this help message.') &&
-          !line.startsWith('d Detach (terminate "flutter run" but leave application running).') &&
-          !line.startsWith('c Clear the screen') &&
-          !line.startsWith('q Quit (terminate the application on the device).') &&
-          !line.startsWith('flutter: Another exception was thrown:') &&
-          !line.startsWith('An Observatory debugger and profiler on') &&
-          !/^flutter: #\d+ +.+$/.test(line)
-        );
-      });
-  }
-
   private onStdout = (lines: string[]) => {
     lines.forEach(line => {
       const m = line.match(
@@ -239,7 +199,6 @@ export class Dev extends Dispose {
         this.profilerUrl = m[1];
       }
     });
-    notification.show(this.filterInvalidLines(lines));
   };
 
   private onStderr = (/* lines: string[] */) => {
