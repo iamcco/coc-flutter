@@ -65,6 +65,7 @@ Flutter support for (Neo)vim
 - `flutter.openDevLogSplitCommand` Vim command to open dev log window, like: `botright 10split`, default: ''
 - `flutter.workspaceFolder.ignore` Path start within the list will not treat as workspaceFolder, default: []
   - also flutter sdk will not treat as workspaceFolder, more detail issues [50](https://github.com/iamcco/coc-flutter/issues/50)
+- `flutter.runDevToolsAtStartup` Automatically open devtools debugger web page when a project is run, default: 'false'
 
 
 **Enable format on save**:
@@ -126,6 +127,7 @@ Open flutter only commands list: `CocList --input=flutter commands`
 - `flutter.dev.screenshot` To save a screenshot to flutter.png
 - `flutter.dev.openDevLog` Open flutter dev server log
 - `flutter.dev.openProfiler` Open observatory debugger and profiler web page
+- `flutter.dev.openDevToolsProfiler` Open devtools debugger web page
 - `flutter.dev.debugDumpAPP` You can dump the widget hierarchy of the app (debugDumpApp)
 - `flutter.dev.elevationChecker` To toggle the elevation checker
 - `flutter.dev.debugDumpLayerTree` For layers (debugDumpLayerTree)

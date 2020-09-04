@@ -1,4 +1,4 @@
-import { commands, Disposable } from 'coc.nvim';
+import { commands, Disposable, workspace } from 'coc.nvim';
 
 import { devServer } from '../../server/dev';
 import { Dispose } from '../../util/dispose';
@@ -6,6 +6,8 @@ import { opener } from '../../util/opener';
 import { notification } from '../../lib/notification';
 import { logger } from '../../util/logger';
 import { cmdPrefix } from '../../util/constant';
+import { devToolsServer } from '../../server/devtools';
+import { ChildProcessWithoutNullStreams } from 'child_process';
 
 const log = logger.getlog('dev-command');
 
@@ -95,6 +97,12 @@ export const cmds: Record<string, DCmd> = {
       run.openProfiler();
     },
   },
+  openDevToolsProfiler: {
+    desc: 'Load DevTools page in an external web browser',
+    callback: (run: Dev) => {
+      run.openDevToolsProfiler();
+    },
+  },
   openDevLog: {
     desc: 'Open flutter dev server log',
     callback: () => {
@@ -127,6 +135,7 @@ export class Dev extends Dispose {
     });
     this.push(devServer);
     log('register dev command');
+    this.push(devToolsServer);
   }
 
   runServer(...args: string[]) {
@@ -197,6 +206,11 @@ export class Dev extends Dispose {
       );
       if (m) {
         this.profilerUrl = m[1];
+        const config = workspace.getConfiguration('flutter');
+        const runDevToolsAtStartupEnabled = config.get<boolean>('runDevToolsAtStartup', false);
+        if (runDevToolsAtStartupEnabled) {
+          this.openDevToolsProfiler();
+        }
       }
     });
   };
@@ -233,6 +247,36 @@ export class Dev extends Dispose {
       }
     }
     notification.show('Flutter server is not running!');
+  }
+
+  openDevToolsProfiler(): void {
+    if (!this.profilerUrl || !devServer.state) {
+      return;
+    }
+    if (devToolsServer.state) {
+      this.launchDevToolsInBrowser();
+    } else {
+      devToolsServer.start();
+      devToolsServer.onStdout(() => {
+        this.launchDevToolsInBrowser();
+      });
+      devToolsServer.onStderr(() => {
+        this.openDevToolsProfiler();
+      });
+    }
+  }
+
+  private launchDevToolsInBrowser(): ChildProcessWithoutNullStreams | undefined {
+    if (devToolsServer.state) {
+      try {
+        // assertion to fix encodeURIComponent not accepting undefined- we rule out undefined values before this is called
+        const url = `http://${devToolsServer.devToolsUri}/#/?uri=ws${encodeURIComponent(this.profilerUrl as string)}`;
+        return opener(url);
+      } catch (error) {
+        log(`Open browser fail: ${error.message}\n${error.stack}`);
+        notification.show(`Open browser fail: ${error.message || error}`);
+      }
+    }
   }
 
   dispose() {

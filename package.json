@@ -122,6 +122,11 @@
           "default": [],
           "item": "string",
           "description": "Path start within the list will not treat as workspaceFolder"
+        },
+        "flutter.runDevToolsAtStartup": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically run the DevTools debugger in a web browser when running a project"
         }
       }
     },
