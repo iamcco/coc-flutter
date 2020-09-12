@@ -91,6 +91,12 @@ export const cmds: Record<string, DCmd> = {
     cmd: 'q',
     desc: 'Quit server',
   },
+  copyProfilerUrl: {
+    desc: 'Copy the observatory debugger and profiler web page to the system clipboard (register +)',
+    callback: (run: Dev) => {
+      run.copyProfilerUrl();
+    },
+  },
   openProfiler: {
     desc: 'Observatory debugger and profiler web page',
     callback: (run: Dev) => {
@@ -108,6 +114,14 @@ export const cmds: Record<string, DCmd> = {
     callback: () => {
       if (devServer.state) {
         devServer.openDevLog();
+      }
+    },
+  },
+  clearDevLog: {
+    desc: 'Clear the flutter dev server log',
+    callback: () => {
+      if (devServer.state) {
+        devServer.clearDevLog();
       }
     },
   },
@@ -232,6 +246,17 @@ export class Dev extends Dispose {
         notification.show('Flutter server is not running!');
       }
     };
+  }
+
+  async copyProfilerUrl() {
+    if (!this.profilerUrl) {
+      return;
+    }
+    if (devServer.state) {
+      workspace.nvim.command(`let @+='${this.profilerUrl}'`);
+      return;
+    }
+    notification.show('Flutter server is not running!');
   }
 
   openProfiler() {

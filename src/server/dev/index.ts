@@ -144,6 +144,12 @@ class DevServer extends Dispose {
     }
   }
 
+  clearDevLog() {
+    if (this.outputChannel) {
+      this.outputChannel.clear();
+    }
+  }
+
   async openDevLog() {
     const config = workspace.getConfiguration('flutter');
     const cmd = config.get<string>('openDevLogSplitCommand', '');
