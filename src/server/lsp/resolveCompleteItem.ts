@@ -10,6 +10,12 @@ const propertyRegex = /^([^ ]+?:\s+),$/;
 export const resolveCompleteItem = (item: CompletionItem) => {
   const { label, insertTextFormat } = item;
 
+  // delete unnecessary filterText
+  // ref: https://github.com/iamcco/coc-flutter/issues/70
+  if (item.insertTextFormat === InsertTextFormat.Snippet && item.filterText) {
+    delete item.filterText;
+  }
+
   // delete unnecessary textEdit
   if (item.textEdit) {
     delete item.textEdit;
