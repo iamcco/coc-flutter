@@ -98,7 +98,7 @@ const cmds: GCmd[] = [
 export class Global extends Dispose {
   constructor() {
     super();
-    cmds.forEach(cmd => {
+    cmds.forEach((cmd) => {
       const { desc, execute, name } = cmd;
       const cmdId = `${cmdPrefix}.${name || cmd.cmd}`;
       this.push(

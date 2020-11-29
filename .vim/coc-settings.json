@@ -4,6 +4,7 @@
     "getlog",
     "outchannel",
     "pubspec",
-    "regist"
+    "regist",
+    "textdocument"
   ]
 }
