@@ -2,10 +2,11 @@ import { commands, workspace } from 'coc.nvim';
 
 import { Dispose } from '../util/dispose';
 import { cmdPrefix } from '../util/constant';
-import { execCommand, getFlutterWorkspaceFolder } from '../util/fs';
+import { getFlutterWorkspaceFolder } from '../util/fs';
 import { logger } from '../util/logger';
 import { notification } from '../lib/notification';
 import { formatMessage } from '../util';
+import {flutterSDK} from '../lib/sdk';
 
 const log = logger.getlog('global-commands');
 
@@ -26,7 +27,7 @@ const getCmd = () => {
     if (inputArgs.length) {
       args = args.concat(inputArgs);
     }
-    const { err, stdout, stderr } = await execCommand(`flutter ${cmd} ${args.join(' ')}`);
+    const { err, stdout, stderr } = await flutterSDK.execFlutterCommand(`${cmd} ${args.join(' ')}`);
     const devLog = logger.devOutchannel;
     if (stdout) {
       devLog.append(`\n${stdout}\n`);
@@ -72,7 +73,7 @@ const cmds: GCmd[] = [
         notification.show('Flutter project workspaceFolder not found!');
         return;
       }
-      const { code, err, stdout, stderr } = await execCommand('flutter pub get', { cwd: workspaceFolder });
+      const { code, err, stdout, stderr } = await flutterSDK.execDartCommand(`pub get`, { cwd: workspaceFolder });
       notification.show(formatMessage(stdout));
       if (err || code) {
         notification.show(formatMessage(stderr));

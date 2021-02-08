@@ -7,6 +7,7 @@ import { lineBreak, devLogName } from '../../util/constant';
 import { logger } from '../../util/logger';
 import { notification } from '../../lib/notification';
 import { Dispose } from '../../util/dispose';
+import {flutterSDK} from '../../lib/sdk';
 
 const log = logger.getlog('server');
 
@@ -74,7 +75,7 @@ class DevServer extends Dispose {
       this.outputChannel = logger.devOutchannel;
     }
 
-    this.task = spawn('flutter', args, {
+    this.task = spawn(flutterSDK.flutterCommand, args, {
       cwd: workspaceFolder,
       detached: false,
       shell: os.platform() === 'win32' ? true : undefined,

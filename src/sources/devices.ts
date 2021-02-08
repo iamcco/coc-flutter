@@ -1,8 +1,8 @@
 import { IList, ListAction, ListItem, commands } from 'coc.nvim';
 import colors from 'colors/safe';
 
-import { execCommand } from '../util/fs';
 import { lineBreak } from '../util/constant';
+import {flutterSDK} from '../lib/sdk';
 
 interface Device {
   name: string;
@@ -31,7 +31,7 @@ export default class DevicesList implements IList {
   }
 
   public async loadItems(): Promise<ListItem[]> {
-    const { err, stdout } = await execCommand('flutter devices');
+    const { err, stdout } = await flutterSDK.execFlutterCommand('devices');
     let devices: Device[] = [];
     if (!err) {
       devices = stdout
