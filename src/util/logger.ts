@@ -2,7 +2,7 @@ import { OutputChannel, workspace, Uri } from 'coc.nvim';
 import { devLogName } from './constant';
 import { Dispose } from './dispose';
 
-export type logLevel = 'off' | 'messages' | 'verbose';
+export type logLevel = 'off' | 'message' | 'verbose';
 
 class Logger extends Dispose {
   private _outchannel: OutputChannel | undefined;
