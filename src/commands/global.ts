@@ -82,8 +82,8 @@ const cmds: GCmd[] = [
   {
     cmd: 'devices',
     desc: 'open devices list',
-    execute: async (): Promise<void> => {
-      workspace.nvim.command('CocList FlutterDevices');
+    execute: async (_, ...args: string[]): Promise<void> => {
+      workspace.nvim.command(`CocList FlutterDevices ${args.join(' ')}`);
     },
   },
   {
