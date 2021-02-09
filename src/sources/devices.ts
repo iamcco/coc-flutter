@@ -3,6 +3,7 @@ import colors from 'colors/safe';
 
 import { execCommand } from '../util/fs';
 import { lineBreak } from '../util/constant';
+import {logger} from '../util/logger';
 
 interface Device {
   name: string;
@@ -10,6 +11,8 @@ interface Device {
   platform: string;
   system: string;
 }
+
+const log = logger.getlog('devserver');
 
 export default class DevicesList implements IList {
   public readonly name = 'FlutterDevices';
@@ -21,11 +24,11 @@ export default class DevicesList implements IList {
     this.actions.push({
       name: 'run',
       multiple: false,
-      execute: async item => {
+      execute: async (item, context) => {
         if (Array.isArray(item)) {
           return;
         }
-        commands.executeCommand(`flutter.run`, '-d', item.data!.deviceId);
+        commands.executeCommand(`flutter.run`, '-d', item.data!.deviceId, ...context.args);
       },
     });
   }
