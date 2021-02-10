@@ -73,7 +73,7 @@ const cmds: GCmd[] = [
         notification.show('Flutter project workspaceFolder not found!');
         return;
       }
-      const { code, err, stdout, stderr } = await flutterSDK.execDartCommand(`pub get`, { cwd: workspaceFolder });
+      const { code, err, stdout, stderr } = await flutterSDK.execFlutterCommand(`pub get`, { cwd: workspaceFolder });
       notification.show(formatMessage(stdout));
       if (err || code) {
         notification.show(formatMessage(stderr));
