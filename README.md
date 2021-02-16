@@ -35,6 +35,15 @@ Flutter support for (Neo)vim
 
 > **NOTE**: install `dart-vim-plugin` plugin if your (neo)vim detect filetype incorrect
 
+### Ubuntu snap
+
+If you installed flutter using default [snap instructions](https://flutter.dev/docs/get-started/install/linux#install-flutter-using-snapd). You should add the following configuration to `:CocConfig`
+
+```
+  "flutter.sdk.flutter-lookup": "echo $HOME/snap/flutter/common/flutter/bin/flutter",
+  "flutter.sdk.dart-lookup": "echo $HOME/snap/flutter/common/flutter/bin/dart",
+```
+
 ## coc-list sources
 
 - FlutterDevices
