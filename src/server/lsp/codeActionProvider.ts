@@ -16,10 +16,23 @@ export const codeActionProvider = async (
   token: CancellationToken,
   next: ProvideCodeActionsSignature,
 ) => {
-  const res = await next(document, range, context, token);
+  let res = await next(document, range, context, token);
   if (!res) {
     return res;
   }
+
+  res = res.map((item) => {
+    if ((item as CodeAction).kind) {
+      if ((item as CodeAction).kind!.startsWith('quickfix.import')) {
+        return {
+          ...item,
+          isPreferred: true,
+        }
+      }
+    }
+    return item;
+  })
+
   const codeActions = res.slice();
   res.some(item => {
     if (item.title === 'Wrap with widget...' && (item as CodeAction).edit) {
