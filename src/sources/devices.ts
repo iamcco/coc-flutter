@@ -21,11 +21,11 @@ export default class DevicesList implements IList {
     this.actions.push({
       name: 'run',
       multiple: false,
-      execute: async item => {
+      execute: async (item, context) => {
         if (Array.isArray(item)) {
           return;
         }
-        commands.executeCommand(`flutter.run`, '-d', item.data!.deviceId);
+        commands.executeCommand(`flutter.run`, '-d', item.data!.deviceId, ...context.args);
       },
     });
   }

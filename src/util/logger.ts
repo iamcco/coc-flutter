@@ -2,7 +2,7 @@ import { OutputChannel, workspace, Uri } from 'coc.nvim';
 import { devLogName } from './constant';
 import { Dispose } from './dispose';
 
-export type logLevel = 'off' | 'messages' | 'verbose';
+export type logLevel = 'off' | 'message' | 'verbose';
 
 class Logger extends Dispose {
   private _outchannel: OutputChannel | undefined;
@@ -15,21 +15,6 @@ class Logger extends Dispose {
       this._outchannel = workspace.createOutputChannel('flutter');
       this.push(this._outchannel);
     }
-    const subscription = workspace.registerAutocmd({
-      event: ['BufEnter'],
-      request: true,
-      callback: async () => {
-        const doc = await workspace.document;
-        const uri = Uri.parse(doc.uri);
-        if (uri && uri.fsPath && uri.fsPath.endsWith(devLogName)) {
-          const { nvim } = workspace;
-          const win = await nvim.window;
-          await win.setOption('wrap', false);
-          subscription.dispose();
-        }
-      },
-    });
-    this.push(subscription);
   }
 
   set outchannel(channel: OutputChannel | undefined) {
