@@ -6,6 +6,7 @@ import { getFlutterWorkspaceFolder } from '../../util/fs';
 import { logger } from '../../util/logger';
 import { notification } from '../../lib/notification';
 import { Dispose } from '../../util/dispose';
+import {flutterSDK} from '../../lib/sdk';
 
 const log = logger.getlog('devtools-server');
 
@@ -71,7 +72,7 @@ class DevToolsServer extends Dispose {
     notification.show('Launching flutter devtools...');
 
     // run devtools server, look for an open port if default is unavailable, return output in JSON format
-    this.launchDevToolsTask = spawn('flutter', ['pub', 'global', 'run', 'devtools', '--machine', '--try-ports', '10'], {
+    this.launchDevToolsTask = spawn(flutterSDK.dartCommand, ['pub', 'global', 'run', 'devtools', '--machine', '--try-ports', '10'], {
       cwd: workspaceFolder,
       detached: false,
       shell: os.platform() === 'win32' ? true : undefined,
@@ -146,7 +147,7 @@ class DevToolsServer extends Dispose {
         notification.show('Flutter project workspaceFolder not found!');
         return false;
       }
-      this.activateDevToolsTask = spawn('flutter', ['pub', 'global', 'activate', 'devtools'], {
+      this.activateDevToolsTask = spawn(flutterSDK.dartCommand, ['pub', 'global', 'activate', 'devtools'], {
         cwd: workspaceFolder,
         detached: false,
         shell: os.platform() === 'win32' ? true : undefined,

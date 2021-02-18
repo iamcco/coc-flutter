@@ -1,9 +1,9 @@
 import { IList, ListAction, ListItem } from 'coc.nvim';
 import colors from 'colors/safe';
 
-import { execCommand } from '../util/fs';
 import { lineBreak } from '../util/constant';
 import { notification } from '../lib/notification';
+import { flutterSDK } from '../lib/sdk';
 
 interface Emulator {
   name: string;
@@ -27,13 +27,13 @@ export default class EmulatorsList implements IList {
           return;
         }
         notification.show(`launch emulator ${item.data!.id}`);
-        await execCommand(`flutter emulators --launch ${item.data!.id}`);
+        await flutterSDK.execFlutterCommand(`emulators --launch ${item.data!.id}`);
       },
     });
   }
 
   public async loadItems(): Promise<ListItem[]> {
-    const { err, stdout } = await execCommand('flutter emulators');
+    const { err, stdout } = await flutterSDK.execFlutterCommand('emulators');
     let emulators: Emulator[] = [];
     if (!err) {
       emulators = stdout

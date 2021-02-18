@@ -4,6 +4,7 @@ import { WorkspaceConfiguration } from 'coc.nvim';
 import which from 'which';
 import { logger } from '../util/logger';
 import { exists, getRealPath, execCommand } from '../util/fs';
+import { ExecOptions } from 'child_process';
 
 const log = logger.getlog('sdk');
 
@@ -11,14 +12,15 @@ const ANALYZER_SNAPSHOT_NAME = join('bin', 'snapshots', 'analysis_server.dart.sn
 const DART_COMMAND = join('bin', os.platform() === 'win32' ? 'dart.bat' : 'dart');
 
 class FlutterSDK {
-  private _sdkHOme = '';
+  private _sdkHome = '';
   private _state = false;
   private _dartHome = '';
   private _analyzerSnapshotPath = '';
   private _dartCommand = '';
+  private _flutterCommand?: string;
 
   public get sdkHome(): string {
-    return this._sdkHOme;
+    return this._sdkHome;
   }
 
   public get state(): boolean {
@@ -35,6 +37,10 @@ class FlutterSDK {
 
   public get dartCommand(): string {
     return this._dartCommand;
+  }
+
+  public get flutterCommand(): string {
+    return this._flutterCommand || 'flutter';
   }
 
   public async getVersion(): Promise<[number, number, number] | undefined> {
@@ -98,10 +104,10 @@ class FlutterSDK {
       let flutterPath: string;
 
       if (flutterLookup.length == 0) {
-        flutterPath = await which('flutter');
+        flutterPath = await which('flutter').trim();
       } else {
         const { stdout } = await execCommand(flutterLookup);
-        flutterPath = stdout;
+        flutterPath = stdout.trim();
         if (stdout.length == 0) {
           throw new Error('flutter lookup returned empty string');
         }
@@ -110,10 +116,14 @@ class FlutterSDK {
 
       if (flutterPath) {
         flutterPath = await getRealPath(flutterPath);
+        flutterPath = flutterPath.trim();
         if (flutterPath.endsWith(join('bin', 'flutter'))) {
-          this._sdkHOme = flutterPath.replace(join('bin', 'flutter'), '');
+          this._sdkHome = flutterPath.replace(join('bin', 'flutter'), '');
+        } else {
+          this._sdkHome = flutterPath;
         }
-        log(`flutter command path => ${flutterPath}`);
+        this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
+        log(`flutter command path => ${this.flutterCommand}`);
         this._dartHome = join(dirname(flutterPath), 'cache', 'dart-sdk');
         log(`dart sdk home => ${this._dartHome}`);
       }
@@ -162,6 +172,30 @@ class FlutterSDK {
       }
     }
     log(`dart command path => ${this._dartCommand}`);
+  }
+
+  execDartCommand(
+    command: string,
+    options: ExecOptions = {},
+  ): Promise<{
+    code: number;
+    err: Error | null;
+    stdout: string;
+    stderr: string;
+  }> {
+    return execCommand(`${this.dartCommand} ${command}`, options);
+  }
+
+  execFlutterCommand(
+    command: string,
+    options: ExecOptions = {},
+  ): Promise<{
+    code: number;
+    err: Error | null;
+    stdout: string;
+    stderr: string;
+  }> {
+    return execCommand(`${this.flutterCommand} ${command}`, options);
   }
 }
 
