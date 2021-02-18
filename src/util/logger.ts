@@ -1,4 +1,4 @@
-import { OutputChannel, workspace, Uri } from 'coc.nvim';
+import { OutputChannel, workspace } from 'coc.nvim';
 import { devLogName } from './constant';
 import { Dispose } from './dispose';
 

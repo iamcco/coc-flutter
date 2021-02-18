@@ -30,7 +30,6 @@
   "activationEvents": [
     "workspaceContains:pubspec.yaml",
     "onLanguage:dart",
-    "onLanguage:yaml",
     "onCommand:flutter.run",
     "onCommand:flutter.doctor",
     "onCommand:flutter.upgrade",

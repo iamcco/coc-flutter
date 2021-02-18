@@ -104,7 +104,7 @@ class FlutterSDK {
       let flutterPath: string;
 
       if (flutterLookup.length == 0) {
-        flutterPath = await which('flutter').trim();
+        flutterPath = (await which('flutter')).trim();
       } else {
         const { stdout } = await execCommand(flutterLookup);
         flutterPath = stdout.trim();

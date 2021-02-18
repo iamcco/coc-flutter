@@ -2,7 +2,7 @@ import { IList, ListAction, ListItem, commands } from 'coc.nvim';
 import colors from 'colors/safe';
 
 import { lineBreak } from '../util/constant';
-import {flutterSDK} from '../lib/sdk';
+import { flutterSDK } from '../lib/sdk';
 
 interface Device {
   name: string;

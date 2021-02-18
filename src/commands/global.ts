@@ -6,7 +6,7 @@ import { getFlutterWorkspaceFolder } from '../util/fs';
 import { logger } from '../util/logger';
 import { notification } from '../lib/notification';
 import { formatMessage } from '../util';
-import {flutterSDK} from '../lib/sdk';
+import { flutterSDK } from '../lib/sdk';
 
 const log = logger.getlog('global-commands');
 

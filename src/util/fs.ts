@@ -53,7 +53,7 @@ export const execCommand = (
   stderr: string;
 }> => {
   return new Promise(resolve => {
-  log(`executing command ${command}`);
+    log(`executing command ${command}`);
     let code = 0;
     exec(
       command,
