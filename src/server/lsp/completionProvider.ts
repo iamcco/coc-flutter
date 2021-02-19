@@ -1,4 +1,4 @@
-import { CompletionContext, ProvideCompletionItemsSignature } from 'coc.nvim';
+import { CompletionContext, ProvideCompletionItemsSignature, workspace } from 'coc.nvim';
 import {
   CompletionItem,
   CancellationToken,
@@ -7,7 +7,7 @@ import {
   Range,
   CompletionList,
 } from 'vscode-languageserver-protocol';
-import { resolveCompleteItem } from './resolveCompleteItem';
+import { getResolveCompleteItemFunc } from './resolveCompleteItem';
 
 export const completionProvider = async (
   document: TextDocument,
@@ -30,6 +30,10 @@ export const completionProvider = async (
   if (list.length > 1000 && /[a-zA-Z]/i.test(character)) {
     list = list.filter(item => new RegExp(character, 'i').test(item.label));
   }
+  const config = workspace.getConfiguration('dart');
+  const resolveCompleteItem = getResolveCompleteItemFunc({
+    completeFunctionCalls: config.get<boolean>('completeFunctionCalls', true),
+  });
   // resolve complete item
   list = list.map(resolveCompleteItem);
   return (res as CompletionList).isIncomplete !== undefined

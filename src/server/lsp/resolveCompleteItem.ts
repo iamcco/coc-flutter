@@ -7,7 +7,7 @@ const funcCallRegex = /^(.*)\(\)$/;
 // keyName: ,
 const propertyRegex = /^([^ ]+?:\s+),$/;
 
-export const resolveCompleteItem = (item: CompletionItem) => {
+export const getResolveCompleteItemFunc = (options: { completeFunctionCalls: boolean }) => (item: CompletionItem) => {
   const { label, insertTextFormat } = item;
 
   // delete unnecessary filterText
@@ -50,20 +50,24 @@ export const resolveCompleteItem = (item: CompletionItem) => {
     return item;
   }
 
-  // improve function()
-  m = label.match(funcCallRegex);
-  if (m) {
-    item.insertText = `${m[1]}()\${0}`;
-    item.insertTextFormat = InsertTextFormat.Snippet;
-    return item;
+  // if dart.completeFunctionCalls: false
+  // do not add `()` snippet
+  if (options.completeFunctionCalls && item.insertTextFormat !== InsertTextFormat.Snippet) {
+    // improve function()
+    m = label.match(funcCallRegex);
+    if (m) {
+      item.insertText = `${m[1]}()\${0}`;
+      item.insertTextFormat = InsertTextFormat.Snippet;
+      return item;
+    }
+    // improve function(…?)
+    m = label.match(funcCallWithArgsRegex);
+    if (m) {
+      item.insertText = `${m[1]}(\${1})\${0}`;
+      item.insertTextFormat = InsertTextFormat.Snippet;
+      return item;
+    }
   }
 
-  // improve function(…?)
-  m = label.match(funcCallWithArgsRegex);
-  if (m) {
-    item.insertText = `${m[1]}(\${1})\${0}`;
-    item.insertTextFormat = InsertTextFormat.Snippet;
-    return item;
-  }
   return item;
 };
