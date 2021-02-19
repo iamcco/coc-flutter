@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -126,6 +126,32 @@
           "type": "boolean",
           "default": false,
           "description": "Automatically run the DevTools debugger in a web browser when running a project"
+        },
+        "dart.analysisExcludedFolders": {
+          "type": "array",
+          "default": [],
+          "item": "string",
+          "description": "An array of paths (absolute or relative to each workspace folder) that should be excluded from analysis."
+        },
+        "dart.enableSdkFormatter": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to false, prevents registration (or unregisters) the SDK formatter. When set to true or not supplied, will register/reregister the SDK formatter."
+        },
+        "dart.lineLength": {
+          "type": "number",
+          "default": 80,
+          "description": "The number of characters the formatter should wrap code at. If unspecified, code will be wrapped at 80 characters."
+        },
+        "dart.completeFunctionCalls": {
+          "type": "boolean",
+          "default": true,
+          "description": "Completes functions/methods with their required parameters."
+        },
+        "dart.showTodos": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to generate diagnostics for TODO comments. If unspecified, diagnostics will not be generated."
         }
       }
     },
