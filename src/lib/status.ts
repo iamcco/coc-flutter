@@ -1,16 +1,13 @@
-import { StatusBarItem, workspace, LanguageClient } from 'coc.nvim';
+import { StatusBarItem, workspace } from 'coc.nvim';
 import { Dispose } from '../util/dispose';
 
 class StatusBar extends Dispose {
   private isLSPReady = false;
   private statusBar: StatusBarItem | undefined = undefined;
 
-  ready(client: LanguageClient) {
+  ready() {
     this.isLSPReady = true;
-    // register analyzer status
-    client.onNotification('$/analyzerStatus', (params: { isAnalyzing: boolean }) => {
-      this.progress(params.isAnalyzing);
-    });
+    this.show('flutter');
   }
 
   init() {

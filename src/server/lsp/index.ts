@@ -133,9 +133,7 @@ export class LspServer extends Dispose {
           // https://github.com/iamcco/coc-flutter/issues/8
           this.push(new SignatureHelpProvider(client));
         }, 2000);
-        // update lsp status
-        statusBar.show('Flutter', true);
-        statusBar.ready(client);
+        statusBar.ready();
       })
       .catch((error: Error) => {
         statusBar.hide();
