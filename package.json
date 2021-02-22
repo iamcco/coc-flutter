@@ -66,6 +66,11 @@
           "default": true,
           "description": "Enable coc-flutter extension"
         },
+        "flutter.fvm.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable checking of fvm directories to find flutter install"
+        },
         "flutter.lsp.debug": {
           "type": "boolean",
           "default": false,
