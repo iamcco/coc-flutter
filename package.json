@@ -127,6 +127,11 @@
           "default": false,
           "description": "Automatically run the DevTools debugger in a web browser when running a project"
         },
+        "flutter.commands.devicesTimeout": {
+          "type": "integer",
+          "default": 1,
+          "description": "Sets the `--device-timout` flag when running `flutter devices`"
+        },
         "dart.analysisExcludedFolders": {
           "type": "array",
           "default": [],
