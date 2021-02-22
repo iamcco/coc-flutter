@@ -45,7 +45,7 @@ class FlutterSDK {
   }
 
   private get _hasValidDartHome(): Promise<boolean> {
-    return exists(this._dartHome);
+    return exists(this._sdkHome);
   }
 
   public async getVersion(): Promise<[number, number, number] | undefined> {
@@ -78,9 +78,9 @@ class FlutterSDK {
 
 
     try {
-      if (this._fvmEnabled) await this.initDartSdkHomeFromFvm();
-      if (! (await this._hasValidDartHome)) await this.initDarkSdkHomeFromFlutter(flutterLookup);
-      if (! (await this._hasValidDartHome)) await this.initDarkSdkHome(dartLookup);
+      if (this._fvmEnabled) await this.initDartSdkHomeFromLocalFvm();
+      if (!(await this._hasValidDartHome)) await this.initDarkSdkHomeFromFlutter(flutterLookup);
+      if (!(await this._hasValidDartHome)) await this.initDarkSdkHome(dartLookup);
 
       await this.initDartSdk();
       if (!this._state) {
@@ -102,22 +102,31 @@ class FlutterSDK {
     }
   }
 
-  private async initDartSdkHomeFromFvm() {
+  private async initDartSdkHomeFromLocalFvm() {
     try {
       if (await exists('./.fvm/flutter_sdk')) {
         log('Found local fvm sdk');
-        const realPath = (await getRealPath('./.fvm/flutter_sdk')).trim();
-        this._sdkHome = realPath;
-        this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
-        log(`flutter command path => ${this.flutterCommand}`);
-        this._dartHome = join(this._sdkHome, 'bin', 'cache', 'dart-sdk');
+        this._sdkHome = './.fvm/flutter_sdk';
         log(`dart sdk home => ${this._dartHome}`);
-
+        await this.initFlutterCommandsFromSdkHome();
       } else {
         log('No local fvm sdk');
       }
     } catch(error) {
       log(`Error configuring local fvm sdk: ${error.message}}`);
+    }
+  }
+
+  private async initFlutterCommandsFromSdkHome() {
+    this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
+    log(`flutter command path => ${this.flutterCommand}`);
+    if (!(await exists(this._flutterCommand))) {
+      log('flutter command path does not exist');
+    }
+    this._dartHome = join(this._sdkHome, 'bin', 'cache', 'dart-sdk');
+    log(`dart sdk home => ${this._dartHome}`);
+    if (!(await exists(this._dartHome))) {
+      log('dart sdk home path does not exist');
     }
   }
 
@@ -144,10 +153,7 @@ class FlutterSDK {
         } else {
           this._sdkHome = flutterPath;
         }
-        this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
-        log(`flutter command path => ${this.flutterCommand}`);
-        this._dartHome = join(this._sdkHome, 'bin', 'cache', 'dart-sdk');
-        log(`dart sdk home => ${this._dartHome}`);
+        await this.initFlutterCommandsFromSdkHome();
       }
     } catch (error) {
       log(`flutter command not found: ${error.message}`);
