@@ -44,8 +44,8 @@ class FlutterSDK {
     return this._flutterCommand || 'flutter';
   }
 
-  private get _hasValidDartHome(): Promise<boolean> {
-    return exists(this._sdkHome);
+  private async _hasValidFlutterSdk(): Promise<boolean> {
+    return (await exists(this._sdkHome)) && (await exists(join(this._sdkHome, 'bin', 'flutter')));
   }
 
   public async getVersion(): Promise<[number, number, number] | undefined> {
@@ -70,17 +70,35 @@ class FlutterSDK {
     return v.every((n, idx) => n >= version[idx]);
   }
 
+  async reloadWithSdk(sdkLocation: string): Promise<void> {
+    this._sdkHome = sdkLocation;
+    await this.initFlutterCommandsFromSdkHome();
+    await this.initDartSdk();
+  }
+
   async init(config: WorkspaceConfiguration): Promise<void> {
     this._dartCommand = config.get<string>('sdk.dart-command', '');
     const flutterLookup = config.get<string>('sdk.flutter-lookup', '');
     const dartLookup = config.get<string>('sdk.dart-lookup', '');
-    this._fvmEnabled = config.get<boolean>('flutter.fvm.enabled', true);
+    this._fvmEnabled = config.get<boolean>('fvm.enabled', true);
 
+    this._sdkHome = config.get<string>('sdk.path', '');
+    let hasValidFlutterSdk = await this._hasValidFlutterSdk();
+    if (hasValidFlutterSdk) await this.initFlutterCommandsFromSdkHome();
 
     try {
-      if (this._fvmEnabled) await this.initDartSdkHomeFromLocalFvm();
-      if (!(await this._hasValidDartHome)) await this.initDarkSdkHomeFromFlutter(flutterLookup);
-      if (!(await this._hasValidDartHome)) await this.initDarkSdkHome(dartLookup);
+      if (this._fvmEnabled && !hasValidFlutterSdk) {
+        await this.initDartSdkHomeFromLocalFvm();
+        hasValidFlutterSdk = await this._hasValidFlutterSdk();
+      }
+      if (!hasValidFlutterSdk) {
+        await this.initDarkSdkHomeFromFlutter(flutterLookup);
+        hasValidFlutterSdk = await this._hasValidFlutterSdk();
+      }
+      if (!hasValidFlutterSdk) {
+        await this.initDarkSdkHome(dartLookup);
+        hasValidFlutterSdk = await this._hasValidFlutterSdk();
+      }
 
       await this.initDartSdk();
       if (!this._state) {
@@ -107,7 +125,6 @@ class FlutterSDK {
       if (await exists('./.fvm/flutter_sdk')) {
         log('Found local fvm sdk');
         this._sdkHome = './.fvm/flutter_sdk';
-        log(`dart sdk home => ${this._dartHome}`);
         await this.initFlutterCommandsFromSdkHome();
       } else {
         log('No local fvm sdk');

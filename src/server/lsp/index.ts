@@ -33,12 +33,14 @@ export class LspServer extends Dispose {
     return this._client;
   }
 
-  async init() {
+  async init(): Promise<void> {
     const config = workspace.getConfiguration('flutter');
     // is force lsp debug
     const isLspDebug = config.get<boolean>('lsp.debug');
     // dart sdk analysis snapshot path
-    await flutterSDK.init(config);
+    if (!flutterSDK.state) {
+      await flutterSDK.init(config);
+    }
 
     if (!flutterSDK.state) {
       log('flutter SDK not found!');
@@ -144,5 +146,13 @@ export class LspServer extends Dispose {
     // Push the disposable to the context's subscriptions so that the
     // client can be deactivated on extension deactivation
     this.push(services.registLanguageClient(client));
+  }
+
+  async restart(): Promise<void> {
+    // await services.stop(this._client!.id);
+    // await this._client?.stop();
+
+    // await this.init();
+    // this._client?.
   }
 }

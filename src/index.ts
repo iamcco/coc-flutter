@@ -30,5 +30,5 @@ export async function activate(context: ExtensionContext): Promise<void> {
   context.subscriptions.push(new Providers());
 
   // register sources
-  context.subscriptions.push(new SourceList());
+  context.subscriptions.push(new SourceList(lsp));
 }
