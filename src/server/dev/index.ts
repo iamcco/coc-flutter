@@ -60,6 +60,7 @@ class DevServer extends Dispose {
       notification.show('Flutter dev server is running!');
       return false;
     }
+    const config = workspace.getConfiguration('flutter.commands');
     const workspaceFolder = await getFlutterWorkspaceFolder();
     if (!workspaceFolder) {
       notification.show('Flutter project workspaceFolder not found!');
@@ -82,6 +83,10 @@ class DevServer extends Dispose {
     });
     this.task.on('exit', this._onExit);
     this.task.on('error', this._onError);
+
+    if (config.get<boolean>('autoOpenDevLog', false)) {
+      this.openDevLog();
+    }
 
     if (this.onHandler.length) {
       this.onHandler.forEach(cb => cb());
