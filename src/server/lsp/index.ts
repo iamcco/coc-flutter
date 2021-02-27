@@ -7,6 +7,7 @@ import {
   LanguageClient,
   services,
   Uri,
+  OutputChannel,
 } from 'coc.nvim';
 import { homedir } from 'os';
 
@@ -33,7 +34,12 @@ export class LspServer extends Dispose {
     return this._client;
   }
 
+  private lastId = 0;
+  private outchannel?: OutputChannel;
+
   async init(): Promise<void> {
+    this.outchannel = workspace.createOutputChannel('flutter-lsp');
+    this.push(this.outchannel);
     const config = workspace.getConfiguration('flutter');
     // is force lsp debug
     const isLspDebug = config.get<boolean>('lsp.debug');
@@ -87,8 +93,7 @@ export class LspServer extends Dispose {
 
       initializationOptions: initialization,
 
-      // lsp outchannel use same as logger
-      outputChannel: logger.outchannel,
+      outputChannel: this.outchannel,
       // do not automatically open outchannel
       revealOutputChannelOn: RevealOutputChannelOn.Never,
 
@@ -116,11 +121,13 @@ export class LspServer extends Dispose {
     };
 
     // Create the language client and start the client.
-    const client = new LanguageClient('flutter', 'flutter analysis server', serverOptions, clientOptions, isLspDebug);
+    const client = new LanguageClient(`flutter${this.lastId++}`, 'flutter analysis server', serverOptions, clientOptions, isLspDebug);
     this._client = client;
 
-    statusBar.init();
-    this.push(statusBar);
+    if (!statusBar.isInitialized) {
+      statusBar.init();
+      this.push(statusBar);
+    }
 
     client
       .onReady()
@@ -149,10 +156,7 @@ export class LspServer extends Dispose {
   }
 
   async restart(): Promise<void> {
-    // await services.stop(this._client!.id);
-    // await this._client?.stop();
-
-    // await this.init();
-    // this._client?.
+    await this._client?.stop();
+    await this.init();
   }
 }

@@ -16,7 +16,7 @@ export default class SdksList implements IList {
 
   constructor(lsp: LspServer) {
     this.actions.push({
-      name: 'project only switch',
+      name: 'switch',
       multiple: false,
       execute: async (item) => {
         if (Array.isArray(item)) {
@@ -38,7 +38,7 @@ export default class SdksList implements IList {
       },
     });
     this.actions.push({
-      name: 'switch',
+      name: 'global switch',
       multiple: false,
       execute: async (item) => {
         if (Array.isArray(item)) {

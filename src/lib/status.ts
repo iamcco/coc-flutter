@@ -5,6 +5,10 @@ class StatusBar extends Dispose {
   private isLSPReady = false;
   private statusBar: StatusBarItem | undefined = undefined;
 
+  get isInitialized(): boolean {
+    return this.statusBar != undefined;
+  }
+
   ready() {
     this.isLSPReady = true;
     this.show('flutter');
