@@ -43,7 +43,7 @@ class DevServer extends Dispose {
   private _onExit = (code: number) => {
     this.task = undefined;
     const config = workspace.getConfiguration('flutter.commands');
-    if (config.get<boolean>('autoOpenDevLog', false) && this.outputChannel) {
+    if (config.get<boolean>('autoHideDevLog', false) && this.outputChannel) {
       this.outputChannel.hide();
     }
     log(`server exit with: ${code}`);

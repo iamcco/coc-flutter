@@ -127,6 +127,11 @@
           "default": false,
           "description": "Automatically open the dev log after calling flutter run"
         },
+        "flutter.commands.autoHideDevLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically hide the dev log when the app stops running"
+        },
         "flutter.runDevToolsAtStartup": {
           "type": "boolean",
           "default": false,
