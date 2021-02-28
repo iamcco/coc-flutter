@@ -35,9 +35,9 @@ If applicable, add screenshots to help explain your problem.
 
 1. Set `"flutter.trace.server":   "verbose"`
 2. Reproduce the issue
-3. `:CocList output` open output list and select `flutter`
+3. `:CocCommand workspace.showOutput` open output list and select `flutter`
 
-Log:
+Paste Log from above:
 
 ```
 ```
