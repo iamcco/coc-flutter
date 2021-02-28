@@ -66,8 +66,8 @@ Flutter support for (Neo)vim
 - `flutter.workspaceFolder.ignore` Path start within the list will not treat as workspaceFolder, default: []
   - also flutter sdk will not treat as workspaceFolder, more detail issues [50](https://github.com/iamcco/coc-flutter/issues/50)
 - `flutter.runDevToolsAtStartup` Automatically open devtools debugger web page when a project is run, default: false
-- `flutter.commands.autoOpenDevLog` Automatically open the dev log after calling flutter run, default: false
-- `flutter.commands.autoHideDevLog` Automatically hide the dev log when the app stops running, default: false
+- `flutter.autoOpenDevLog` Automatically open the dev log after calling flutter run, default: false
+- `flutter.autoHideDevLog` Automatically hide the dev log when the app stops running, default: false
 
 
 **Enable format on save**:
