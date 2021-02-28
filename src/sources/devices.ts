@@ -1,4 +1,4 @@
-import { IList, ListAction, ListItem, commands } from 'coc.nvim';
+import { IList, ListAction, ListItem, commands, workspace } from 'coc.nvim';
 import colors from 'colors/safe';
 
 import { lineBreak } from '../util/constant';
@@ -31,7 +31,9 @@ export default class DevicesList implements IList {
   }
 
   public async loadItems(): Promise<ListItem[]> {
-    const { err, stdout } = await flutterSDK.execFlutterCommand('devices');
+    const config = workspace.getConfiguration('flutter');
+    const timeout = config.get<number>('commands.devicesTimeout', 1);
+    const { err, stdout } = await flutterSDK.execFlutterCommand(`devices --device-timeout=${timeout}`);
     let devices: Device[] = [];
     if (!err) {
       devices = stdout
