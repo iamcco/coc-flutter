@@ -122,6 +122,16 @@
           "item": "string",
           "description": "Path start within the list will not treat as workspaceFolder"
         },
+        "flutter.autoOpenDevLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically open the dev log after calling flutter run"
+        },
+        "flutter.autoHideDevLog": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically hide the dev log when the app stops running"
+        },
         "flutter.runDevToolsAtStartup": {
           "type": "boolean",
           "default": false,

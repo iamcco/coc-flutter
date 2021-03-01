@@ -42,6 +42,10 @@ class DevServer extends Dispose {
 
   private _onExit = (code: number) => {
     this.task = undefined;
+    const config = workspace.getConfiguration('flutter');
+    if (config.get<boolean>('autoHideDevLog', false) && this.outputChannel) {
+      this.outputChannel.hide();
+    }
     log(`server exit with: ${code}`);
   };
 
@@ -82,6 +86,11 @@ class DevServer extends Dispose {
     });
     this.task.on('exit', this._onExit);
     this.task.on('error', this._onError);
+
+    const config = workspace.getConfiguration('flutter');
+    if (config.get<boolean>('autoOpenDevLog', false)) {
+      this.openDevLog(true);
+    }
 
     if (this.onHandler.length) {
       this.onHandler.forEach(cb => cb());
@@ -151,16 +160,18 @@ class DevServer extends Dispose {
     }
   }
 
-  async openDevLog() {
+  async openDevLog(preserveFocus?: boolean) {
     const config = workspace.getConfiguration('flutter');
     const cmd = config.get<string>('openDevLogSplitCommand', '');
     if (this.outputChannel) {
       if (!cmd) {
-        this.outputChannel.show();
+        this.outputChannel.show(preserveFocus);
       } else {
         const win = await workspace.nvim.window;
         await workspace.nvim.command(`${cmd} output:///${devLogName}`);
-        workspace.nvim.call('win_gotoid', [win.id]);
+        if (!preserveFocus) {
+          workspace.nvim.call('win_gotoid', [win.id]);
+        }
       }
     }
     setTimeout(() => {
