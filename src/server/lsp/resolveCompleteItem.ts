@@ -36,7 +36,8 @@ export const getResolveCompleteItemFunc = (options: { completeFunctionCalls: boo
   }
 
   // improve setState
-  if (label === 'setState(() {});' && insertTextFormat !== InsertTextFormat.Snippet) {
+  // refer: https://github.com/iamcco/coc-flutter/issues/95
+  if (label === 'setState(() {});') {
     item.insertText = ['setState(() {', '\t${1}', '});${0}'].join('\n');
     item.insertTextFormat = InsertTextFormat.Snippet;
     return item;
