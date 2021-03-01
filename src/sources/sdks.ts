@@ -32,9 +32,9 @@ export default class SdksList implements IList {
         } else {
           config.update('sdk.path', sdk.location);
         }
-        await flutterSDK.reloadWithSdk(sdk.location);
+        await lsp.reloadSdk();
+        await commands.executeCommand('flutter.pub.get');
         await lsp.restart();
-        commands.executeCommand('flutter.pub.get');
       },
     });
     this.actions.push({
@@ -48,7 +48,6 @@ export default class SdksList implements IList {
         if (sdk.isCurrent) return;
         const config = workspace.getConfiguration('flutter');
         config.update('sdk.path', sdk.location, true);
-        await flutterSDK.reloadWithSdk(sdk.location);
         await lsp.restart();
         commands.executeCommand('flutter.pub.get');
       },

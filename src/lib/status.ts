@@ -11,7 +11,7 @@ class StatusBar extends Dispose {
 
   ready() {
     this.isLSPReady = true;
-    this.show('flutter');
+    this.show('flutter', false);
   }
 
   init() {
@@ -34,6 +34,11 @@ class StatusBar extends Dispose {
         },
       }),
     );
+  }
+
+  restartingLsp() {
+    this.isLSPReady = false;
+    this.show('restartingLsp', true);
   }
 
   show(message: string, isProgress?: boolean) {

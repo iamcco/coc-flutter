@@ -8,6 +8,7 @@ import {
   services,
   Uri,
   OutputChannel,
+  ExecutableOptions,
 } from 'coc.nvim';
 import { homedir } from 'os';
 
@@ -22,6 +23,17 @@ import { codeActionProvider } from './codeActionProvider';
 
 const log = logger.getlog('lsp-server');
 
+class _ExecOptions implements Executable {
+  get command(): string {
+    return flutterSDK.dartCommand;
+  }
+  get args(): string[] {
+    return [flutterSDK.analyzerSnapshotPath, '--lsp'];
+  }
+  options?: ExecutableOptions | undefined;
+
+}
+
 export class LspServer extends Dispose {
   private _client: LanguageClient | undefined;
 
@@ -34,7 +46,7 @@ export class LspServer extends Dispose {
     return this._client;
   }
 
-  private lastId = 0;
+  private execOptions = new _ExecOptions();
   private outchannel?: OutputChannel;
 
   async init(): Promise<void> {
@@ -53,17 +65,12 @@ export class LspServer extends Dispose {
       return;
     }
 
-    const execOptions: Executable = {
-      command: flutterSDK.dartCommand,
-      args: [flutterSDK.analyzerSnapshotPath, '--lsp'],
-    };
-
     // TODO: debug options
     // If the extension is launched in debug mode then the debug server options are used
     // Otherwise the run options are used
     const serverOptions: ServerOptions = {
-      run: execOptions,
-      debug: execOptions,
+      run: this.execOptions,
+      debug: this.execOptions,
     };
 
     // lsp initialization
@@ -121,7 +128,7 @@ export class LspServer extends Dispose {
     };
 
     // Create the language client and start the client.
-    const client = new LanguageClient(`flutter${this.lastId++}`, 'flutter analysis server', serverOptions, clientOptions, isLspDebug);
+    const client = new LanguageClient(`flutter`, 'flutter analysis server', serverOptions, clientOptions, isLspDebug);
     this._client = client;
 
     if (!statusBar.isInitialized) {
@@ -155,8 +162,18 @@ export class LspServer extends Dispose {
     this.push(services.registLanguageClient(client));
   }
 
+  async reloadSdk(): Promise<void> {
+    const config = workspace.getConfiguration('flutter');
+    await flutterSDK.init(config);
+  }
+
   async restart(): Promise<void> {
+    statusBar.restartingLsp();
+    await this.reloadSdk();
     await this._client?.stop();
-    await this.init();
+    this._client?.onReady().then(() => {
+      statusBar.ready();
+    })
+    this._client?.start();
   }
 }
