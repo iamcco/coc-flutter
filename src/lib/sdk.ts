@@ -1,6 +1,6 @@
 import os, { homedir } from 'os';
 import { join, dirname } from 'path';
-import { workspace, WorkspaceConfiguration } from 'coc.nvim';
+import { Uri, workspace, WorkspaceConfiguration } from 'coc.nvim';
 import which from 'which';
 import { logger } from '../util/logger';
 import { exists, getRealPath, execCommand, readDir } from '../util/fs';
@@ -149,7 +149,7 @@ class FlutterSDK {
 
   private async initDartSdkHomeFromLocalFvm() {
     try {
-      const fvmLocation = join(workspace.workspaceFolder.uri.replace(/^file:/, ''), '.fvm/flutter_sdk');
+      const fvmLocation = join(Uri.parse(workspace.workspaceFolder.uri).fsPath, '.fvm','flutter_sdk');
       if (await exists(fvmLocation)) {
         log('Found local fvm sdk');
         this._sdkHome = fvmLocation;
