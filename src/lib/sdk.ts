@@ -1,15 +1,30 @@
-import os from 'os';
+import os, { homedir } from 'os';
 import { join, dirname } from 'path';
-import { WorkspaceConfiguration } from 'coc.nvim';
+import { Uri, workspace, WorkspaceConfiguration } from 'coc.nvim';
 import which from 'which';
 import { logger } from '../util/logger';
-import { exists, getRealPath, execCommand } from '../util/fs';
+import { exists, getRealPath, execCommand, readDir } from '../util/fs';
 import { ExecOptions } from 'child_process';
+import { readFile } from 'fs/promises';
 
 const log = logger.getlog('sdk');
 
 const ANALYZER_SNAPSHOT_NAME = join('bin', 'snapshots', 'analysis_server.dart.snapshot');
 const DART_COMMAND = join('bin', os.platform() === 'win32' ? 'dart.bat' : 'dart');
+
+const _defaultSearchPaths: string[] = [
+  '~/snap/flutter/common/flutter',
+  '~/fvm/versions',
+];
+
+export interface FlutterSdk {
+  location: string;
+  version: string;
+  fvmVersion?: string;
+  isFvm: boolean;
+  isCurrent: boolean;
+}
+
 
 class FlutterSDK {
   private _sdkHome = '';
@@ -18,6 +33,9 @@ class FlutterSDK {
   private _analyzerSnapshotPath = '';
   private _dartCommand = '';
   private _flutterCommand?: string;
+  private _fvmEnabled!: boolean;
+
+  private config!: WorkspaceConfiguration;
 
   public get sdkHome(): string {
     return this._sdkHome;
@@ -43,6 +61,10 @@ class FlutterSDK {
     return this._flutterCommand || 'flutter';
   }
 
+  private async _hasValidFlutterSdk(): Promise<boolean> {
+    return (await exists(this._sdkHome)) && (await exists(join(this._sdkHome, 'bin', 'flutter')));
+  }
+
   public async getVersion(): Promise<[number, number, number] | undefined> {
     if (this._dartCommand) {
       const { stderr } = await execCommand(`${this._dartCommand} --version`);
@@ -66,19 +88,33 @@ class FlutterSDK {
   }
 
   async init(config: WorkspaceConfiguration): Promise<void> {
-    this._dartCommand = config.get<string>('sdk.dart-command', '');
-    const flutterLookup = config.get<string>('sdk.flutter-lookup', '');
-    const dartLookup = config.get<string>('sdk.dart-lookup', '');
+    this.config = config;
+    await this._init();
+  }
+
+  private async _init(): Promise<void> {
+    this._dartCommand = this.config.get<string>('sdk.dart-command', '');
+    const dartLookup = this.config.get<string>('sdk.dart-lookup', '');
+    this._fvmEnabled = this.config.get<boolean>('fvm.enabled', true);
+
+    this._sdkHome = this.config.get<string>('sdk.path', '');
+    let hasValidFlutterSdk = await this._hasValidFlutterSdk();
+    if (hasValidFlutterSdk) await this.initFlutterCommandsFromSdkHome();
 
     try {
-      // dart sdk from flutter sdk
-      // => cache/dart-sdk
-      await this.initDarkSdkHomeFromFlutter(flutterLookup);
-      // if do not have flutter sdk, detect dart sdk
-      const isPathExists = await exists(this._dartHome);
-      if (!isPathExists) {
-        await this.initDarkSdkHome(dartLookup);
+      if (this._fvmEnabled && !hasValidFlutterSdk) {
+        await this.initDartSdkHomeFromLocalFvm();
+        hasValidFlutterSdk = await this._hasValidFlutterSdk();
       }
+      if (!hasValidFlutterSdk) {
+        await this.initDarkSdkHomeFromSearchPaths();
+        hasValidFlutterSdk = await this._hasValidFlutterSdk();
+      }
+      if (!hasValidFlutterSdk) {
+        await this.initDarkSdkHome(dartLookup);
+        hasValidFlutterSdk = await this._hasValidFlutterSdk();
+      }
+
       await this.initDartSdk();
       if (!this._state) {
         log('Dart SDK not found!');
@@ -99,36 +135,43 @@ class FlutterSDK {
     }
   }
 
-  private async initDarkSdkHomeFromFlutter(flutterLookup: string) {
+  private async initDarkSdkHomeFromSearchPaths() {
     try {
-      let flutterPath: string;
+      const sdks = await this.findSdks();
+      if (sdks.length > 0) {
+        this._sdkHome = sdks[0].location;
+        await this.initFlutterCommandsFromSdkHome();
+      }
+    } catch(error) {
+      log(`Error configuring sdk from searchPaths: ${error.message}}`);
+    }
+  }
 
-      if (flutterLookup.length == 0) {
-        flutterPath = (await which('flutter')).trim();
+  private async initDartSdkHomeFromLocalFvm() {
+    try {
+      const fvmLocation = join(Uri.parse(workspace.workspaceFolder.uri).fsPath, '.fvm','flutter_sdk');
+      if (await exists(fvmLocation)) {
+        log('Found local fvm sdk');
+        this._sdkHome = fvmLocation;
+        await this.initFlutterCommandsFromSdkHome();
       } else {
-        const { stdout } = await execCommand(flutterLookup);
-        flutterPath = stdout.trim();
-        if (stdout.length == 0) {
-          throw new Error('flutter lookup returned empty string');
-        }
+        log('No local fvm sdk');
       }
-      log(`which flutter command => ${flutterPath}`);
+    } catch(error) {
+      log(`Error configuring local fvm sdk: ${error.message}}`);
+    }
+  }
 
-      if (flutterPath) {
-        flutterPath = await getRealPath(flutterPath);
-        flutterPath = flutterPath.trim();
-        if (flutterPath.endsWith(join('bin', 'flutter'))) {
-          this._sdkHome = flutterPath.replace(join('bin', 'flutter'), '');
-        } else {
-          this._sdkHome = flutterPath;
-        }
-        this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
-        log(`flutter command path => ${this.flutterCommand}`);
-        this._dartHome = join(dirname(flutterPath), 'cache', 'dart-sdk');
-        log(`dart sdk home => ${this._dartHome}`);
-      }
-    } catch (error) {
-      log(`flutter command not found: ${error.message}`);
+  private async initFlutterCommandsFromSdkHome() {
+    this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
+    log(`flutter command path => ${this.flutterCommand}`);
+    if (!(await exists(this._flutterCommand))) {
+      log('flutter command path does not exist');
+    }
+    this._dartHome = join(this._sdkHome, 'bin', 'cache', 'dart-sdk');
+    log(`dart sdk home => ${this._dartHome}`);
+    if (!(await exists(this._dartHome))) {
+      log('dart sdk home path does not exist');
     }
   }
 
@@ -196,6 +239,133 @@ class FlutterSDK {
     stderr: string;
   }> {
     return execCommand(`${this.flutterCommand} ${command}`, options);
+  }
+
+  private async versionForSdk(location: string): Promise<string | undefined> {
+    const version = await execCommand(`cat ${join(location, 'version')}`);
+    if (version.err) return;
+    return version.stdout;
+  }
+
+  private async sdkWithLookup(flutterLookup: string, currentSdk: string): Promise<FlutterSdk | undefined> {
+    let flutterPath: string;
+    if (flutterLookup.length == 0) {
+      flutterPath = (await which('flutter')).trim();
+    } else {
+      const { stdout } = await execCommand(flutterLookup);
+      flutterPath = stdout.trim();
+      if (stdout.length == 0) {
+        return;
+      }
+    }
+    log(`which flutter command => ${flutterPath}`);
+
+    if (flutterPath) {
+      flutterPath = await getRealPath(flutterPath);
+      flutterPath = flutterPath.trim();
+      if (flutterPath.endsWith(join('bin', 'flutter'))) {
+        flutterPath = join(flutterPath, '..', '..');
+      }
+      const isFlutterDir = await exists(join(flutterPath, 'bin', 'flutter'));
+      if (!isFlutterDir) return;
+      const version = await this.versionForSdk(flutterPath);
+      if (version) {
+        return {
+          location: flutterPath,
+          version: version,
+          isFvm: false,
+          isCurrent: currentSdk == flutterPath,
+        }
+      }
+    }
+  }
+
+  async findSdks(): Promise<FlutterSdk[]> {
+    let sdks: FlutterSdk[] = [];
+
+    let currentSdk = this.sdkHome.length == 0 ? '' : await getRealPath(this.sdkHome);
+
+    const flutterLookup = this.config.get<string>('sdk.flutter-lookup', '');
+    const fvmEnabled = this.config.get<boolean>('fvm.enabled', true);
+    let home = homedir();
+
+    const lookupSdk = await this.sdkWithLookup(flutterLookup, currentSdk);
+    if (lookupSdk) {
+      sdks.push(lookupSdk);
+    }
+
+    const paths = [
+      ...this.config.get<string[]>('sdk.searchPaths', []),
+      ..._defaultSearchPaths,
+    ];
+    log(`searchPaths: ${paths}`);
+
+    for (let path of paths) {
+      path = path.replace(/^~/, home).trim();
+      const isFlutterDir = await exists(join(path, 'bin', 'flutter'));
+      if (isFlutterDir) {
+        const version = await this.versionForSdk(path);
+        if (version && !sdks.some((sdk) => sdk.location == path)) {
+          sdks.push({
+            location: path,
+            isFvm: false,
+            version: version,
+            isCurrent: path == currentSdk,
+          });
+        }
+        continue;
+      }
+
+      const files = await readDir(path);
+      for (const file of files) {
+        let location = join(path, file).trim();
+        const isFlutterDir = await exists(join(location, 'bin', 'flutter'));
+        if (!isFlutterDir) continue;
+        if (sdks.some((sdk) => sdk.location == location)) continue;
+        const version = await this.versionForSdk(location);
+        sdks.push({
+          location: location,
+          isFvm: false,
+          version: version || 'unknown',
+          isCurrent: location == currentSdk,
+        });
+      }
+    }
+
+    if (fvmEnabled) {
+      let fvmCachePath = join(home, 'fvm', 'versions');
+      const settingsPath = join(home, 'fvm', '.settings');
+      try {
+        const fvmSettingsFileExists = await exists(settingsPath);
+        if (fvmSettingsFileExists) {
+          const settingsRaw = await readFile(settingsPath);
+          const settings = JSON.parse(settingsRaw.toString());
+          if (typeof(settings.cachePath) == 'string' && settings.cachePath.trim() != '') {
+            fvmCachePath = settings.cachePath;
+          }
+        }
+      } catch(error) {
+        log(`Failed to load fvm settings: ${error.message}`);
+      }
+
+      const fvmVersions = await readDir(fvmCachePath);
+      for (const version of fvmVersions) {
+        let location = join(fvmCachePath, version).trim();
+        const isFlutterDir = await exists(join(location, 'bin', 'flutter'));
+        if (!isFlutterDir) continue;
+        if (sdks.some((sdk) => sdk.location == location)) continue;
+        const flutterVersion = await this.versionForSdk(location);
+        sdks.push({
+          location: location,
+          fvmVersion: version,
+          isFvm: true,
+          version: !flutterVersion ? version : `${version} (${flutterVersion})`,
+          isCurrent: location == currentSdk,
+        });
+      }
+    }
+
+    return sdks;
   }
 }
 

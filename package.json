@@ -66,6 +66,22 @@
           "default": true,
           "description": "Enable coc-flutter extension"
         },
+        "flutter.fvm.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable checking of fvm directories to find flutter install"
+        },
+        "flutter.sdk.path": {
+          "type": "string",
+          "default": [],
+          "description": "The path of the flutter sdk to use. (When using the `FlutterSDKs` list to change sdk this value will be updated)"
+        },
+        "flutter.sdk.searchPaths": {
+          "type": "array",
+          "default": [],
+          "item": "string",
+          "description": "The paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed\neg. /path/to/flutter (command at /path/to/flutter/bin/flutter) \n~/flutter_versions (command at ~/flutter_versions/version/bin/flutter)."
+        },
         "flutter.lsp.debug": {
           "type": "boolean",
           "default": false,

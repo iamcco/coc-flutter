@@ -98,3 +98,15 @@ export const getRealPath = async (path: string): Promise<string> => {
   }
   return path;
 };
+
+export const readDir = async(path: string, options?: { encoding: BufferEncoding | null; withFileTypes?: false } | BufferEncoding | undefined | null): Promise<string[]> => {
+  return new Promise(resolve => {
+    fs.readdir(path, options, (err, files) => {
+      if (err) {
+        return resolve([]);
+      } else {
+        return resolve(files);
+      }
+    })
+  });
+}
