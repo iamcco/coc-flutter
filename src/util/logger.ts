@@ -1,4 +1,4 @@
-import { OutputChannel, workspace } from 'coc.nvim';
+import { OutputChannel, window } from 'coc.nvim';
 import { devLogName } from './constant';
 import { Dispose } from './dispose';
 
@@ -12,7 +12,7 @@ class Logger extends Dispose {
   init(level: logLevel) {
     this._traceServer = level;
     if (this._traceServer !== 'off') {
-      this._outchannel = workspace.createOutputChannel('flutter');
+      this._outchannel = window.createOutputChannel('flutter');
       this.push(this._outchannel);
     }
   }
@@ -27,7 +27,7 @@ class Logger extends Dispose {
 
   get devOutchannel(): OutputChannel {
     if (!this._devOutchannel) {
-      this._devOutchannel = workspace.createOutputChannel(devLogName);
+      this._devOutchannel = window.createOutputChannel(devLogName);
       this.push(this._devOutchannel);
     }
     return this._devOutchannel;

@@ -1,4 +1,4 @@
-import { StatusBarItem, workspace } from 'coc.nvim';
+import { StatusBarItem, window, workspace } from 'coc.nvim';
 import { Dispose } from '../util/dispose';
 
 class StatusBar extends Dispose {
@@ -15,7 +15,7 @@ class StatusBar extends Dispose {
   }
 
   init() {
-    this.statusBar = workspace.createStatusBarItem(0, { progress: false });
+    this.statusBar = window.createStatusBarItem(0, { progress: false });
     this.push(this.statusBar);
 
     this.push(

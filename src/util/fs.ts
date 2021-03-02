@@ -1,10 +1,10 @@
-import fs from 'fs';
-import { sep, dirname, join } from 'path';
-import { exec, ExecOptions } from 'child_process';
-import fastGlob from 'fast-glob';
-import { Uri, workspace } from 'coc.nvim';
 import { Stats } from '@nodelib/fs.scandir/out/types';
 import { ErrnoException } from '@nodelib/fs.stat/out/types';
+import { exec, ExecOptions } from 'child_process';
+import { Uri, workspace } from 'coc.nvim';
+import fastGlob from 'fast-glob';
+import fs, {BaseEncodingOptions} from 'fs';
+import { dirname, join, sep } from 'path';
 import { logger } from './logger';
 
 export const exists = async (path: string): Promise<boolean> => {
@@ -38,7 +38,8 @@ export const findWorkspaceFolder = async (cwd: string, patterns: string[]): Prom
 };
 
 export const getFlutterWorkspaceFolder = async (): Promise<string | undefined> => {
-  return await findWorkspaceFolder(Uri.parse(workspace.workspaceFolder.uri).fsPath, ['**/pubspec.yaml']);
+  const workspaceFolder = workspace.workspaceFolder ? Uri.parse(workspace.workspaceFolder.uri).fsPath : workspace.cwd
+  return await findWorkspaceFolder(workspaceFolder, ['**/pubspec.yaml']);
 };
 
 const log = logger.getlog('fs');
@@ -106,6 +107,18 @@ export const readDir = async(path: string, options?: { encoding: BufferEncoding 
         return resolve([]);
       } else {
         return resolve(files);
+      }
+    })
+  });
+}
+
+export const readFile = async(path: string, options?: BaseEncodingOptions & { flag?: string; } | string | undefined | null): Promise<string | Buffer> => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, options, (err, data) => {
+      if (err) {
+        return reject(err);
+      } else {
+        return resolve(data);
       }
     })
   });

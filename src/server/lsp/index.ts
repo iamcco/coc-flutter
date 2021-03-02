@@ -1,25 +1,26 @@
 import {
-  workspace,
-  Executable,
-  ServerOptions,
-  LanguageClientOptions,
-  RevealOutputChannelOn,
-  LanguageClient,
-  services,
-  Uri,
-  OutputChannel,
-  ExecutableOptions,
+    Executable,
+    ExecutableOptions,
+    LanguageClient,
+    LanguageClientOptions,
+    OutputChannel,
+    RevealOutputChannelOn,
+    ServerOptions,
+    services,
+    Uri,
+    window,
+    workspace
 } from 'coc.nvim';
 import { homedir } from 'os';
-
 import { flutterSDK } from '../../lib/sdk';
-import { logger } from '../../util/logger';
 import { statusBar } from '../../lib/status';
 import { Dispose } from '../../util/dispose';
+import { logger } from '../../util/logger';
 import { ClosingLabels } from './closingLabels';
-import { SignatureHelpProvider } from './signatureHelp';
-import { completionProvider } from './completionProvider';
 import { codeActionProvider } from './codeActionProvider';
+import { completionProvider } from './completionProvider';
+import { SignatureHelpProvider } from './signatureHelp';
+
 
 const log = logger.getlog('lsp-server');
 
@@ -50,7 +51,7 @@ export class LspServer extends Dispose {
   private outchannel?: OutputChannel;
 
   async init(): Promise<void> {
-    this.outchannel = workspace.createOutputChannel('flutter-lsp');
+    this.outchannel = window.createOutputChannel('flutter-lsp');
     this.push(this.outchannel);
     const config = workspace.getConfiguration('flutter');
     // is force lsp debug

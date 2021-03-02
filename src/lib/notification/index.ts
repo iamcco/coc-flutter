@@ -1,5 +1,4 @@
-import { workspace } from 'coc.nvim';
-
+import { window, workspace } from 'coc.nvim';
 import { Dispose } from '../../util/dispose';
 import { Message } from './message';
 
@@ -69,7 +68,7 @@ class Notification extends Dispose {
       return;
     }
     if (!this.isSupportFloat) {
-      return workspace.showMessage(messages.join('\n'));
+      return window.showMessage(messages.join('\n'));
     }
     this.messages.push(new Message(messages, this.maxWidth, showTime));
     this.detect();

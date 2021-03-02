@@ -1,12 +1,12 @@
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { window } from 'coc.nvim';
 import os from 'os';
-import { workspace } from 'coc.nvim';
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
-
+import { notification } from '../../lib/notification';
+import { flutterSDK } from '../../lib/sdk';
+import { Dispose } from '../../util/dispose';
 import { getFlutterWorkspaceFolder } from '../../util/fs';
 import { logger } from '../../util/logger';
-import { notification } from '../../lib/notification';
-import { Dispose } from '../../util/dispose';
-import {flutterSDK} from '../../lib/sdk';
+
 
 const log = logger.getlog('devtools-server');
 
@@ -121,7 +121,7 @@ class DevToolsServer extends Dispose {
         // Check for this message, prompt user to let us activate devtools, and continue if they accept
         const m = text.match(/No active package devtools/g);
         if (m) {
-          const devToolsActivationPrompt = workspace.showPrompt(
+          const devToolsActivationPrompt = window.showPrompt(
             'Flutter pub global devtools has not been activated. Activate now?',
           );
           this.handleDevToolsActivationPrompt(devToolsActivationPrompt, handler);
