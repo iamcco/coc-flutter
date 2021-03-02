@@ -26,6 +26,7 @@ Flutter support for (Neo)vim
 - Automatically run `flutter pub get` when `pubspec.yaml` change
 - Support flutter dev server
 - Snippet enhance `flutter.provider.enableSnippet`
+- Sdk switching
 - Devices List
 - Emulators List
 
@@ -35,12 +36,36 @@ Flutter support for (Neo)vim
 
 > **NOTE**: install `dart-vim-plugin` plugin if your (neo)vim detect filetype incorrect
 
+Most likely the extension will find your sdk automatically as long as the `flutter` command maps to an sdk location on your system.
+
+If you are using a version manager like `asdf` that maps the `flutter` command to another binary instead of an sdk location or this extension cannot find your sdk for another reason you'll have to provide the extension with how to find your sdk.
+To do this there are a few options:
+1. If your version manager supports a `wich` command like then you can set the `flutter.sdk.flutter-lookup` config option. Eg. `"flutter.sdk.flutter-lookup": "asdf which flutter"`.
+2. You can add the path where to find the sdk to the `flutter.sdk.searchPaths` config option.
+   Either specify the exact folder the sdk is installed in or a folder that contains other folders which directly have an sdk in them. *Note that not all of these folders need to have an sdk, if they don't contain one they will simply be ignored*
+3. Set the `flutter.sdk.path` config option to the exact path you want to use for your sdk.
+   If you have also set the `flutter.sdk.searchPaths` then you can use the `FlutterSdks` list (see below) to see what versions you have installed and set the config option for you. **Note that this means that the `flutter.sdk.path` option will be overriden by this list**
+
 ## coc-list sources
+
+- FlutterSdks
+  > `:CocList FlutterSdks`
+
+  Shows all the sdks that can be found by using the `searchPaths` config and the `flutter-lookup` config options and allows you to switch between them, either only for your current workspace or globally.
+  Besides those two ways to find sdks it also checks if you are using fvm and if so uses those directories to find your sdk.
+  *You can disable this using the `flutter.fvm.enabled` config option.*
+
+  You can also use this list to see what your current sdk is since it will have `(current)` behind it clearly.
 
 - FlutterDevices
   > `:CocList FlutterDevices`
+
+  Shows the devices that you can run the app on.
+
 - FlutterEmulators
   > `:CocList FlutterEmulators`
+
+  Shows emulators available to start.
 
 ## Settings
 
@@ -51,10 +76,15 @@ Flutter support for (Neo)vim
   > When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder.
 - `flutter.lsp.initialization.suggestFromUnimportedLibraries`: default: `true`
   > When set to false, completion will not include synbols that are not already imported into the current file
-- [`flutter.lsp.initialization.closingLabels`](#closing-labels): default: `true`
+
+- `[flutter.lsp.initialization.closingLabels](#closing-labels)`: default: `true`
   > When set to true, will display closing labels at end of closing, only neovim support.
+
+- `flutter.sdk.searchPaths` the paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed
+  eg. `/path/to/flutter` (command at `/path/to/flutter/bin/flutter`) or
+  `~/flutter_versions` (command at `~/flutter_versions/version/bin/flutter`).
 - `flutter.sdk.dart-command` dart command, leave empty should just work, default: `''`
-- `flutter.sdk.dart-lookup` command to find dart executable location, used to infer dart-sdk location, default: `''`
+- `flutter.sdk.dart-lookup` **only use this if you don't have a flutter installation but only dart** command to find dart executable location, used to infer dart-sdk location, default: `''`
 - `flutter.sdk.flutter-lookup` command to find flutter executable location, used to infer location of dart-sdk in flutter cache: `''`
 - `flutter.provider.hot-reload` Enable hot reload after save, default: `true`
   > only when there are no errors for the save file
