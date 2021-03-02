@@ -8,7 +8,6 @@ import { Dispose } from '../../util/dispose';
 import { getFlutterWorkspaceFolder } from '../../util/fs';
 import { logger } from '../../util/logger';
 
-
 const log = logger.getlog('server');
 
 type callback = (...params: any[]) => void;
@@ -93,7 +92,7 @@ class DevServer extends Dispose {
     }
 
     if (this.onHandler.length) {
-      this.onHandler.forEach(cb => cb());
+      this.onHandler.forEach((cb) => cb());
       this.onHandler = [];
     }
     return true;

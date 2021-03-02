@@ -7,7 +7,6 @@ import { Dispose } from '../../util/dispose';
 import { getFlutterWorkspaceFolder } from '../../util/fs';
 import { logger } from '../../util/logger';
 
-
 const log = logger.getlog('devtools-server');
 
 type callback = (...params: any[]) => void;
@@ -72,16 +71,20 @@ class DevToolsServer extends Dispose {
     notification.show('Launching flutter devtools...');
 
     // run devtools server, look for an open port if default is unavailable, return output in JSON format
-    this.launchDevToolsTask = spawn(flutterSDK.dartCommand, ['pub', 'global', 'run', 'devtools', '--machine', '--try-ports', '10'], {
-      cwd: workspaceFolder,
-      detached: false,
-      shell: os.platform() === 'win32' ? true : undefined,
-    });
+    this.launchDevToolsTask = spawn(
+      flutterSDK.dartCommand,
+      ['pub', 'global', 'run', 'devtools', '--machine', '--try-ports', '10'],
+      {
+        cwd: workspaceFolder,
+        detached: false,
+        shell: os.platform() === 'win32' ? true : undefined,
+      },
+    );
     this.launchDevToolsTask.on('exit', this._onExit);
     this.launchDevToolsTask.on('error', this._onError);
 
     if (this.onHandler.length) {
-      this.onHandler.forEach(cb => cb());
+      this.onHandler.forEach((cb) => cb());
       this.onHandler = [];
     }
     return true;

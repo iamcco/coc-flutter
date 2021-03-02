@@ -18,14 +18,9 @@
     "clean": "rm -rf ./out",
     "watch": "webpack --watch",
     "build": "webpack",
-    "lint": "eslint --fix ./src/**/*.ts",
+    "lint": "eslint src",
+    "lint-fix": "eslint --fix src",
     "prepare": "husky install && npm run clean && npm run build"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint",
-      "pre-push": "npm run lint"
-    }
   },
   "activationEvents": [
     "workspaceContains:pubspec.yaml",

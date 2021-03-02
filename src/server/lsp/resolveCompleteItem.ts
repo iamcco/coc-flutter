@@ -1,4 +1,4 @@
-import {CompletionItem, InsertTextFormat} from "coc.nvim";
+import { CompletionItem, InsertTextFormat } from 'coc.nvim';
 
 // functionName(…)
 const funcCallWithArgsRegex = /^(.*)\(…\)$/;

@@ -70,7 +70,7 @@ export class ClosingLabels extends Dispose {
     // clear closing labels
     const uris = Object.keys(this.nsIds);
     if (uris.length) {
-      uris.forEach(uri => {
+      uris.forEach((uri) => {
         const doc = workspace.getDocument(uri);
         if (!doc) {
           return;

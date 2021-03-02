@@ -2,7 +2,6 @@ import { Buffer as NVIMBuffer, Window, workspace } from 'coc.nvim';
 import { Dispose } from '../../util/dispose';
 import { Message } from './message';
 
-
 export class FloatWindow extends Dispose {
   private buf: NVIMBuffer | undefined;
   private win: Window | undefined;
@@ -16,7 +15,7 @@ export class FloatWindow extends Dispose {
     const { message } = this;
 
     const buf = await nvim.createNewBuffer(false, true);
-    await buf.setLines(message.lines, { start: 0, end: -1, strictIndexing: false});
+    await buf.setLines(message.lines, { start: 0, end: -1, strictIndexing: false });
     const col = (await nvim.getOption('columns')) as number;
     const win = await nvim.openFloatWindow(
       buf,

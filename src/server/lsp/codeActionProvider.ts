@@ -27,14 +27,14 @@ export const codeActionProvider = async (
         return {
           ...item,
           isPreferred: true,
-        }
+        };
       }
     }
     return item;
-  })
+  });
 
   const codeActions = res.slice();
-  res.some(item => {
+  res.some((item) => {
     if (item.title === 'Wrap with widget...' && (item as CodeAction).edit) {
       const edit = (item as CodeAction).edit;
       if (!edit || !edit.documentChanges) {

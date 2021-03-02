@@ -3,12 +3,11 @@ import { commands, Disposable, workspace } from 'coc.nvim';
 import { notification } from '../../lib/notification';
 import { devServer } from '../../server/dev';
 import { devToolsServer } from '../../server/devtools';
-import {deleteCommandTitle, setCommandTitle} from '../../util';
+import { deleteCommandTitle, setCommandTitle } from '../../util';
 import { cmdPrefix } from '../../util/constant';
 import { Dispose } from '../../util/dispose';
 import { logger } from '../../util/logger';
 import { opener } from '../../util/opener';
-
 
 const log = logger.getlog('dev-command');
 
@@ -134,15 +133,15 @@ export class Dev extends Dispose {
 
   constructor() {
     super();
-    ['run', 'attach'].forEach(cmd => {
+    ['run', 'attach'].forEach((cmd) => {
       const cmdId = `${cmdPrefix}.${cmd}`;
       this.push(commands.registerCommand(cmdId, this[`${cmd}Server`], this));
       this.push(
-        (function() {
-          setCommandTitle(cmdId, `${cmd} flutter server`)
+        (function () {
+          setCommandTitle(cmdId, `${cmd} flutter server`);
           return {
             dispose() {
-              deleteCommandTitle(cmdId)
+              deleteCommandTitle(cmdId);
             },
           };
         })(),
@@ -176,7 +175,7 @@ export class Dev extends Dispose {
   private registerCommands() {
     log('register commands');
     this.cmds.push(
-      ...Object.keys(cmds).map(key => {
+      ...Object.keys(cmds).map((key) => {
         const cmdId = `${cmdPrefix}.dev.${key}`;
         setCommandTitle(cmdId, cmds[key].desc);
         const subscription = commands.registerCommand(cmdId, this.execCmd(cmds[key]));
@@ -193,7 +192,7 @@ export class Dev extends Dispose {
   private unRegisterCommands() {
     log('unregister commands');
     if (this.cmds) {
-      this.cmds.forEach(cmd => {
+      this.cmds.forEach((cmd) => {
         cmd.dispose();
       });
     }
@@ -215,7 +214,7 @@ export class Dev extends Dispose {
   };
 
   private onStdout = (lines: string[]) => {
-    lines.forEach(line => {
+    lines.forEach((line) => {
       const m = line.match(
         /^\s*An Observatory debugger and profiler on .* is available at:\s*(https?:\/\/127\.0\.0\.1:\d+\/.+\/)$/,
       );

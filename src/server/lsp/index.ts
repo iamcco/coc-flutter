@@ -1,15 +1,15 @@
 import {
-    Executable,
-    ExecutableOptions,
-    LanguageClient,
-    LanguageClientOptions,
-    OutputChannel,
-    RevealOutputChannelOn,
-    ServerOptions,
-    services,
-    Uri,
-    window,
-    workspace
+  Executable,
+  ExecutableOptions,
+  LanguageClient,
+  LanguageClientOptions,
+  OutputChannel,
+  RevealOutputChannelOn,
+  ServerOptions,
+  services,
+  Uri,
+  window,
+  workspace,
 } from 'coc.nvim';
 import { homedir } from 'os';
 import { flutterSDK } from '../../lib/sdk';
@@ -21,7 +21,6 @@ import { codeActionProvider } from './codeActionProvider';
 import { completionProvider } from './completionProvider';
 import { SignatureHelpProvider } from './signatureHelp';
 
-
 const log = logger.getlog('lsp-server');
 
 class _ExecOptions implements Executable {
@@ -32,7 +31,6 @@ class _ExecOptions implements Executable {
     return [flutterSDK.analyzerSnapshotPath, '--lsp'];
   }
   options?: ExecutableOptions | undefined;
-
 }
 
 export class LspServer extends Dispose {
@@ -114,11 +112,11 @@ export class LspServer extends Dispose {
               const ignore = config
                 .get<string[]>('workspaceFolder.ignore', [])
                 .concat(flutterSDK.sdkHome)
-                .map(p => {
+                .map((p) => {
                   p = p.replace(/^(~|\$HOME)/, homedir());
                   return Uri.file(p).toString();
                 });
-              data.added = data.added.filter(fold => !ignore.some(i => fold.uri.startsWith(i)));
+              data.added = data.added.filter((fold) => !ignore.some((i) => fold.uri.startsWith(i)));
             }
             if (data.added.length || data.removed.length) {
               next(data);
@@ -174,7 +172,7 @@ export class LspServer extends Dispose {
     await this._client?.stop();
     this._client?.onReady().then(() => {
       statusBar.ready();
-    })
+    });
     this._client?.start();
   }
 }
