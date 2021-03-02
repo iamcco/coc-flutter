@@ -2,7 +2,7 @@ import { commands, window, workspace } from 'coc.nvim';
 import { Location, TextDocumentPositionParams } from 'vscode-languageserver-protocol';
 import { notification } from '../lib/notification';
 import { LspServer } from '../server/lsp';
-import {deleteCommandTitle, setCommandTitle} from '../util';
+import { deleteCommandTitle, setCommandTitle } from '../util';
 import { cmdPrefix } from '../util/constant';
 import { Dispose } from '../util/dispose';
 

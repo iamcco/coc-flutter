@@ -19,7 +19,7 @@
     "watch": "webpack --watch",
     "build": "webpack",
     "lint": "eslint --fix ./src/**/*.ts",
-    "prepare": "npm run clean && npm run build"
+    "prepare": "husky install && npm run clean && npm run build"
   },
   "husky": {
     "hooks": {

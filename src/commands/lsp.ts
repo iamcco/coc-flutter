@@ -1,7 +1,7 @@
 import { commands } from 'coc.nvim';
 import { notification } from '../lib/notification';
 import { LspServer } from '../server/lsp';
-import {deleteCommandTitle, setCommandTitle} from '../util';
+import { deleteCommandTitle, setCommandTitle } from '../util';
 import { cmdPrefix } from '../util/constant';
 import { Dispose } from '../util/dispose';
 

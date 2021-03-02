@@ -3,13 +3,13 @@ import { ErrnoException } from '@nodelib/fs.stat/out/types';
 import { exec, ExecOptions } from 'child_process';
 import { Uri, workspace } from 'coc.nvim';
 import fastGlob from 'fast-glob';
-import fs, {BaseEncodingOptions} from 'fs';
+import fs, { BaseEncodingOptions } from 'fs';
 import { dirname, join, sep } from 'path';
 import { logger } from './logger';
 
 export const exists = async (path: string): Promise<boolean> => {
-  return new Promise(resolve => {
-    fs.exists(path, exists => {
+  return new Promise((resolve) => {
+    fs.exists(path, (exists) => {
       resolve(exists);
     });
   });
@@ -21,7 +21,7 @@ export const findWorkspaceFolders = async (cwd: string, patterns: string[]): Pro
     cwd,
     deep: 10,
   });
-  return paths.map(p => join(cwd, dirname(p)));
+  return paths.map((p) => join(cwd, dirname(p)));
 };
 
 export const closestPath = (paths: string[]): string | undefined => {
@@ -38,7 +38,7 @@ export const findWorkspaceFolder = async (cwd: string, patterns: string[]): Prom
 };
 
 export const getFlutterWorkspaceFolder = async (): Promise<string | undefined> => {
-  const workspaceFolder = workspace.workspaceFolder ? Uri.parse(workspace.workspaceFolder.uri).fsPath : workspace.cwd
+  const workspaceFolder = workspace.workspaceFolder ? Uri.parse(workspace.workspaceFolder.uri).fsPath : workspace.cwd;
   return await findWorkspaceFolder(workspaceFolder, ['**/pubspec.yaml']);
 };
 
@@ -53,7 +53,7 @@ export const execCommand = (
   stdout: string;
   stderr: string;
 }> => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     log(`executing command ${command}`);
     let code = 0;
     exec(
@@ -75,7 +75,7 @@ export const execCommand = (
 };
 
 export const isSymbolLink = async (path: string): Promise<{ err: ErrnoException | null; stats: boolean }> => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     fs.lstat(path, (err: ErrnoException | null, stats: Stats) => {
       resolve({
         err,
@@ -88,7 +88,7 @@ export const isSymbolLink = async (path: string): Promise<{ err: ErrnoException 
 export const getRealPath = async (path: string): Promise<string> => {
   const { err, stats } = await isSymbolLink(path);
   if (!err && stats) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       fs.realpath(path, (err: ErrnoException | null, realPath: string) => {
         if (err) {
           return resolve(path);
@@ -100,19 +100,25 @@ export const getRealPath = async (path: string): Promise<string> => {
   return path;
 };
 
-export const readDir = async(path: string, options?: { encoding: BufferEncoding | null; withFileTypes?: false } | BufferEncoding | undefined | null): Promise<string[]> => {
-  return new Promise(resolve => {
+export const readDir = async (
+  path: string,
+  options?: { encoding: BufferEncoding | null; withFileTypes?: false } | BufferEncoding | undefined | null,
+): Promise<string[]> => {
+  return new Promise((resolve) => {
     fs.readdir(path, options, (err, files) => {
       if (err) {
         return resolve([]);
       } else {
         return resolve(files);
       }
-    })
+    });
   });
-}
+};
 
-export const readFile = async(path: string, options?: BaseEncodingOptions & { flag?: string; } | string | undefined | null): Promise<string | Buffer> => {
+export const readFile = async (
+  path: string,
+  options?: (BaseEncodingOptions & { flag?: string }) | string | undefined | null,
+): Promise<string | Buffer> => {
   return new Promise((resolve, reject) => {
     fs.readFile(path, options, (err, data) => {
       if (err) {
@@ -120,6 +126,6 @@ export const readFile = async(path: string, options?: BaseEncodingOptions & { fl
       } else {
         return resolve(data);
       }
-    })
+    });
   });
-}
+};
