@@ -69,35 +69,56 @@ To do this there are a few options:
 
 ## Settings
 
-- `flutter.trace.server` Trace level of log, default: `off`
-- `flutter.enabled` Enable coc-flutter extension, default: `true`
-- `flutter.lsp.debug` Enable debug for language server, default: `false`
+- `flutter.trace.server` default: `off`
+  > Trace level of log
+- `flutter.enabled` default: `true`
+  > Enable coc-flutter extension
+- `flutter.lsp.debug` default: `false`
+  > Enable debug for language server
 - `flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles`: default: `true`
   > When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder.
 - `flutter.lsp.initialization.suggestFromUnimportedLibraries`: default: `true`
   > When set to false, completion will not include synbols that are not already imported into the current file
-
 - `[flutter.lsp.initialization.closingLabels](#closing-labels)`: default: `true`
   > When set to true, will display closing labels at end of closing, only neovim support.
-
-- `flutter.sdk.searchPaths` the paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed
-  eg. `/path/to/flutter` (command at `/path/to/flutter/bin/flutter`) or
-  `~/flutter_versions` (command at `~/flutter_versions/version/bin/flutter`).
-- `flutter.sdk.dart-command` dart command, leave empty should just work, default: `''`
-- `flutter.sdk.dart-lookup` **only use this if you don't have a flutter installation but only dart** command to find dart executable location, used to infer dart-sdk location, default: `''`
-- `flutter.sdk.flutter-lookup` command to find flutter executable location, used to infer location of dart-sdk in flutter cache: `''`
-- `flutter.provider.hot-reload` Enable hot reload after save, default: `true`
-  > only when there are no errors for the save file
-- `flutter.provider.enableSnippet` Enable completion item snippet, default: true
+- `flutter.sdk.searchPaths` default: `[]`
+  > the paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed
+  > eg. `/path/to/flutter` (command at `/path/to/flutter/bin/flutter`) or
+  > `~/flutter_versions` (command at `~/flutter_versions/version/bin/flutter`).
+- `flutter.sdk.dart-command` default: `''`
+  > dart command, leave empty should just work
+- `flutter.sdk.dart-lookup` default: `''`
+  > (**only use this if you don't have a flutter installation but only dart**) command to find dart executable location, used to infer dart-sdk location
+- `flutter.sdk.flutter-lookup` default: `''`
+  > command to find flutter executable location, used to infer location of dart-sdk in flutter cache
+- `flutter.provider.hot-reload` default: `true`
+  > Enable hot reload after save.
+  > Only when there are no errors for the save file
+- `flutter.provider.enableSnippet` Enable completion item snippet, default: `true`
   - `import '';` => `import '${1}';${0}`
   - `someName(…)` => `someName(${1})${0}`
   - `setState(() {});` => `setState(() {\n\t${1}\n});${0}`
-- `flutter.openDevLogSplitCommand` Vim command to open dev log window, like: `botright 10split`, default: ''
-- `flutter.workspaceFolder.ignore` Path start within the list will not treat as workspaceFolder, default: []
-  - also flutter sdk will not treat as workspaceFolder, more detail issues [50](https://github.com/iamcco/coc-flutter/issues/50)
-- `flutter.runDevToolsAtStartup` Automatically open devtools debugger web page when a project is run, default: false
-- `flutter.autoOpenDevLog` Automatically open the dev log after calling flutter run, default: false
-- `flutter.autoHideDevLog` Automatically hide the dev log when the app stops running, default: false
+- `flutter.openDevLogSplitCommand` default: `''`
+  >  Vim command to open dev log window, like: `botright 10split`
+- `flutter.workspaceFolder.ignore` default: `[]`
+  > Path start within the list will not treat as workspaceFolder.
+  > Also flutter sdk will not treat as workspaceFolder, more detail issues [50](https://github.com/iamcco/coc-flutter/issues/50)
+- `flutter.runDevToolsAtStartup` default: `false`
+  > Automatically open devtools debugger web page when a project is run
+- `flutter.autoOpenDevLog` default: `false`
+  > Automatically open the dev log after calling flutter run
+- `flutter.autoHideDevLog` default: `false`
+  >  Automatically hide the dev log when the app stops running
+- `dart.analysisExcludedFolders` default: `[]`
+  > An array of paths (absolute or relative to each workspace folder) that should be excluded from analysis.
+- `dart.enableSdkFormatter` default: `true`
+  > When set to false, prevents registration (or unregisters) the SDK formatter. When set to true or not supplied, will register/reregister the SDK formatter.
+- `dart.lineLength` default: `80`
+  > The number of characters the formatter should wrap code at. If unspecified, code will be wrapped at 80 characters.
+- `dart.completeFunctionCalls` default: `true`
+  > Completes functions/methods with their required parameters.
+- `dart.showTodos` default: `true`
+  > Whether to generate diagnostics for TODO comments. If unspecified, diagnostics will not be generated.
 
 
 **Enable format on save**:
