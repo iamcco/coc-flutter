@@ -40,7 +40,7 @@ Most likely the extension will find your sdk automatically as long as the `flutt
 
 If you are using a version manager like `asdf` that maps the `flutter` command to another binary instead of an sdk location or this extension cannot find your sdk for another reason you'll have to provide the extension with how to find your sdk.
 To do this there are a few options:
-1. If your version manager supports a `wich` command like then you can set the `flutter.sdk.flutter-lookup` config option. Eg. `"flutter.sdk.flutter-lookup": "asdf which flutter"`.
+1. If your version manager supports a `which` command like then you can set the `flutter.sdk.flutter-lookup` config option. Eg. `"flutter.sdk.flutter-lookup": "asdf which flutter"`.
 2. You can add the path where to find the sdk to the `flutter.sdk.searchPaths` config option.
    Either specify the exact folder the sdk is installed in or a folder that contains other folders which directly have an sdk in them. *Note that not all of these folders need to have an sdk, if they don't contain one they will simply be ignored*
 3. Set the `flutter.sdk.path` config option to the exact path you want to use for your sdk.
