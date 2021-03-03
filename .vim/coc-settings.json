@@ -1,4 +1,9 @@
 {
+  "coc.preferences.formatOnSaveFiletypes": [
+    "typescript"
+  ],
+  "prettier.eslintIntegration": true,
+  "eslint.autoFixOnSave": true,
   "cSpell.words": [
     "Unimported",
     "getlog",
