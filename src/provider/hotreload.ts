@@ -12,7 +12,8 @@ export const registerHotReloadProvider = (): Disposable => {
         // do not reload if there ara errors for the save file
         const diagnostics = diagnosticManager.getDiagnostics(doc.uri);
         const hasErrors =
-          diagnostics && diagnostics.find(d => d.source === 'dart' && d.severity === DiagnosticSeverity.Error) != null;
+          diagnostics &&
+          diagnostics.find((d) => d.source === 'dart' && d.severity === DiagnosticSeverity.Error) != null;
         if (!hasErrors) {
           devServer.sendCommand('r');
         }

@@ -38,8 +38,8 @@ export default class DevicesList implements IList {
     if (!err) {
       devices = stdout
         .split(lineBreak)
-        .filter(line => line.split('•').length === 4)
-        .map(line => {
+        .filter((line) => line.split('•').length === 4)
+        .map((line) => {
           // MI 6 • 1ba39646 • android-arm64 • Android 9 (API 28)
           const items = line.split('•');
           return {
@@ -50,7 +50,7 @@ export default class DevicesList implements IList {
           };
         });
     }
-    return devices.map(device => {
+    return devices.map((device) => {
       return {
         label: `${colors.yellow(device.name)} • ${colors.gray(
           `${device.deviceId} • ${device.platform} • ${device.system}`,

@@ -22,7 +22,7 @@ export default class EmulatorsList implements IList {
     this.actions.push({
       name: 'run',
       multiple: false,
-      execute: async item => {
+      execute: async (item) => {
         if (Array.isArray(item)) {
           return;
         }
@@ -38,8 +38,8 @@ export default class EmulatorsList implements IList {
     if (!err) {
       emulators = stdout
         .split(lineBreak)
-        .filter(line => line.split('•').length === 4)
-        .map(line => {
+        .filter((line) => line.split('•').length === 4)
+        .map((line) => {
           // apple_ios_simulator • iOS Simulator • Apple • ios
           const items = line.split('•');
           return {
@@ -50,7 +50,7 @@ export default class EmulatorsList implements IList {
           };
         });
     }
-    return emulators.map(emulator => {
+    return emulators.map((emulator) => {
       return {
         label: `${colors.yellow(emulator.id)} • ${colors.gray(
           `${emulator.name} • ${emulator.platform} • ${emulator.system}`,

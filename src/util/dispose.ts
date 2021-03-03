@@ -8,7 +8,7 @@ export class Dispose {
   }
 
   remove(subscription: Disposable) {
-    this.subscriptions = this.subscriptions.filter(dispose => {
+    this.subscriptions = this.subscriptions.filter((dispose) => {
       if (subscription === dispose) {
         dispose.dispose();
         return false;
@@ -19,7 +19,7 @@ export class Dispose {
 
   dispose() {
     if (this.subscriptions.length) {
-      this.subscriptions.forEach(item => {
+      this.subscriptions.forEach((item) => {
         item.dispose();
       });
       this.subscriptions = [];

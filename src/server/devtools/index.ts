@@ -1,12 +1,11 @@
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { window } from 'coc.nvim';
 import os from 'os';
-import { workspace } from 'coc.nvim';
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
-
+import { notification } from '../../lib/notification';
+import { flutterSDK } from '../../lib/sdk';
+import { Dispose } from '../../util/dispose';
 import { getFlutterWorkspaceFolder } from '../../util/fs';
 import { logger } from '../../util/logger';
-import { notification } from '../../lib/notification';
-import { Dispose } from '../../util/dispose';
-import {flutterSDK} from '../../lib/sdk';
 
 const log = logger.getlog('devtools-server');
 
@@ -72,16 +71,20 @@ class DevToolsServer extends Dispose {
     notification.show('Launching flutter devtools...');
 
     // run devtools server, look for an open port if default is unavailable, return output in JSON format
-    this.launchDevToolsTask = spawn(flutterSDK.dartCommand, ['pub', 'global', 'run', 'devtools', '--machine', '--try-ports', '10'], {
-      cwd: workspaceFolder,
-      detached: false,
-      shell: os.platform() === 'win32' ? true : undefined,
-    });
+    this.launchDevToolsTask = spawn(
+      flutterSDK.dartCommand,
+      ['pub', 'global', 'run', 'devtools', '--machine', '--try-ports', '10'],
+      {
+        cwd: workspaceFolder,
+        detached: false,
+        shell: os.platform() === 'win32' ? true : undefined,
+      },
+    );
     this.launchDevToolsTask.on('exit', this._onExit);
     this.launchDevToolsTask.on('error', this._onError);
 
     if (this.onHandler.length) {
-      this.onHandler.forEach(cb => cb());
+      this.onHandler.forEach((cb) => cb());
       this.onHandler = [];
     }
     return true;
@@ -121,7 +124,7 @@ class DevToolsServer extends Dispose {
         // Check for this message, prompt user to let us activate devtools, and continue if they accept
         const m = text.match(/No active package devtools/g);
         if (m) {
-          const devToolsActivationPrompt = workspace.showPrompt(
+          const devToolsActivationPrompt = window.showPrompt(
             'Flutter pub global devtools has not been activated. Activate now?',
           );
           this.handleDevToolsActivationPrompt(devToolsActivationPrompt, handler);

@@ -1,4 +1,4 @@
-import { InsertTextFormat, CompletionItem } from 'vscode-languageserver-protocol';
+import { CompletionItem, InsertTextFormat } from 'coc.nvim';
 
 // functionName(…)
 const funcCallWithArgsRegex = /^(.*)\(…\)$/;

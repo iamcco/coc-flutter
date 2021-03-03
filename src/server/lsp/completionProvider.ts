@@ -1,12 +1,14 @@
-import { CompletionContext, ProvideCompletionItemsSignature, workspace } from 'coc.nvim';
 import {
-  CompletionItem,
   CancellationToken,
-  TextDocument,
-  Position,
-  Range,
+  CompletionContext,
+  CompletionItem,
   CompletionList,
-} from 'vscode-languageserver-protocol';
+  Position,
+  ProvideCompletionItemsSignature,
+  Range,
+  TextDocument,
+  workspace,
+} from 'coc.nvim';
 import { getResolveCompleteItemFunc } from './resolveCompleteItem';
 
 export const completionProvider = async (
@@ -28,7 +30,7 @@ export const completionProvider = async (
   // reduce items since it's too many
   // ref: https://github.com/dart-lang/sdk/issues/42152
   if (list.length > 1000 && /[a-zA-Z]/i.test(character)) {
-    list = list.filter(item => new RegExp(character, 'i').test(item.label));
+    list = list.filter((item) => new RegExp(character, 'i').test(item.label));
   }
   const config = workspace.getConfiguration('dart');
   const resolveCompleteItem = getResolveCompleteItemFunc({

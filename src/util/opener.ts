@@ -52,7 +52,7 @@ export function opener(args: string | string[], tool?: string) {
     // so we need to add a dummy empty-string window title: http://stackoverflow.com/a/154090/3191
     //
     // Additionally, on Windows ampersand needs to be escaped when passed to "start"
-    args = args.map(value => {
+    args = args.map((value) => {
       return value.replace(/&/g, '^&');
     });
     args = ['/c', 'start', '""'].concat(args);

@@ -1,25 +1,25 @@
 import {
-  workspace,
   Executable,
-  ServerOptions,
-  LanguageClientOptions,
-  RevealOutputChannelOn,
+  ExecutableOptions,
   LanguageClient,
+  LanguageClientOptions,
+  OutputChannel,
+  RevealOutputChannelOn,
+  ServerOptions,
   services,
   Uri,
-  OutputChannel,
-  ExecutableOptions,
+  window,
+  workspace,
 } from 'coc.nvim';
 import { homedir } from 'os';
-
 import { flutterSDK } from '../../lib/sdk';
-import { logger } from '../../util/logger';
 import { statusBar } from '../../lib/status';
 import { Dispose } from '../../util/dispose';
+import { logger } from '../../util/logger';
 import { ClosingLabels } from './closingLabels';
-import { SignatureHelpProvider } from './signatureHelp';
-import { completionProvider } from './completionProvider';
 import { codeActionProvider } from './codeActionProvider';
+import { completionProvider } from './completionProvider';
+import { SignatureHelpProvider } from './signatureHelp';
 
 const log = logger.getlog('lsp-server');
 
@@ -31,7 +31,6 @@ class _ExecOptions implements Executable {
     return [flutterSDK.analyzerSnapshotPath, '--lsp'];
   }
   options?: ExecutableOptions | undefined;
-
 }
 
 export class LspServer extends Dispose {
@@ -50,7 +49,7 @@ export class LspServer extends Dispose {
   private outchannel?: OutputChannel;
 
   async init(): Promise<void> {
-    this.outchannel = workspace.createOutputChannel('flutter-lsp');
+    this.outchannel = window.createOutputChannel('flutter-lsp');
     this.push(this.outchannel);
     const config = workspace.getConfiguration('flutter');
     // is force lsp debug
@@ -113,11 +112,11 @@ export class LspServer extends Dispose {
               const ignore = config
                 .get<string[]>('workspaceFolder.ignore', [])
                 .concat(flutterSDK.sdkHome)
-                .map(p => {
+                .map((p) => {
                   p = p.replace(/^(~|\$HOME)/, homedir());
                   return Uri.file(p).toString();
                 });
-              data.added = data.added.filter(fold => !ignore.some(i => fold.uri.startsWith(i)));
+              data.added = data.added.filter((fold) => !ignore.some((i) => fold.uri.startsWith(i)));
             }
             if (data.added.length || data.removed.length) {
               next(data);
@@ -173,7 +172,7 @@ export class LspServer extends Dispose {
     await this._client?.stop();
     this._client?.onReady().then(() => {
       statusBar.ready();
-    })
+    });
     this._client?.start();
   }
 }

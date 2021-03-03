@@ -1,12 +1,11 @@
-import { commands, workspace } from 'coc.nvim';
-
-import { Dispose } from '../util/dispose';
+import { commands, Disposable, window, workspace } from 'coc.nvim';
+import { notification } from '../lib/notification';
+import { flutterSDK } from '../lib/sdk';
+import { deleteCommandTitle, formatMessage, setCommandTitle } from '../util';
 import { cmdPrefix } from '../util/constant';
+import { Dispose } from '../util/dispose';
 import { getFlutterWorkspaceFolder } from '../util/fs';
 import { logger } from '../util/logger';
-import { notification } from '../lib/notification';
-import { formatMessage } from '../util';
-import { flutterSDK } from '../lib/sdk';
 
 const log = logger.getlog('global-commands');
 
@@ -58,7 +57,7 @@ const cmds: GCmd[] = [
     desc: 'flutter create',
     execute: getCmd(),
     getArgs: async (): Promise<string[]> => {
-      const params = await workspace.requestInput('Input project name and other params: ');
+      const params = await window.requestInput('Input project name and other params: ');
       return params.split(' ');
     },
   },
@@ -99,20 +98,23 @@ const cmds: GCmd[] = [
 export class Global extends Dispose {
   constructor() {
     super();
-    cmds.forEach(cmd => {
+    cmds.forEach((cmd) => {
       const { desc, execute, name } = cmd;
       const cmdId = `${cmdPrefix}.${name || cmd.cmd}`;
       this.push(
         commands.registerCommand(cmdId, async (...args: string[]) => {
-          const statusBar = workspace.createStatusBarItem(0, { progress: true });
+          const statusBar = window.createStatusBarItem(0, { progress: true });
           this.push(statusBar);
           statusBar.text = desc;
           statusBar.show();
           await execute(cmd, ...args);
           this.remove(statusBar);
         }),
+        Disposable.create(() => {
+          deleteCommandTitle(cmdId);
+        }),
       );
-      commands.titles.set(cmdId, desc);
+      setCommandTitle(cmdId, desc);
     });
   }
 }

@@ -1,9 +1,10 @@
-import { TextDocumentPositionParams, Location } from 'vscode-languageserver-protocol';
-import { Dispose } from '../util/dispose';
-import { LspServer } from '../server/lsp';
-import { commands, workspace } from 'coc.nvim';
-import { cmdPrefix } from '../util/constant';
+import { commands, window, workspace } from 'coc.nvim';
+import { Location, TextDocumentPositionParams } from 'vscode-languageserver-protocol';
 import { notification } from '../lib/notification';
+import { LspServer } from '../server/lsp';
+import { deleteCommandTitle, setCommandTitle } from '../util';
+import { cmdPrefix } from '../util/constant';
+import { Dispose } from '../util/dispose';
 
 export class SuperCommand extends Dispose {
   private requestType = 'dart/textDocument/super';
@@ -20,7 +21,7 @@ export class SuperCommand extends Dispose {
         if (!doc || !doc.textDocument || doc.textDocument.languageId !== 'dart') {
           return;
         }
-        const position = await workspace.getCursorPosition();
+        const position = await window.getCursorPosition();
         const args: TextDocumentPositionParams = {
           textDocument: {
             uri: doc.uri,
@@ -33,11 +34,11 @@ export class SuperCommand extends Dispose {
         }
       }),
     );
-    commands.titles.set(this.cmdId, 'jump to the location of the super definition of the class or method');
+    setCommandTitle(this.cmdId, 'jump to the location of the super definition of the class or method');
   }
 
   dispose(): void {
     super.dispose();
-    commands.titles.delete(this.cmdId);
+    deleteCommandTitle(this.cmdId);
   }
 }

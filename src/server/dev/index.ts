@@ -1,13 +1,12 @@
-import { OutputChannel, workspace, Disposable } from 'coc.nvim';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { Disposable, OutputChannel, workspace } from 'coc.nvim';
 import os from 'os';
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process';
-
-import { getFlutterWorkspaceFolder } from '../../util/fs';
-import { lineBreak, devLogName } from '../../util/constant';
-import { logger } from '../../util/logger';
 import { notification } from '../../lib/notification';
+import { flutterSDK } from '../../lib/sdk';
+import { devLogName, lineBreak } from '../../util/constant';
 import { Dispose } from '../../util/dispose';
-import {flutterSDK} from '../../lib/sdk';
+import { getFlutterWorkspaceFolder } from '../../util/fs';
+import { logger } from '../../util/logger';
 
 const log = logger.getlog('server');
 
@@ -93,7 +92,7 @@ class DevServer extends Dispose {
     }
 
     if (this.onHandler.length) {
-      this.onHandler.forEach(cb => cb());
+      this.onHandler.forEach((cb) => cb());
       this.onHandler = [];
     }
     return true;
@@ -189,14 +188,16 @@ class DevServer extends Dispose {
       const name = await buf.name;
       log(`bufName ${name}`);
       if (name === `output:///${devLogName}`) {
-        const isAttach = await buf.attach(false);
+        // FIXME: coc.nvim version v0.80.0 do not export attach function
+        const isAttach = await (buf as any).attach(false);
         if (!isAttach) {
           log(`Attach buf ${name} error`);
           this.isAutoScroll = false;
           return;
         }
         this.isAutoScroll = true;
-        buf.listen('lines', async () => {
+        // FIXME: coc.nvim version v0.80.0 do not export listen function
+        (buf as any).listen('lines', async () => {
           const wins = await workspace.nvim.windows;
           if (!wins || !wins.length) {
             return;
@@ -216,7 +217,8 @@ class DevServer extends Dispose {
             }
           }
         });
-        buf.listen('detach', () => {
+        // FIXME: coc.nvim version v0.80.0 do not export listen function
+        (buf as any).listen('detach', () => {
           if (this.isAutoScroll) {
             log(`Unexpected detach buf ${name}`);
             this.isAutoScroll = false;
@@ -227,8 +229,9 @@ class DevServer extends Dispose {
             if (this.isAutoScroll) {
               this.isAutoScroll = false;
               try {
-                buf.removeAllListeners();
-                buf.detach();
+                // FIXME: coc.nvim version v0.80.0 do not export these function
+                (buf as any).removeAllListeners();
+                (buf as any).detach();
               } catch (error) {
                 log(`Detach error ${error.message || error}`);
               }

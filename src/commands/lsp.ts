@@ -1,8 +1,9 @@
-import { Dispose } from '../util/dispose';
-import { LspServer } from '../server/lsp';
 import { commands } from 'coc.nvim';
-import { cmdPrefix } from '../util/constant';
 import { notification } from '../lib/notification';
+import { LspServer } from '../server/lsp';
+import { deleteCommandTitle, setCommandTitle } from '../util';
+import { cmdPrefix } from '../util/constant';
+import { Dispose } from '../util/dispose';
 
 export class LspCommands extends Dispose {
   private restartCmdId = `${cmdPrefix}.lsp.restart`;
@@ -17,11 +18,11 @@ export class LspCommands extends Dispose {
         await lsp.restart();
       }),
     );
-    commands.titles.set(this.restartCmdId, 'restart the lsp server');
+    setCommandTitle(this.restartCmdId, 'restart the lsp server');
   }
 
   dispose(): void {
     super.dispose();
-    commands.titles.delete(this.restartCmdId);
+    deleteCommandTitle(this.restartCmdId);
   }
 }
