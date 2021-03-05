@@ -161,7 +161,7 @@ class FlutterSDK {
   }
 
   private async initFlutterCommandsFromSdkHome() {
-    this._flutterCommand = join(this._sdkHome, 'bin', 'flutter');
+    this._flutterCommand = join(this._sdkHome, 'bin', os.platform() === 'win32' ? 'flutter.bat' : 'flutter');
     log(`flutter command path => ${this.flutterCommand}`);
     if (!(await exists(this._flutterCommand))) {
       log('flutter command path does not exist');
@@ -261,7 +261,10 @@ class FlutterSDK {
     if (flutterPath) {
       flutterPath = await getRealPath(flutterPath);
       flutterPath = flutterPath.trim();
-      if (flutterPath.endsWith(join('bin', 'flutter'))) {
+      if (
+        flutterPath.toLowerCase().endsWith(join('bin', 'flutter')) ||
+        flutterPath.toLowerCase().endsWith(join('bin', 'flutter.bat'))
+      ) {
         flutterPath = join(flutterPath, '..', '..');
       }
       const isFlutterDir = await exists(join(flutterPath, 'bin', 'flutter'));
