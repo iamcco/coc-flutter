@@ -34,10 +34,14 @@ If applicable, add screenshots to help explain your problem.
 **Output channel:**
 
 1. Set `"flutter.trace.server":   "verbose"`
-2. Reproduce the issue
-3. `:CocCommand workspace.showOutput` open output list and select `flutter`
+2. Restart coc using `:CocRestart`
+3. Reproduce the issue
+4. `:CocCommand workspace.showOutput` open output list and select `flutter`
 
 Paste Log from above:
 
 ```
 ```
+
+**Config**
+If you have any config for this specific extenstion in you `coc-settings` please include them here.
