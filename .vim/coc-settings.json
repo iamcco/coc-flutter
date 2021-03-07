@@ -6,9 +6,16 @@
   "eslint.autoFixOnSave": true,
   "cSpell.words": [
     "Unimported",
+    "conceallevel",
+    "cursorcolumn",
+    "cursorline",
+    "foldcolumn",
     "getlog",
     "outchannel",
     "pubspec",
-    "regist"
+    "regist",
+    "relativenumber",
+    "signcolumn",
+    "winhighlight"
   ]
 }
