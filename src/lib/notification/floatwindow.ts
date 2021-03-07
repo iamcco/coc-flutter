@@ -1,6 +1,9 @@
 import { Buffer as NVIMBuffer, Window, workspace } from 'coc.nvim';
 import { Dispose } from '../../util/dispose';
+import { logger } from '../../util/logger';
 import { Message } from './message';
+
+const log = logger.getlog('floatWin');
 
 export class FloatWindow extends Dispose {
   private buf: NVIMBuffer | undefined;
@@ -41,13 +44,14 @@ export class FloatWindow extends Dispose {
     await win.setOption('cursorcolumn', false);
     await win.setOption('conceallevel', 2);
     await win.setOption('signcolumn', 'no');
-    try {
-      await win.setOption('foldcolumn', 1);
-    } catch (error) {
-      await win.setOption('foldcolumn', '1');
-    }
     await win.setOption('winhighlight', 'FoldColumn:NormalFloat');
     await nvim.resumeNotification();
+    try {
+      // vim is number and neovim is string
+      await win.setOption('foldcolumn', workspace.isVim ? 1 : '1');
+    } catch (error) {
+      log(`set foldcolumn error: ${error.message || error}`);
+    }
   }
 
   public async dispose() {
