@@ -19,6 +19,7 @@ import { logger } from '../../util/logger';
 import { ClosingLabels } from './closingLabels';
 import { codeActionProvider } from './codeActionProvider';
 import { completionProvider } from './completionProvider';
+import { executeCommandProvider } from './extractProvider';
 import { SignatureHelpProvider } from './signatureHelp';
 
 const log = logger.getlog('lsp-server');
@@ -106,6 +107,7 @@ export class LspServer extends Dispose {
       middleware: {
         provideCompletionItem: config.get<boolean>('provider.enableSnippet', true) ? completionProvider : undefined,
         provideCodeActions: codeActionProvider,
+        executeCommand: executeCommandProvider,
         workspace: {
           didChangeWorkspaceFolders(data, next) {
             if (data.added.length && flutterSDK.sdkHome !== '') {
