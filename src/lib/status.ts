@@ -4,6 +4,8 @@ import { Dispose } from '../util/dispose';
 class StatusBar extends Dispose {
   private isLSPReady = false;
   private statusBar: StatusBarItem | undefined = undefined;
+  private currentDevice?: string;
+  private loadingDevices?: boolean;
 
   get isInitialized(): boolean {
     return this.statusBar != undefined;
@@ -11,7 +13,8 @@ class StatusBar extends Dispose {
 
   ready() {
     this.isLSPReady = true;
-    this.show('flutter', false);
+    this.progress(false);
+    // this.show('flutter', false);
   }
 
   init() {
@@ -26,7 +29,9 @@ class StatusBar extends Dispose {
           if (this.isLSPReady) {
             const doc = await workspace.document;
             if (doc.filetype === 'dart') {
-              this.show('flutter');
+              if (this.isLSPReady) {
+                this.statusBar?.show();
+              }
             } else {
               this.hide();
             }
@@ -36,12 +41,27 @@ class StatusBar extends Dispose {
     );
   }
 
-  restartingLsp() {
-    this.isLSPReady = false;
-    this.show('restartingLsp', true);
+  updateDevice(name: string | undefined, isLoading: boolean) {
+    this.currentDevice = name;
+    if (isLoading) {
+      this.loadingDevices = true;
+      this.show('Loading devices...', true);
+    } else if (this.loadingDevices) {
+      this.loadingDevices = false;
+      this.progress(false);
+    } else {
+      this.show(this.currentDevice || 'No device available');
+    }
   }
 
-  show(message: string, isProgress?: boolean) {
+  restartingLsp() {
+    this.isLSPReady = false;
+    this.loadingDevices = undefined;
+    this.currentDevice = undefined;
+    this.show('restartingLsp...', true);
+  }
+
+  private show(message: string, isProgress?: boolean) {
     if (this.statusBar) {
       this.statusBar.text = message;
       if (isProgress !== undefined) {
@@ -57,9 +77,14 @@ class StatusBar extends Dispose {
     }
   }
 
-  progress(isProgress = true) {
+  private progress(isProgress = true) {
     if (this.statusBar) {
       this.statusBar.isProgress = isProgress;
+      if (!isProgress && this.loadingDevices != undefined) {
+        this.show(this.currentDevice || 'No device available');
+      } else {
+        this.hide();
+      }
     }
   }
 

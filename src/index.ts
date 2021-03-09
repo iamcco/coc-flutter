@@ -5,6 +5,7 @@ import { Commands } from './commands';
 import { Providers } from './provider';
 import { LspServer } from './server/lsp';
 import { SourceList } from './sources';
+import { DaemonServer } from './server/deamon';
 
 export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration('flutter');
@@ -19,16 +20,17 @@ export async function activate(context: ExtensionContext): Promise<void> {
   // logger init
   logger.init(config.get<logLevel>('trace.server', 'off'));
 
+  const daemon = new DaemonServer();
   // register lsp server
-  const lsp = new LspServer();
+  const lsp = new LspServer(daemon);
   context.subscriptions.push(lsp);
 
   // register commands
-  context.subscriptions.push(new Commands(lsp));
+  context.subscriptions.push(new Commands(lsp, daemon));
 
   // register providers
   context.subscriptions.push(new Providers());
 
   // register sources
-  context.subscriptions.push(new SourceList(lsp));
+  context.subscriptions.push(new SourceList(lsp, daemon));
 }

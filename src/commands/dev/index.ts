@@ -1,6 +1,7 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
 import { commands, Disposable, workspace } from 'coc.nvim';
 import { notification } from '../../lib/notification';
+import { DaemonServer } from '../../server/deamon';
 import { devServer } from '../../server/dev';
 import { devToolsServer } from '../../server/devtools';
 import { deleteCommandTitle, setCommandTitle } from '../../util';
@@ -130,9 +131,11 @@ export const cmds: Record<string, DCmd> = {
 export class Dev extends Dispose {
   private profilerUrl: string | undefined;
   private cmds: Disposable[] = [];
+  private daemon: DaemonServer;
 
-  constructor() {
+  constructor(daemon: DaemonServer) {
     super();
+    this.daemon = daemon;
     ['run', 'attach'].forEach((cmd) => {
       const cmdId = `${cmdPrefix}.${cmd}`;
       this.push(commands.registerCommand(cmdId, this[`${cmd}Server`], this));
@@ -162,7 +165,13 @@ export class Dev extends Dispose {
 
   private async execute(cmd: string, args: string[]) {
     log(`${cmd} dev server, devServer state: ${devServer.state}`);
-    const state = await devServer.start([cmd].concat(args));
+    let baseArgs: string[];
+    if (this.daemon.currentDevice && !args.some((arg) => arg === '-d')) {
+      baseArgs = [cmd, '-d', this.daemon.currentDevice.id];
+    } else {
+      baseArgs = [cmd];
+    }
+    const state = await devServer.start(baseArgs.concat(args));
     if (state) {
       devServer.onError(this.onError);
       devServer.onExit(this.onExit);

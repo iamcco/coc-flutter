@@ -16,6 +16,7 @@ import { flutterSDK } from '../../lib/sdk';
 import { statusBar } from '../../lib/status';
 import { Dispose } from '../../util/dispose';
 import { logger } from '../../util/logger';
+import { DaemonServer } from '../deamon';
 import { ClosingLabels } from './closingLabels';
 import { codeActionProvider } from './codeActionProvider';
 import { completionProvider } from './completionProvider';
@@ -36,8 +37,9 @@ class _ExecOptions implements Executable {
 export class LspServer extends Dispose {
   private _client: LanguageClient | undefined;
 
-  constructor() {
+  constructor(daemon: DaemonServer) {
     super();
+    this.daemon = daemon;
     this.init();
   }
 
@@ -47,6 +49,7 @@ export class LspServer extends Dispose {
 
   private execOptions = new _ExecOptions();
   private outchannel?: OutputChannel;
+  private daemon: DaemonServer;
 
   async init(): Promise<void> {
     this.outchannel = window.createOutputChannel('flutter-lsp');
@@ -57,6 +60,8 @@ export class LspServer extends Dispose {
     // dart sdk analysis snapshot path
     if (!flutterSDK.state) {
       await flutterSDK.init(config);
+      this.push(this.daemon);
+      this.daemon.start();
     }
 
     if (!flutterSDK.state) {
@@ -166,6 +171,8 @@ export class LspServer extends Dispose {
     statusBar.restartingLsp();
     await this.reloadSdk();
     await this._client?.stop();
+    this.daemon.stop();
+    this.daemon.start();
     this._client?.onReady().then(() => {
       statusBar.ready();
     });
