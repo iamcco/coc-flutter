@@ -5,6 +5,7 @@
   "prettier.eslintIntegration": true,
   "eslint.autoFixOnSave": true,
   "cSpell.words": [
+    "Autocmd",
     "Unimported",
     "conceallevel",
     "cursorcolumn",

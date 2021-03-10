@@ -20,7 +20,6 @@ import { ClosingLabels } from './closingLabels';
 import { codeActionProvider } from './codeActionProvider';
 import { completionProvider } from './completionProvider';
 import { executeCommandProvider } from './extractProvider';
-import { SignatureHelpProvider } from './signatureHelp';
 
 const log = logger.getlog('lsp-server');
 
@@ -145,11 +144,6 @@ export class LspServer extends Dispose {
           // register closing label
           this.push(new ClosingLabels(client));
         }
-        // FIXME
-        setTimeout(() => {
-          // https://github.com/iamcco/coc-flutter/issues/8
-          this.push(new SignatureHelpProvider(client));
-        }, 2000);
         statusBar.ready();
       })
       .catch((error: Error) => {

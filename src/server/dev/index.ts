@@ -186,7 +186,6 @@ class DevServer extends Dispose {
     const buffers = await workspace.nvim.buffers;
     for (const buf of buffers) {
       const name = await buf.name;
-      log(`bufName ${name}`);
       if (name === `output:///${devLogName}`) {
         // FIXME: coc.nvim version v0.80.0 do not export attach function
         const isAttach = await (buf as any).attach(false);
