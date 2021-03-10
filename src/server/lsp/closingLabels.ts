@@ -1,15 +1,8 @@
-import { LanguageClient, workspace } from 'coc.nvim';
+import { Document, LanguageClient, workspace } from 'coc.nvim';
 import { Range } from 'vscode-languageserver-protocol';
 
 import { Dispose } from '../../util/dispose';
 import { logger } from '../../util/logger';
-
-const log = logger.getlog('lsp-closing-labels');
-
-// closing label namespace
-const virtualNamespace = 'flutter-closing-lablel';
-// closing label highlight group
-const flutterClosingLabel = 'FlutterClosingLabel';
 
 interface ClosingLabelsParams {
   uri: string;
@@ -18,6 +11,16 @@ interface ClosingLabelsParams {
     range: Range;
   }[];
 }
+
+const log = logger.getlog('lsp-closing-labels');
+
+// closing label namespace
+const virtualNamespace = 'flutter-closing-label';
+// closing label highlight group
+const flutterClosingLabel = 'FlutterClosingLabel';
+// cache closing labels if in insert mode
+// update after leave insert mode
+const tmpClosingLabels: Record<string, ClosingLabelsParams> = {};
 
 export class ClosingLabels extends Dispose {
   private nsIds: Record<string, number> = {};
@@ -36,6 +39,13 @@ export class ClosingLabels extends Dispose {
     }
     await nvim.command(`highlight default link ${flutterClosingLabel} Comment`);
     client.onNotification('dart/textDocument/publishClosingLabels', this.onClosingLabels);
+    this.push(
+      workspace.registerAutocmd({
+        event: 'InsertLeave',
+        pattern: '*.dart',
+        callback: this.checkClosingLabels,
+      }),
+    );
   }
 
   onClosingLabels = async (params: ClosingLabelsParams) => {
@@ -43,14 +53,35 @@ export class ClosingLabels extends Dispose {
     if (!labels.length) {
       return;
     }
+    const curDoc = await workspace.document;
     const doc = workspace.getDocument(uri);
-    // ensure the document is exists
-    if (!doc) {
+    // ensure the document and current document exist
+    if (!doc || !curDoc) {
       return;
     }
 
+    const mode = await workspace.nvim.mode;
+    if (mode.mode && mode.mode.startsWith('i')) {
+      tmpClosingLabels[uri] = params;
+      return;
+    }
+    this.updateClosingLabels(doc, params);
+  };
+
+  checkClosingLabels = async () => {
+    const doc = await workspace.document;
+    if (!doc || !tmpClosingLabels[doc.uri]) {
+      return;
+    }
+    const params = tmpClosingLabels[doc.uri];
+    delete tmpClosingLabels[doc.uri];
+    this.onClosingLabels(params);
+  };
+
+  updateClosingLabels = async (doc: Document, params: ClosingLabelsParams) => {
     const { nvim } = workspace;
     const { buffer } = doc;
+    const { uri, labels } = params;
 
     // clear previous virtual text
     if (this.nsIds[uri] !== undefined) {
