@@ -11,7 +11,7 @@ const log = logger.getlog('sdk');
 const ANALYZER_SNAPSHOT_NAME = join('bin', 'snapshots', 'analysis_server.dart.snapshot');
 const DART_COMMAND = join('bin', os.platform() === 'win32' ? 'dart.bat' : 'dart');
 
-const _defaultSearchPaths: string[] = ['~/snap/flutter/common/flutter', '~/fvm/versions'];
+const _defaultSearchPaths: string[] = ['~/snap/flutter/common/flutter'];
 
 export interface FlutterSdk {
   location: string;

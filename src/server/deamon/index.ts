@@ -200,7 +200,7 @@ export class DaemonServer extends Dispose {
   selectDevice(device: Device) {
     this._currentDevice = device;
     this.selectedDeviceId = device.id;
-    this.config.update(selectedDeviceIdKey, device.id, true);
+    this.config.update(selectedDeviceIdKey, device.id);
     statusBar.updateDevice(this._currentDevice?.name, false);
   }
 }
