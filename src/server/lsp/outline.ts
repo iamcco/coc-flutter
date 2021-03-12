@@ -152,7 +152,9 @@ export class Outline extends Dispose {
           const buf = await win.buffer;
           if (buf.id === this.outlineBuffer.id) {
             buf.clearHighlight();
-            win.setCursor([this.curOutlineItem.lineNumber + 1, 0]).catch(() => {});
+            win.setCursor([this.curOutlineItem.lineNumber + 1, 0]).catch((e) => {
+              log(e);
+            });
             buf
               .addHighlight({
                 hlGroup: 'HighlightedOutlineArea',
@@ -160,9 +162,13 @@ export class Outline extends Dispose {
                 colStart: this.curOutlineItem.startCol,
                 colEnd: this.curOutlineItem.endCol,
               })
-              .catch(() => {});
+              .catch((e) => {
+                log(e);
+              });
           }
-        } catch (e) {}
+        } catch (e) {
+          log(e);
+        }
       }
     }
   };
@@ -206,7 +212,9 @@ export class Outline extends Dispose {
             await this.outlineBuffer.setOption('modifiable', false);
           }
         })
-        .catch(() => {});
+        .catch((e) => {
+          log(e);
+        });
       await this.outlineBuffer.length
         .then(async (len: number) => {
           await this.outlineBuffer.setOption('modifiable', true);
@@ -224,7 +232,9 @@ export class Outline extends Dispose {
           }
           await this.outlineBuffer.setOption('modifiable', false);
         })
-        .catch(() => {});
+        .catch((e) => {
+          log(e);
+        });
     }
     await this.highlightCurrentOutlineItem();
   };
@@ -367,7 +377,9 @@ export class Outline extends Dispose {
               (await tab.number) === (await curTab.number) &&
               `file://${await (await win.buffer).name}` === this.curUri
             ) {
-              win.setCursor([outline.codeRange.start.line + 1, outline.codeRange.start.character]).catch(() => {});
+              win.setCursor([outline.codeRange.start.line + 1, outline.codeRange.start.character]).catch((e) => {
+                log(e);
+              });
               await nvim.call('win_gotoid', [win.id]);
               break;
             }
@@ -398,7 +410,9 @@ export class Outline extends Dispose {
         if ((await tab.number) === (await curTab.number)) {
           if ((await win.buffer).id === this.outlineBuffer.id) {
             shouldOpenOutlinePanel = false;
-            win.close(true).catch(() => {});
+            win.close(true).catch((e) => {
+              log(e);
+            });
           }
         }
       }
