@@ -350,7 +350,7 @@ export class Outline extends Dispose {
       await nvim.command(`syntax match FlutterOutlineLineNumber /: \\d\\+$/`);
       await nvim.command(`highlight default link FlutterOutlineLineNumber Number`);
       this.outlineBuffer = await win.buffer;
-      workspace.registerLocalKeymap('n', '<CR>', async () => {
+      const goto = async () => {
         const curWin = await nvim.window;
         const cursor = await curWin.cursor;
         const outlineItems = this.outlinePanelData[this.curUri];
@@ -373,7 +373,9 @@ export class Outline extends Dispose {
             }
           }
         }
-      });
+      };
+      workspace.registerLocalKeymap('n', '<CR>', goto);
+      workspace.registerLocalKeymap('n', '<LeftRelease>', goto);
       await nvim.call('win_gotoid', [curWin.id]);
       const uri = await this.getCurrentUri();
       this.updateOutlineBuffer(uri, true);
