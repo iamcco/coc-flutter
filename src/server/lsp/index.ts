@@ -21,6 +21,7 @@ import { ClosingLabels } from './closingLabels';
 import { codeActionProvider } from './codeActionProvider';
 import { completionProvider } from './completionProvider';
 import { executeCommandProvider } from './extractProvider';
+import { Outline } from './outline';
 
 const log = logger.getlog('lsp-server');
 
@@ -82,6 +83,7 @@ export class LspServer extends Dispose {
       onlyAnalyzeProjectsWithOpenFiles: true,
       suggestFromUnimportedLibraries: true,
       closingLabels: true,
+      outline: true,
     });
 
     /**
@@ -149,6 +151,7 @@ export class LspServer extends Dispose {
           // register closing label
           this.push(new ClosingLabels(client));
         }
+        this.push(new Outline(client));
         statusBar.ready();
       })
       .catch((error: Error) => {

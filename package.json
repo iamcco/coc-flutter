@@ -97,6 +97,11 @@
           "default": true,
           "description": "When set to true, dart/textDocument/publishClosingLabels notifications will be sent with information to render editor closing labels."
         },
+        "flutter.lsp.initialization.outline": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to true, dart/textDocument/publishOutline notifications will be sent with information to render the outline."
+        },
         "flutter.sdk.dart-command": {
           "type": "string",
           "default": "",
