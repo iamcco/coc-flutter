@@ -10,13 +10,16 @@
     "conceallevel",
     "cursorcolumn",
     "cursorline",
+    "esbuild",
     "foldcolumn",
     "getlog",
     "outchannel",
+    "outfile",
     "pubspec",
     "regist",
     "relativenumber",
     "signcolumn",
+    "sourcemap",
     "winhighlight"
   ]
 }
