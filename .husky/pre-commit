@@ -1,5 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run lint-fix
-git add .
+# eslint fix if lint fail then abort commit
+npm run lint || (npm run lint-fix && exit 1)
