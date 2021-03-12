@@ -43,6 +43,7 @@ class StatusBar extends Dispose {
 
   updateDevice(name: string | undefined, isLoading: boolean) {
     this.currentDevice = name;
+    if (workspace.getConfiguration('flutter').get<string>('status') !== 'device') return;
     if (isLoading) {
       this.loadingDevices = true;
       this.show('Loading devices...', true);

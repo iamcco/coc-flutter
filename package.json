@@ -77,10 +77,14 @@
           "item": "string",
           "description": "The paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed\neg. /path/to/flutter (command at /path/to/flutter/bin/flutter) \n~/flutter_versions (command at ~/flutter_versions/version/bin/flutter)."
         },
-        "flutter.UIPath": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether if the path for the current UI component should be shown on the status bar"
+        "flutter.status": {
+          "type": "string",
+          "enum": [
+            "device",
+            "uipath"
+          ],
+          "default": "device",
+          "description": "Controls what to show for the coc#status.\n Valid options:\n    'device' - The selected device\n    'uipath' - The path for the current UI component"
         },
         "flutter.outlineWidth": {
           "type": "number",

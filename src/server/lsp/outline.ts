@@ -81,7 +81,7 @@ export class Outline extends Dispose {
     super();
     this.init(client);
     const config = workspace.getConfiguration('flutter');
-    this.showPath = config.get<boolean>('UIPath', true);
+    this.showPath = config.get<string>('status') === 'uipath';
     this.outlineWidth = config.get<number>('outlineWidth', 30);
     this.iconSpacing = ' '.repeat(config.get<number>('outlineIconPadding', 0));
   }
@@ -274,7 +274,7 @@ export class Outline extends Dispose {
       }
     }
     this.curOutlineItem = outline;
-    // if (this.showPath) statusBar.show(elementPath, false);
+    if (this.showPath) statusBar.show(elementPath, false);
   }
 
   async getCurrentUri() {

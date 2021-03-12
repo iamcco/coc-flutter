@@ -115,3 +115,5 @@ typings/
 
 # Node-patch:
 out/
+
+.nvimrc
