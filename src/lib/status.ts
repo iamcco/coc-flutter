@@ -61,7 +61,7 @@ class StatusBar extends Dispose {
     this.show('restartingLsp...', true);
   }
 
-  private show(message: string, isProgress?: boolean) {
+  show(message: string, isProgress?: boolean) {
     if (this.statusBar) {
       this.statusBar.text = message;
       if (isProgress !== undefined) {

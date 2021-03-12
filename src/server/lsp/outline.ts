@@ -93,12 +93,12 @@ export class Outline extends Dispose {
     const iconSpacing = this.iconSpacing;
     function genOutline(outline: OutlineParams, indentStr: string) {
       let indent = indentStr;
-      let foldIndicator = '  ';
+      // let foldIndicator = '  ';
       let icon = icons[outline.element.kind];
       if (icon === undefined) icon = icon_default;
       // icon += ' ';
-      if (Array.isArray(outline.children) && outline.children.length > 0 && outline.folded === true)
-        foldIndicator = '▸ ';
+      // if (Array.isArray(outline.children) && outline.children.length > 0 && outline.folded === true)
+      // foldIndicator = '▸ ';
       const newLine = `${indent} ${icon}${iconSpacing}${outline.element.name}: ${outline.codeRange.start.line + 1}`;
       outline.lineNumber = lines.length;
       outline.startCol = ucs2ToBinaryString(indent).length;
@@ -259,7 +259,7 @@ export class Outline extends Dispose {
       }
     }
     this.curOutlineItem = outline;
-    // if (this.showPath) statusBar.show(elementPath, false);
+    if (this.showPath) statusBar.show(elementPath, false);
   }
 
   async getCurrentUri() {

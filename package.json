@@ -77,6 +77,21 @@
           "item": "string",
           "description": "The paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed\neg. /path/to/flutter (command at /path/to/flutter/bin/flutter) \n~/flutter_versions (command at ~/flutter_versions/version/bin/flutter)."
         },
+        "flutter.UIPath": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether if the path for the current UI component should be shown on the status bar"
+        },
+        "flutter.outlineWidth": {
+          "type": "number",
+          "default": 30,
+          "description": "The default width of the outline panel"
+        },
+        "flutter.outlineIconPadding": {
+          "type": "number",
+          "default": 0,
+          "description": "The number of spaces between the icon and the item text in the outline panel"
+        },
         "flutter.lsp.debug": {
           "type": "boolean",
           "default": false,
@@ -223,6 +238,14 @@
       {
         "command": "flutter.emulators",
         "title": "open emulators list"
+      },
+      {
+        "command": "flutter.outline",
+        "title": "Opens a side panel that shows real time the flutter outline"
+      },
+      {
+        "command": "flutter.outline",
+        "title": "Toggles the flutter outline side panel"
       }
     ]
   },
