@@ -1,4 +1,4 @@
-import { commands, LanguageClient, workspace } from 'coc.nvim';
+import { commands, LanguageClient, workspace, Buffer as VimBuffer } from 'coc.nvim';
 import { statusBar } from '../../lib/status';
 import { cmdPrefix } from '../../util/constant';
 import { Range } from 'vscode-languageserver-protocol';
@@ -69,7 +69,7 @@ export class Outline extends Dispose {
   public outlineVersions: Record<string, number> = {};
   public outlineVersions_Rendered: Record<string, number> = {};
   public renderedOutlineUri = '';
-  public outlineBuffer: any;
+  public outlineBuffer?: VimBuffer;
   public curOutlineItem: OutlineParams | undefined;
   public highlightIds: number[] = [];
   public showPath: boolean | undefined;
@@ -99,7 +99,10 @@ export class Outline extends Dispose {
       // icon += ' ';
       // if (Array.isArray(outline.children) && outline.children.length > 0 && outline.folded === true)
       // foldIndicator = '▸ ';
-      const newLine = `${indent} ${icon}${iconSpacing}${outline.element.name}: ${outline.codeRange.start.line + 1}`;
+      let newLine = `${indent} ${icon}${iconSpacing}${outline.element.name}`;
+      if (outline.element.returnType) {
+        newLine += `: ${outline.element.returnType}`;
+      }
       outline.lineNumber = lines.length;
       outline.startCol = ucs2ToBinaryString(indent).length;
       outline.endCol = ucs2ToBinaryString(newLine).length;
@@ -181,8 +184,9 @@ export class Outline extends Dispose {
         this.outlineVersions_Rendered[uri] = this.outlineVersions[uri];
         content = this.outlineStrings[uri];
       }
-      await this.outlineBuffer.length
+      await this.outlineBuffer?.length
         .then(async (len: number) => {
+          if (!this.outlineBuffer) return;
           if (Number.isInteger(len)) {
             await this.outlineBuffer.setOption('modifiable', true);
             if (len > content.length) {
@@ -209,6 +213,7 @@ export class Outline extends Dispose {
         .catch(() => {});
       await this.outlineBuffer.length
         .then(async (len: number) => {
+          if (!this.outlineBuffer) return;
           await this.outlineBuffer.setOption('modifiable', true);
           if (len > content.length) {
             await this.outlineBuffer.setLines([], {
@@ -259,7 +264,7 @@ export class Outline extends Dispose {
       }
     }
     this.curOutlineItem = outline;
-    if (this.showPath) statusBar.show(elementPath, false);
+    // if (this.showPath) statusBar.show(elementPath, false);
   }
 
   async getCurrentUri() {
@@ -347,7 +352,7 @@ export class Outline extends Dispose {
       await nvim.command(`highlight default link FlutterOutlineEnum Type`);
       await nvim.command(`syntax match FlutterOutlineEnumMember /${icons.ENUM_CONSTANT}/`);
       await nvim.command(`highlight default link FlutterOutlineEnumMember Identifier`);
-      await nvim.command(`syntax match FlutterOutlineLineNumber /: \\d\\+$/`);
+      await nvim.command(`syntax match FlutterOutlineLineNumber /: \.\\+$/`);
       await nvim.command(`highlight default link FlutterOutlineLineNumber Number`);
       this.outlineBuffer = await win.buffer;
       const goto = async () => {
