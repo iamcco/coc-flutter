@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { window } from 'coc.nvim';
 import os from 'os';
 import { notification } from '../../lib/notification';
@@ -12,8 +12,8 @@ const log = logger.getlog('devtools-server');
 type callback = (...params: any[]) => void;
 
 class DevToolsServer extends Dispose {
-  private launchDevToolsTask: ChildProcessWithoutNullStreams | undefined;
-  private activateDevToolsTask: ChildProcessWithoutNullStreams | undefined;
+  private launchDevToolsTask: ChildProcess | undefined;
+  private activateDevToolsTask: ChildProcess | undefined;
   private port: number | undefined;
   private PID: number | undefined;
   private host: string | undefined;

@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { Disposable, OutputChannel, workspace } from 'coc.nvim';
 import os from 'os';
 import { notification } from '../../lib/notification';
@@ -14,7 +14,7 @@ type callback = (...params: any[]) => void;
 
 class DevServer extends Dispose {
   private outputChannel: OutputChannel | undefined;
-  private task: ChildProcessWithoutNullStreams | undefined;
+  private task: ChildProcess | undefined;
   private onHandler: callback[] = [];
   private isAutoScroll = false;
 

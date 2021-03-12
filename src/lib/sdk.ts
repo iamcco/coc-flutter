@@ -57,7 +57,7 @@ class FlutterSDK {
   }
 
   private async _hasValidFlutterSdk(): Promise<boolean> {
-    return (await exists(this._sdkHome)) && (await exists(join(this._sdkHome, 'bin', 'flutter')));
+    return exists(this._sdkHome) && exists(join(this._sdkHome, 'bin', 'flutter'));
   }
 
   public async getVersion(): Promise<[number, number, number] | undefined> {
@@ -148,7 +148,7 @@ class FlutterSDK {
         ? Uri.parse(workspace.workspaceFolder.uri).fsPath
         : workspace.cwd;
       const fvmLocation = join(workspaceFolder, '.fvm', 'flutter_sdk');
-      if (await exists(fvmLocation)) {
+      if (exists(fvmLocation)) {
         log('Found local fvm sdk');
         this._sdkHome = fvmLocation;
         await this.initFlutterCommandsFromSdkHome();
@@ -163,12 +163,12 @@ class FlutterSDK {
   private async initFlutterCommandsFromSdkHome() {
     this._flutterCommand = join(this._sdkHome, 'bin', os.platform() === 'win32' ? 'flutter.bat' : 'flutter');
     log(`flutter command path => ${this.flutterCommand}`);
-    if (!(await exists(this._flutterCommand))) {
+    if (!exists(this._flutterCommand)) {
       log('flutter command path does not exist');
     }
     this._dartHome = join(this._sdkHome, 'bin', 'cache', 'dart-sdk');
     log(`dart sdk home => ${this._dartHome}`);
-    if (!(await exists(this._dartHome))) {
+    if (!exists(this._dartHome)) {
       log('dart sdk home path does not exist');
     }
   }
@@ -202,11 +202,11 @@ class FlutterSDK {
   private async initDartSdk() {
     this._analyzerSnapshotPath = join(this._dartHome, ANALYZER_SNAPSHOT_NAME);
     log(`analyzer path => ${this._analyzerSnapshotPath}`);
-    this._state = await exists(this._analyzerSnapshotPath);
+    this._state = exists(this._analyzerSnapshotPath);
     if (!this._dartCommand) {
       this._dartCommand = join(this.dartHome, DART_COMMAND);
       if (os.platform() === 'win32') {
-        const isCommandExists = await exists(this._dartCommand);
+        const isCommandExists = exists(this._dartCommand);
         if (!isCommandExists) {
           this._dartCommand = this._dartCommand.replace(/bat$/, 'exe');
         }
@@ -267,7 +267,7 @@ class FlutterSDK {
       ) {
         flutterPath = join(flutterPath, '..', '..');
       }
-      const isFlutterDir = await exists(join(flutterPath, 'bin', 'flutter'));
+      const isFlutterDir = exists(join(flutterPath, 'bin', 'flutter'));
       if (!isFlutterDir) return;
       const version = await this.versionForSdk(flutterPath);
       if (version) {
@@ -300,7 +300,7 @@ class FlutterSDK {
 
     for (let path of paths) {
       path = path.replace(/^~/, home).trim();
-      const isFlutterDir = await exists(join(path, 'bin', 'flutter'));
+      const isFlutterDir = exists(join(path, 'bin', 'flutter'));
       if (isFlutterDir) {
         const version = await this.versionForSdk(path);
         if (version && !sdks.some((sdk) => sdk.location == path)) {
@@ -317,7 +317,7 @@ class FlutterSDK {
       const files = await readDir(path);
       for (const file of files) {
         const location = join(path, file).trim();
-        const isFlutterDir = await exists(join(location, 'bin', 'flutter'));
+        const isFlutterDir = exists(join(location, 'bin', 'flutter'));
         if (!isFlutterDir) continue;
         if (sdks.some((sdk) => sdk.location == location)) continue;
         const version = await this.versionForSdk(location);
@@ -334,7 +334,7 @@ class FlutterSDK {
       let fvmCachePath = join(home, 'fvm', 'versions');
       const settingsPath = join(home, 'fvm', '.settings');
       try {
-        const fvmSettingsFileExists = await exists(settingsPath);
+        const fvmSettingsFileExists = exists(settingsPath);
         if (fvmSettingsFileExists) {
           const settingsRaw = await readFile(settingsPath);
           const settings = JSON.parse(settingsRaw.toString());
@@ -349,7 +349,7 @@ class FlutterSDK {
       const fvmVersions = await readDir(fvmCachePath);
       for (const version of fvmVersions) {
         const location = join(fvmCachePath, version).trim();
-        const isFlutterDir = await exists(join(location, 'bin', 'flutter'));
+        const isFlutterDir = exists(join(location, 'bin', 'flutter'));
         if (!isFlutterDir) continue;
         if (sdks.some((sdk) => sdk.location == location)) continue;
         const flutterVersion = await this.versionForSdk(location);
