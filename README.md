@@ -46,6 +46,19 @@ To do this there are a few options:
 3. Set the `flutter.sdk.path` config option to the exact path you want to use for your sdk.
    If you have also set the `flutter.sdk.searchPaths` then you can use the `FlutterSdks` list (see below) to see what versions you have installed and set the config option for you. **Note that this means that the `flutter.sdk.path` option will be overriden by this list**
 
+## Running the app
+
+When the extension starts and has found an sdk it will request from flutter the available devices.
+The device it will run the app on will be shown in the statusbar and can be changed using the `FlutterDevices` list.
+If you call `flutter.run` with an explicit `-d deviceId` argument then the selected device will be ignored.
+
+After making sure that the correct device is selected you can run the app by calling the `flutter.run`:
+> :CocCommand flutter.run
+
+If you want to give arguments to the flutter run command you can simply append them:
+> :CocCommand flutter.run -t lib/main.dart --flavor myflavor
+
+
 ## coc-list sources
 
 - FlutterSdks
@@ -60,7 +73,9 @@ To do this there are a few options:
 - FlutterDevices
   > `:CocList FlutterDevices`
 
-  Shows the devices that you can run the app on.
+  Shows a list of available devices that can be selected to use as run destination.
+  When selecting a device the `flutter.selectedDeviceId` config option will be updated in the local config.
+  It also has the `run` action which only runs the app once on that device without changing the selected device.
 
 - FlutterEmulators
   > `:CocList FlutterEmulators`
@@ -108,7 +123,9 @@ To do this there are a few options:
 - `flutter.autoOpenDevLog` default: `false`
   > Automatically open the dev log after calling flutter run
 - `flutter.autoHideDevLog` default: `false`
-  >  Automatically hide the dev log when the app stops running
+  > Automatically hide the dev log when the app stops running
+- `flutter.selectedDeviceId` default: `null`
+  > The id of the device that was last selected using the FlutterDevices list.
 - `dart.analysisExcludedFolders` default: `[]`
   > An array of paths (absolute or relative to each workspace folder) that should be excluded from analysis.
 - `dart.enableSdkFormatter` default: `true`

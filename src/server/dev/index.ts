@@ -69,7 +69,7 @@ class DevServer extends Dispose {
       return false;
     }
 
-    log(`server start at: ${workspaceFolder}`);
+    log(`server start at: ${workspaceFolder}, args: ${args}`);
     notification.show('Start flutter dev server...');
 
     if (this.outputChannel) {

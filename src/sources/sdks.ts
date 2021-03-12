@@ -5,6 +5,7 @@ import { flutterSDK, FlutterSdk } from '../lib/sdk';
 import { execCommand } from '../util/fs';
 import { logger } from '../util/logger';
 import { LspServer } from '../server/lsp';
+import { join } from 'path';
 
 const log = logger.getlog('SdksList');
 
@@ -27,7 +28,7 @@ export default class SdksList implements IList {
         const config = workspace.getConfiguration('flutter');
         if (sdk.isFvm) {
           await execCommand(`fvm use ${sdk.fvmVersion!}`);
-          config.update('sdk.path', '.fvm/flutter_sdk');
+          config.update('sdk.path', join('.fvm', 'flutter_sdk'));
           log(`swithed to ${sdk.version} using fvm`);
         } else {
           config.update('sdk.path', sdk.location);

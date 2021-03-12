@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -152,6 +152,11 @@
           "type": "integer",
           "default": 1,
           "description": "Sets the `--device-timout` flag when running `flutter devices`"
+        },
+        "flutter.selectedDeviceId": {
+          "type": "string",
+          "default": null,
+          "description": "The id of the device that is selected and will be used by `flutter.run` if it is available."
         },
         "dart.analysisExcludedFolders": {
           "type": "array",
