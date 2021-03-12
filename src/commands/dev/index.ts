@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams } from 'child_process';
+import { ChildProcess } from 'child_process';
 import { commands, Disposable, workspace } from 'coc.nvim';
 import { notification } from '../../lib/notification';
 import { DaemonServer } from '../../server/deamon';
@@ -300,7 +300,7 @@ export class Dev extends Dispose {
     }
   }
 
-  private launchDevToolsInBrowser(): ChildProcessWithoutNullStreams | undefined {
+  private launchDevToolsInBrowser(): ChildProcess | undefined {
     if (devToolsServer.state) {
       try {
         // assertion to fix encodeURIComponent not accepting undefined- we rule out undefined values before this is called

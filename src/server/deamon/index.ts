@@ -1,4 +1,4 @@
-import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { workspace, WorkspaceConfiguration } from 'coc.nvim';
 import os from 'os';
 import { notification } from '../../lib/notification';
@@ -32,7 +32,7 @@ export interface Device {
 const selectedDeviceIdKey = 'selectedDeviceId';
 
 export class DaemonServer extends Dispose {
-  private process?: ChildProcessWithoutNullStreams;
+  private process?: ChildProcess;
 
   private eventHandlers: { [key: string]: (params?: { [key: string]: any }) => void } = {};
   private currentId = 1;
@@ -155,7 +155,7 @@ export class DaemonServer extends Dispose {
     notification.show(params['message']);
   };
 
-  private connected = (_params?: { [key: string]: any }) => {
+  private connected = () => {
     statusBar.updateDevice(undefined, true);
     this.sendRequest({
       id: this.currentId++,

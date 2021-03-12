@@ -3,16 +3,12 @@ import { ErrnoException } from '@nodelib/fs.stat/out/types';
 import { exec, ExecOptions } from 'child_process';
 import { Uri, workspace } from 'coc.nvim';
 import fastGlob from 'fast-glob';
-import fs, { BaseEncodingOptions } from 'fs';
+import fs from 'fs';
 import { dirname, join, sep } from 'path';
 import { logger } from './logger';
 
-export const exists = async (path: string): Promise<boolean> => {
-  return new Promise((resolve) => {
-    fs.exists(path, (exists) => {
-      resolve(exists);
-    });
-  });
+export const exists = (path: string): boolean => {
+  return fs.existsSync(path);
 };
 
 export const findWorkspaceFolders = async (cwd: string, patterns: string[]): Promise<string[]> => {
@@ -66,8 +62,8 @@ export const execCommand = (
         resolve({
           code,
           err,
-          stdout,
-          stderr,
+          stdout: stdout.toString(),
+          stderr: stderr.toString(),
         });
       },
     ).on('exit', (co: number) => co && (code = co));
@@ -117,7 +113,7 @@ export const readDir = async (
 
 export const readFile = async (
   path: string,
-  options?: (BaseEncodingOptions & { flag?: string }) | string | undefined | null,
+  options?: { encoding?: null; flag?: string } | string | undefined | null,
 ): Promise<string | Buffer> => {
   return new Promise((resolve, reject) => {
     fs.readFile(path, options, (err, data) => {

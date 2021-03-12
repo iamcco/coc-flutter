@@ -15,7 +15,7 @@ export default class DevicesList implements IList {
     this.actions.push({
       name: 'select',
       multiple: false,
-      execute: async (item, context) => {
+      execute: async (item) => {
         if (Array.isArray(item)) {
           return;
         }
