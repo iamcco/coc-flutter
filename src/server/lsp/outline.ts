@@ -209,24 +209,11 @@ export class Outline extends Dispose {
           if (!this.outlineBuffer) return;
           if (Number.isInteger(len)) {
             await this.outlineBuffer.setOption('modifiable', true);
-            if (len > content.length) {
-              await this.outlineBuffer.setLines([], {
-                start: 0,
-                end: len - 1,
-                strictIndexing: false,
-              });
-              await this.outlineBuffer.setLines(content, {
-                start: 0,
-                end: 0,
-                strictIndexing: false,
-              });
-            } else {
-              await this.outlineBuffer.setLines(content, {
-                start: 0,
-                end: len - 1,
-                strictIndexing: false,
-              });
-            }
+            await this.outlineBuffer.setLines(content, {
+              start: 0,
+              end: -1,
+              strictIndexing: false,
+            });
             await this.outlineBuffer.setOption('modifiable', false);
           }
         })
