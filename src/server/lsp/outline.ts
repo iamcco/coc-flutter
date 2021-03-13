@@ -227,7 +227,7 @@ export class Outline extends Dispose {
       if (Array.isArray(outline.children) && outline.children.length > 0) {
         for (const child of outline.children) {
           const curLine = cursor[0] - 1,
-            curCol = cursor[1] - 1;
+            curCol = cursor[1];
           const startLine = child.codeRange.start.line,
             startCol = child.codeRange.start.character;
           const endLine = child.codeRange.end.line,
@@ -264,9 +264,10 @@ export class Outline extends Dispose {
     if (!this.outlineBuffer) return;
     const outline = this.outlines[this.curUri];
     if (outline) {
-      this.getUIPathFromCursor(outline, await (await workspace.nvim.window).cursor);
+      const cursor = await (await workspace.nvim.window).cursor;
+      this.getUIPathFromCursor(outline, cursor);
     }
-    this.updateOutlineBuffer(this.curUri);
+    await this.updateOutlineBuffer(this.curUri);
   }
 
   async init(client: LanguageClient) {
