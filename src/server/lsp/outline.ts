@@ -193,10 +193,6 @@ export class Outline extends Dispose {
     }
   };
 
-  sleep = (milliseconds) => {
-    return new Promise((resolve) => setTimeout(resolve, milliseconds));
-  };
-
   updateOutlineBuffer = async (uri: string, force = false) => {
     if (
       ((this.outlineVersions[uri] === this.outlineVersions_Rendered[uri] && this.outlineVersions[uri] === undefined) ||
@@ -210,45 +206,15 @@ export class Outline extends Dispose {
       if (this.outlineStrings[uri]) {
         this.outlineVersions_Rendered[uri] = this.outlineVersions[uri];
         content = this.outlineStrings[uri];
+      } else {
+        content = ['No outline data yet'];
       }
-      await this.outlineBuffer?.length
-        .then(async (len: number) => {
-          if (!this.outlineBuffer) return;
-          if (Number.isInteger(len)) {
-            await this.outlineBuffer.setOption('modifiable', true);
-            await this.sleep(1000);
-            await this.outlineBuffer.setLines(content, {
-              start: 0,
-              end: -1,
-              strictIndexing: false,
-            });
-            await this.outlineBuffer.setOption('modifiable', false);
-          }
-        })
-        .catch((e) => {
-          log(e);
-        });
-      await this.outlineBuffer.length
-        .then(async (len: number) => {
-          if (!this.outlineBuffer) return;
-          await this.outlineBuffer.setOption('modifiable', true);
-          if (len > content.length) {
-            await this.outlineBuffer.setLines([], {
-              start: 0,
-              end: len - 1,
-              strictIndexing: false,
-            });
-            await this.outlineBuffer.setLines(content, {
-              start: 0,
-              end: 0,
-              strictIndexing: false,
-            });
-          }
-          await this.outlineBuffer.setOption('modifiable', false);
-        })
-        .catch((e) => {
-          log(e);
-        });
+      if (!this.outlineBuffer) return;
+      await this.outlineBuffer.setLines(content, {
+        start: 0,
+        end: -1,
+        strictIndexing: false,
+      });
     }
     await this.highlightCurrentOutlineItem();
   };
@@ -291,29 +257,35 @@ export class Outline extends Dispose {
     return `file://${path}`;
   }
 
+  private async updateBuffer() {
+    this.curUri = await this.getCurrentUri();
+    if (!this.outlineBuffer) return;
+    const outline = this.outlines[this.curUri];
+    if (outline) {
+      this.getUIPathFromCursor(outline, await (await workspace.nvim.window).cursor);
+    }
+    this.updateOutlineBuffer(this.curUri);
+  }
+
   async init(client: LanguageClient) {
     const { nvim } = workspace;
 
-    (nvim as any).on('notification', async (...args) => {
-      if (args[0] === 'CocAutocmd') {
-        if (args[1][0] === 'CursorMoved') {
-          const bufId = args[1][1];
-          const cursor = args[1][2];
-          if (this.outlineBuffer && bufId === this.outlineBuffer.id) {
-          } else {
-            this.curUri = await this.getCurrentUri();
-            const outline = this.outlines[this.curUri];
-            if (outline) {
-              this.getUIPathFromCursor(outline, cursor);
-              this.updateOutlineBuffer(this.curUri);
-            }
-          }
-        } else if (args[1][0] === 'BufEnter' && Number.isInteger(args[1][1])) {
-          if (this.outlineBuffer && args[1][1] === this.outlineBuffer.id) {
+    this.push(
+      workspace.registerAutocmd({
+        event: 'CursorMoved',
+        callback: () => this.updateBuffer(),
+      }),
+    );
+    this.push(
+      workspace.registerAutocmd({
+        event: 'BufEnter',
+        callback: async () => {
+          const buffer = await nvim.buffer;
+          if (this.outlineBuffer && buffer.id === this.outlineBuffer.id) {
             const wins = await nvim.windows;
             if (Array.isArray(wins)) {
               if (wins.length === 1) {
-                nvim.command('q');
+                await wins[0].close(true);
               } else {
                 const curWin = await nvim.window;
                 const curTab = await curWin.tabpage;
@@ -325,10 +297,13 @@ export class Outline extends Dispose {
                 if (winTabCount === 1) curWin.close(true);
               }
             }
+          } else {
+            await this.updateBuffer();
           }
-        }
-      }
-    });
+        },
+      }),
+    );
+
     client.onNotification('dart/textDocument/publishOutline', this.onOutline);
     const openOutlinePanel = async () => {
       const curWin = await nvim.window;
@@ -338,7 +313,6 @@ export class Outline extends Dispose {
       await nvim.command('setlocal filetype=flutterOutline');
       await nvim.command('set buftype=nofile');
       await nvim.command('setlocal noswapfile');
-      await nvim.command('setlocal nomodifiable');
       await nvim.command('setlocal winfixwidth');
       await nvim.command('setlocal nocursorline');
       await nvim.command('setlocal nobuflisted');
@@ -453,6 +427,8 @@ export class Outline extends Dispose {
 
     this.outlines[uri] = outline;
     this.generateOutlineStrings(uri);
-    this.updateOutlineBuffer(uri);
+    if (uri === this.curUri) {
+      this.updateOutlineBuffer(uri);
+    }
   };
 }
