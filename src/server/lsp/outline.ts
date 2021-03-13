@@ -436,9 +436,7 @@ export class Outline extends Dispose {
     }
 
     this.outlines[uri] = outline;
-    if (uri === this.renderedOutlineUri) {
-      this.generateOutlineStrings(uri);
-      this.updateOutlineBuffer(uri);
-    }
+    this.generateOutlineStrings(uri);
+    this.updateOutlineBuffer(uri);
   };
 }
