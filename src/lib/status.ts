@@ -2,10 +2,16 @@ import { StatusBarItem, window, workspace } from 'coc.nvim';
 import { Dispose } from '../util/dispose';
 
 class StatusBar extends Dispose {
+  private displayMode = '';
   private isLSPReady = false;
   private statusBar: StatusBarItem | undefined = undefined;
   private currentDevice?: string;
   private loadingDevices?: boolean;
+
+  constructor() {
+    super();
+    this.displayMode = workspace.getConfiguration('flutter').get<string>('status', '');
+  }
 
   get isInitialized(): boolean {
     return this.statusBar != undefined;
@@ -43,7 +49,7 @@ class StatusBar extends Dispose {
 
   updateDevice(name: string | undefined, isLoading: boolean) {
     this.currentDevice = name;
-    if (workspace.getConfiguration('flutter').get<string>('status') !== 'device') return;
+    if (this.displayMode !== 'device') return;
     if (isLoading) {
       this.loadingDevices = true;
       this.show('Loading devices...', true);
@@ -55,6 +61,10 @@ class StatusBar extends Dispose {
     }
   }
 
+  updateUIPath(path: string) {
+    if (this.displayMode === 'uipath') this.show(path);
+  }
+
   restartingLsp() {
     this.isLSPReady = false;
     this.loadingDevices = undefined;
@@ -62,7 +72,7 @@ class StatusBar extends Dispose {
     this.show('restartingLsp...', true);
   }
 
-  show(message: string, isProgress?: boolean) {
+  private show(message: string, isProgress?: boolean) {
     if (this.statusBar) {
       this.statusBar.text = message;
       if (isProgress !== undefined) {

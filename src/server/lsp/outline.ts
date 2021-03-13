@@ -72,7 +72,6 @@ export class Outline extends Dispose {
   public outlineBuffer?: VimBuffer;
   public curOutlineItem: OutlineParams | undefined;
   public highlightIds: number[] = [];
-  public showPath: boolean | undefined;
   public outlineWidth = 30;
   public curUri = '';
   public iconSpacing = '';
@@ -81,7 +80,6 @@ export class Outline extends Dispose {
     super();
     this.init(client);
     const config = workspace.getConfiguration('flutter');
-    this.showPath = config.get<string>('status') === 'uipath';
     this.outlineWidth = config.get<number>('outlineWidth', 30);
     this.iconSpacing = ' '.repeat(config.get<number>('outlineIconPadding', 0));
   }
@@ -274,7 +272,7 @@ export class Outline extends Dispose {
       }
     }
     this.curOutlineItem = outline;
-    if (this.showPath) statusBar.show(elementPath, false);
+    statusBar.updateUIPath(elementPath);
   }
 
   async getCurrentUri() {
