@@ -13,12 +13,8 @@ class Logger extends Dispose {
     this._traceServer = level;
     if (this._traceServer !== 'off') {
       this._outchannel = window.createOutputChannel('flutter');
-      this.push(this._outchannel);
+      this._outchannel?.clear();
     }
-  }
-
-  set outchannel(channel: OutputChannel | undefined) {
-    this._outchannel = channel;
   }
 
   get outchannel(): OutputChannel | undefined {
@@ -28,7 +24,7 @@ class Logger extends Dispose {
   get devOutchannel(): OutputChannel {
     if (!this._devOutchannel) {
       this._devOutchannel = window.createOutputChannel(devLogName);
-      this.push(this._devOutchannel);
+      this._devOutchannel?.clear();
     }
     return this._devOutchannel;
   }

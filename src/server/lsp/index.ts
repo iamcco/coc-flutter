@@ -54,7 +54,7 @@ export class LspServer extends Dispose {
 
   async init(): Promise<void> {
     this.outchannel = window.createOutputChannel('flutter-lsp');
-    this.push(this.outchannel);
+    this.outchannel.clear();
     const config = workspace.getConfiguration('flutter');
     // is force lsp debug
     const isLspDebug = config.get<boolean>('lsp.debug');
