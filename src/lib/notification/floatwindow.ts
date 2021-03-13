@@ -8,6 +8,8 @@ const log = logger.getlog('floatWin');
 export class FloatWindow extends Dispose {
   private buf: NVIMBuffer | undefined;
   private win: Window | undefined;
+  // neovim >= 0.5.0
+  private isNvimNightly: boolean | undefined;
 
   constructor(public readonly message: Message) {
     super();
@@ -17,6 +19,9 @@ export class FloatWindow extends Dispose {
     const { nvim } = workspace;
     const { message } = this;
 
+    if (this.isNvimNightly === undefined) {
+      this.isNvimNightly = await nvim.call('has', 'nvim-0.5.0');
+    }
     const buf = await nvim.createNewBuffer(false, true);
     await buf.setLines(message.lines, { start: 0, end: -1, strictIndexing: false });
     const col = (await nvim.getOption('columns')) as number;
@@ -47,8 +52,9 @@ export class FloatWindow extends Dispose {
     await win.setOption('winhighlight', 'FoldColumn:NormalFloat');
     await nvim.resumeNotification();
     try {
-      // vim is number and neovim is string
-      await win.setOption('foldcolumn', workspace.isVim ? 1 : '1');
+      // vim and neovim < 0.5.0 foldcolumn is number
+      // refer https://github.com/neovim/neovim/pull/11716
+      await win.setOption('foldcolumn', !this.isNvimNightly ? 1 : '1');
     } catch (error) {
       log(`set foldcolumn error: ${error.message || error}`);
     }
