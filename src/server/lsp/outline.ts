@@ -430,7 +430,7 @@ export class Outline extends Dispose {
     this.outlines[uri] = outline;
     this.generateOutlineStrings(uri);
     if (uri === this.curUri) {
-      this.updateOutlineBuffer(uri);
+      await this.updateBuffer();
     }
   };
 }
