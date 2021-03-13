@@ -288,7 +288,9 @@ export class Outline extends Dispose {
             const wins = await nvim.windows;
             if (Array.isArray(wins)) {
               if (wins.length === 1) {
-                await wins[0].close(true);
+                // Do q command instead of calling close since we want to close
+                // the last window which the close function does not allow
+                await nvim.command('q');
               } else {
                 const curWin = await nvim.window;
                 const curTab = await curWin.tabpage;
