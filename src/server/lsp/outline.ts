@@ -97,6 +97,9 @@ export class Outline extends Dispose {
     this.outlineWidth = config.get<number>('outlineWidth', 30);
     this.useNerdFont = config.get<boolean>('useNerdFont', true);
     this.iconSpacing = ' '.repeat(config.get<number>('outlineIconPadding', 0));
+    this.push({
+      dispose: () => this.hideOutlinePanel(),
+    });
   }
 
   generateOutlineStrings = (uri: string) => {
@@ -190,6 +193,10 @@ export class Outline extends Dispose {
     }
   };
 
+  sleep = (milliseconds) => {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  };
+
   updateOutlineBuffer = async (uri: string, force = false) => {
     if (
       ((this.outlineVersions[uri] === this.outlineVersions_Rendered[uri] && this.outlineVersions[uri] === undefined) ||
@@ -209,6 +216,7 @@ export class Outline extends Dispose {
           if (!this.outlineBuffer) return;
           if (Number.isInteger(len)) {
             await this.outlineBuffer.setOption('modifiable', true);
+            await this.sleep(1000);
             await this.outlineBuffer.setLines(content, {
               start: 0,
               end: -1,
@@ -407,23 +415,30 @@ export class Outline extends Dispose {
         await openOutlinePanel();
         return;
       }
-      const curWin = await nvim.window;
-      const curTab = await curWin.tabpage;
-      const wins = await nvim.windows;
-      let shouldOpenOutlinePanel = true;
-      for (const win of wins) {
-        const tab = await win.tabpage;
-        if ((await tab.number) === (await curTab.number)) {
-          if ((await win.buffer).id === this.outlineBuffer.id) {
-            shouldOpenOutlinePanel = false;
-            win.close(true).catch((e) => {
-              log(e);
-            });
-          }
-        }
-      }
+      const shouldOpenOutlinePanel = !(await this.hideOutlinePanel());
       if (shouldOpenOutlinePanel) await openOutlinePanel();
     });
+  }
+
+  async hideOutlinePanel(): Promise<boolean> {
+    if (!this.outlineBuffer) return false;
+    const nvim = workspace.nvim;
+    const curWin = await nvim.window;
+    const curTab = await curWin.tabpage;
+    const wins = await nvim.windows;
+    let didHide = false;
+    for (const win of wins) {
+      const tab = await win.tabpage;
+      if ((await tab.number) === (await curTab.number)) {
+        if ((await win.buffer).id === this.outlineBuffer.id) {
+          didHide = true;
+          win.close(true).catch((e) => {
+            log(e);
+          });
+        }
+      }
+    }
+    return didHide;
   }
 
   onOutline = async (params: ClientParams_Outline) => {
