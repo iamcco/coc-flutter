@@ -24,7 +24,20 @@ const icons = {
   ENUM: '\uf779 ',
   ENUM_CONSTANT: '\uf02b ',
 };
-const icon_default = '\ue612 ';
+const iconDefault = '\ue612 ';
+const iconsNonNerdFont = {
+  TOP_LEVEL_VARIABLE: 'V ',
+  CLASS: 'C ',
+  FIELD: 'P ',
+  CONSTRUCTOR: 'C ',
+  CONSTRUCTOR_INVOCATION: 'I ',
+  FUNCTION: 'F ',
+  METHOD: 'M ',
+  GETTER: 'G ',
+  ENUM: 'E ',
+  ENUM_CONSTANT: 'E ',
+};
+const iconDefaultNonNerdFont = '* ';
 const outlineBufferName = 'Flutter Outline';
 
 function ucs2ToBinaryString(str: string) {
@@ -75,12 +88,14 @@ export class Outline extends Dispose {
   public outlineWidth = 30;
   public curUri = '';
   public iconSpacing = '';
+  public useNerdFont = true;
 
   constructor(client: LanguageClient) {
     super();
     this.init(client);
     const config = workspace.getConfiguration('flutter');
     this.outlineWidth = config.get<number>('outlineWidth', 30);
+    this.useNerdFont = config.get<boolean>('useNerdFont', true);
     this.iconSpacing = ' '.repeat(config.get<number>('outlineIconPadding', 0));
   }
 
@@ -89,11 +104,12 @@ export class Outline extends Dispose {
     const lines: string[] = [];
     const outlineItems: OutlineParams[] = [];
     const iconSpacing = this.iconSpacing;
+    const useNerdFont = this.useNerdFont;
     function genOutline(outline: OutlineParams, indentStr: string) {
       let indent = indentStr;
       // let foldIndicator = '  ';
-      let icon = icons[outline.element.kind];
-      if (icon === undefined) icon = icon_default;
+      let icon = useNerdFont ? icons[outline.element.kind] : iconsNonNerdFont[outline.element.kind];
+      if (icon === undefined) icon = useNerdFont ? iconDefault : iconDefaultNonNerdFont;
       // icon += ' ';
       // if (Array.isArray(outline.children) && outline.children.length > 0 && outline.folded === true)
       // foldIndicator = '▸ ';

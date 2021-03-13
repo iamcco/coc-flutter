@@ -86,6 +86,11 @@
           "default": "device",
           "description": "Controls what to show for the coc#status.\n Valid options:\n    'device' - The selected device\n    'uipath' - The path for the current UI component"
         },
+        "flutter.useNerdFont": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show unicode icons for the Flutter Outline items (Requires NerdFont)"
+        },
         "flutter.outlineWidth": {
           "type": "number",
           "default": 30,
