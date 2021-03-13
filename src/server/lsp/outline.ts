@@ -258,6 +258,8 @@ export class Outline extends Dispose {
   }
 
   private async updateBuffer() {
+    const buffer = await workspace.nvim.buffer;
+    if (buffer.id === this.outlineBuffer?.id) return;
     this.curUri = await this.getCurrentUri();
     if (!this.outlineBuffer) return;
     const outline = this.outlines[this.curUri];
