@@ -39,7 +39,7 @@ export class DaemonServer extends Dispose {
   private eventHandlers: Record<string, (params?: { [key: string]: any }) => void> = {};
   private currentId = 1;
   private selectedDeviceId?: string;
-  private responseCallbacks: Record<string, ResponseCallback> = {};
+  private responseCallbacks = new Map<number, ResponseCallback>();
   private _currentDevice?: Device;
   private _devices = new Map<string, Device>();
 
@@ -60,7 +60,7 @@ export class DaemonServer extends Dispose {
     this.selectedDeviceId = this.config.get<string>(selectedDeviceIdKey);
     this.push(
       Disposable.create(() => {
-        this.responseCallbacks = {};
+        this.responseCallbacks.clear();
         try {
           this.process?.kill();
           this.process = undefined;
@@ -81,7 +81,7 @@ export class DaemonServer extends Dispose {
       return;
     }
     if (callback) {
-      this.responseCallbacks[request.id] = callback;
+      this.responseCallbacks.set(request.id, callback);
     }
     const rpcRequest = `[${JSON.stringify(request)}]\n`;
     this.process.stdin.write(rpcRequest);
@@ -141,9 +141,9 @@ export class DaemonServer extends Dispose {
   private onMessage = (message: Message) => {
     log(`got message: ${JSON.stringify(message, null, 2)}`);
     const responseId = message.id;
-    if (responseId && this.responseCallbacks[responseId]) {
-      this.responseCallbacks[responseId](message);
-      delete this.responseCallbacks[responseId];
+    if (responseId && this.responseCallbacks.has(responseId)) {
+      this.responseCallbacks.get(responseId)!(message);
+      this.responseCallbacks.delete(responseId);
     }
     if (!message.event) {
       log(`Message without event`);
