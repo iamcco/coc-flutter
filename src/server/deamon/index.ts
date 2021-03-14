@@ -1,5 +1,5 @@
 import { ChildProcess, spawn } from 'child_process';
-import { workspace, WorkspaceConfiguration } from 'coc.nvim';
+import { Disposable, workspace, WorkspaceConfiguration } from 'coc.nvim';
 import os from 'os';
 import { notification } from '../../lib/notification';
 import { flutterSDK } from '../../lib/sdk';
@@ -14,6 +14,7 @@ const outputLog = logger.getlog('daemon_output');
 interface Message {
   id?: number;
   event?: string;
+  result?: any;
   params?: { [key: string]: any };
 }
 
@@ -29,19 +30,23 @@ export interface Device {
   platform: string;
 }
 
+type ResponseCallback = (...args: any[]) => void;
+
 const selectedDeviceIdKey = 'selectedDeviceId';
 
 export class DaemonServer extends Dispose {
   private process?: ChildProcess;
-
-  private eventHandlers: { [key: string]: (params?: { [key: string]: any }) => void } = {};
+  private eventHandlers: Record<string, (params?: { [key: string]: any }) => void> = {};
   private currentId = 1;
   private selectedDeviceId?: string;
+  private responseCallbacks: Record<string, ResponseCallback> = {};
+  private _currentDevice?: Device;
+  private _devices = new Map<string, Device>();
+
   get currentDevice(): Device | undefined {
     return this._currentDevice;
   }
-  private _currentDevice?: Device;
-  private _devices = new Map<string, Device>();
+
   get devices(): Device[] {
     return [...this._devices.values()];
   }
@@ -53,26 +58,30 @@ export class DaemonServer extends Dispose {
   constructor() {
     super();
     this.selectedDeviceId = this.config.get<string>(selectedDeviceIdKey);
-    this.push({
-      dispose: () => {
+    this.push(
+      Disposable.create(() => {
+        this.responseCallbacks = {};
         try {
           this.process?.kill();
           this.process = undefined;
         } catch (error) {
           log(`dispose server error: ${error.message}`);
         }
-      },
-    });
+      }),
+    );
     this.eventHandlers['daemon.logMessage'] = this.logMessage;
     this.eventHandlers['daemon.connected'] = this.connected;
     this.eventHandlers['device.added'] = this.deviceAdded;
     this.eventHandlers['device.removed'] = this.deviceRemoved;
   }
 
-  async sendRequest(request: Request): Promise<void> {
+  async sendRequest(request: Request, callback?: ResponseCallback): Promise<void> {
     if (!this.process || !this.process.stdin.writable) {
       log(`Daemon not running but got request: ${JSON.stringify(request)}`);
       return;
+    }
+    if (callback) {
+      this.responseCallbacks[request.id] = callback;
     }
     const rpcRequest = `[${JSON.stringify(request)}]\n`;
     this.process.stdin.write(rpcRequest);
@@ -114,17 +123,28 @@ export class DaemonServer extends Dispose {
   }
 
   private onStdout = (chunk: Buffer) => {
-    const line = chunk.toString().trim();
-    if (line.match(/^\[{.*}\]$/)) {
-      const message = JSON.parse(line)[0];
-      this.onMessage(message);
-    } else {
-      outputLog(line);
-    }
+    const lines = chunk
+      .toString()
+      .trim()
+      .split('\n')
+      .map((line) => line.trim());
+    lines.forEach((line) => {
+      if (line.match(/^\[{.*}\]$/)) {
+        const message = JSON.parse(line)[0];
+        this.onMessage(message);
+      } else {
+        outputLog(line);
+      }
+    });
   };
 
   private onMessage = (message: Message) => {
     log(`got message: ${JSON.stringify(message, null, 2)}`);
+    const responseId = message.id;
+    if (responseId && this.responseCallbacks[responseId]) {
+      this.responseCallbacks[responseId](message);
+      delete this.responseCallbacks[responseId];
+    }
     if (!message.event) {
       log(`Message without event`);
       return;
@@ -157,10 +177,18 @@ export class DaemonServer extends Dispose {
 
   private connected = () => {
     statusBar.updateDevice(undefined, true);
-    this.sendRequest({
-      id: this.currentId++,
-      method: 'device.enable',
-    });
+    this.sendRequest(
+      {
+        id: this.currentId++,
+        method: 'device.enable',
+      },
+      (message: Message) => {
+        const result = ((message.result as any[]) || []).filter((d) => d !== null);
+        if (result.length === 0) {
+          statusBar.updateDevice(undefined, false);
+        }
+      },
+    );
   };
 
   private deviceAdded = (params?: { [key: string]: any }) => {
