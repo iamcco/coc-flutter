@@ -1,10 +1,10 @@
-import { commands, LanguageClient, workspace, Buffer as VimBuffer } from 'coc.nvim';
+import { commands, LanguageClient, workspace, Buffer as VimBuffer, Range, Disposable } from 'coc.nvim';
 import { statusBar } from '../../lib/status';
 import { cmdPrefix } from '../../util/constant';
-import { Range } from 'vscode-languageserver-protocol';
 
 import { Dispose } from '../../util/dispose';
 import { logger } from '../../util/logger';
+import { registerOutlineCodeActionProvider } from './outlineCodeActionProvider';
 
 const log = logger.getlog('outline');
 
@@ -38,7 +38,7 @@ const iconsNonNerdFont = {
   ENUM_CONSTANT: 'E ',
 };
 const iconDefaultNonNerdFont = '* ';
-const outlineBufferName = 'Flutter Outline';
+const outlineBufferName = 'outline://flutter';
 
 function ucs2ToBinaryString(str: string) {
   const escstr = encodeURIComponent(str);
@@ -97,9 +97,12 @@ export class Outline extends Dispose {
     this.outlineWidth = config.get<number>('outlineWidth', 30);
     this.useNerdFont = config.get<boolean>('useNerdFont', true);
     this.iconSpacing = ' '.repeat(config.get<number>('outlineIconPadding', 0));
-    this.push({
-      dispose: () => this.hideOutlinePanel(),
-    });
+    this.push(
+      Disposable.create(() => {
+        this.hideOutlinePanel();
+      }),
+      registerOutlineCodeActionProvider(this),
+    );
   }
 
   generateOutlineStrings = (uri: string) => {
