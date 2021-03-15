@@ -7,6 +7,7 @@ import { statusBar } from '../../lib/status';
 import { Dispose } from '../../util/dispose';
 import { getFlutterWorkspaceFolder } from '../../util/fs';
 import { logger } from '../../util/logger';
+import { delay } from '../../util/timer';
 
 const log = logger.getlog('daemon');
 const outputLog = logger.getlog('daemon_output');
@@ -30,13 +31,13 @@ export interface Device {
   platform: string;
 }
 
-type ResponseCallback = (...args: any[]) => void;
+type ResponseCallback = (message: Message) => void;
 
 const selectedDeviceIdKey = 'selectedDeviceId';
 
 export class DaemonServer extends Dispose {
   private process?: ChildProcess;
-  private eventHandlers: Record<string, (params?: { [key: string]: any }) => void> = {};
+  private eventHandlers: Record<string, (params?: Record<string, any>) => void> = {};
   private currentId = 1;
   private selectedDeviceId?: string;
   private responseCallbacks = new Map<number, ResponseCallback>();
@@ -75,16 +76,18 @@ export class DaemonServer extends Dispose {
     this.eventHandlers['device.removed'] = this.deviceRemoved;
   }
 
-  async sendRequest(request: Request, callback?: ResponseCallback): Promise<void> {
-    if (!this.process || !this.process.stdin.writable) {
-      log(`Daemon not running but got request: ${JSON.stringify(request)}`);
-      return;
-    }
-    if (callback) {
-      this.responseCallbacks.set(request.id, callback);
-    }
-    const rpcRequest = `[${JSON.stringify(request)}]\n`;
-    this.process.stdin.write(rpcRequest);
+  async sendRequest(request: Request): Promise<Message> {
+    return new Promise<Message>((res, rej) => {
+      if (!this.process || !this.process.stdin.writable) {
+        rej(`Daemon not running but got request: ${JSON.stringify(request)}`);
+        return;
+      }
+      this.responseCallbacks.set(request.id, (message: Message) => {
+        res(message);
+      });
+      const rpcRequest = `[${JSON.stringify(request)}]\n`;
+      this.process.stdin.write(rpcRequest);
+    });
   }
 
   public async start(): Promise<boolean> {
@@ -175,20 +178,27 @@ export class DaemonServer extends Dispose {
     notification.show(params['message']);
   };
 
-  private connected = () => {
+  private connected = async () => {
     statusBar.updateDevice(undefined, true);
-    this.sendRequest(
-      {
+    try {
+      await this.sendRequest({
         id: this.currentId++,
         method: 'device.enable',
-      },
-      (message: Message) => {
-        const result = ((message.result as any[]) || []).filter((d) => d !== null);
-        if (result.length === 0) {
+      });
+      // wait 10 seconds
+      await delay(10000);
+      if (!this.devices.length) {
+        const message = await this.sendRequest({
+          id: this.currentId++,
+          method: 'device.getDevices',
+        });
+        if (!message.result || !(message.result as Device[]).length) {
           statusBar.updateDevice(undefined, false);
         }
-      },
-    );
+      }
+    } catch (error) {
+      log(`${error}`);
+    }
   };
 
   private deviceAdded = (params?: { [key: string]: any }) => {
