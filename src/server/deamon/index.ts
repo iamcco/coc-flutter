@@ -35,6 +35,8 @@ type ResponseCallback = (message: Message) => void;
 
 const selectedDeviceIdKey = 'selectedDeviceId';
 
+const REQUEST_TIMEOUT = 15000;
+
 export class DaemonServer extends Dispose {
   private process?: ChildProcess;
   private eventHandlers: Record<string, (params?: Record<string, any>) => void> = {};
@@ -76,8 +78,8 @@ export class DaemonServer extends Dispose {
     this.eventHandlers['device.removed'] = this.deviceRemoved;
   }
 
-  async sendRequest(request: Request): Promise<Message> {
-    return new Promise<Message>((res, rej) => {
+  async sendRequest(request: Request): Promise<Message | void> {
+    return new Promise((res, rej) => {
       if (!this.process || !this.process.stdin.writable) {
         rej(`Daemon not running but got request: ${JSON.stringify(request)}`);
         return;
@@ -85,6 +87,12 @@ export class DaemonServer extends Dispose {
       this.responseCallbacks.set(request.id, (message: Message) => {
         res(message);
       });
+      setTimeout(() => {
+        if (this.responseCallbacks.has(request.id)) {
+          this.responseCallbacks.delete(request.id);
+          res();
+        }
+      }, REQUEST_TIMEOUT);
       const rpcRequest = `[${JSON.stringify(request)}]\n`;
       this.process.stdin.write(rpcRequest);
     });
@@ -185,16 +193,10 @@ export class DaemonServer extends Dispose {
         id: this.currentId++,
         method: 'device.enable',
       });
-      // wait 10 seconds
-      await delay(10000);
+      // wait 15 seconds
+      await delay(REQUEST_TIMEOUT);
       if (!this.devices.length) {
-        const message = await this.sendRequest({
-          id: this.currentId++,
-          method: 'device.getDevices',
-        });
-        if (!this.devices.length && (!message.result || !(message.result as Device[]).length)) {
-          statusBar.updateDevice(undefined, false);
-        }
+        statusBar.updateDevice(undefined, false);
       }
     } catch (error) {
       log(`${error}`);
