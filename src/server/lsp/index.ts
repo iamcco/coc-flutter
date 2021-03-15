@@ -3,12 +3,10 @@ import {
   ExecutableOptions,
   LanguageClient,
   LanguageClientOptions,
-  OutputChannel,
   RevealOutputChannelOn,
   ServerOptions,
   services,
   Uri,
-  window,
   workspace,
 } from 'coc.nvim';
 import { homedir } from 'os';
@@ -48,12 +46,9 @@ export class LspServer extends Dispose {
   }
 
   private execOptions = new _ExecOptions();
-  private outchannel?: OutputChannel;
   private daemon: DaemonServer;
 
   async init(): Promise<void> {
-    this.outchannel = window.createOutputChannel('flutter-lsp');
-    this.outchannel.clear();
     const config = workspace.getConfiguration('flutter');
     // is force lsp debug
     const isLspDebug = config.get<boolean>('lsp.debug');
@@ -104,7 +99,7 @@ export class LspServer extends Dispose {
 
       initializationOptions: initialization,
 
-      outputChannel: this.outchannel,
+      outputChannelName: 'flutter-lsp',
       // do not automatically open outchannel
       revealOutputChannelOn: RevealOutputChannelOn.Never,
 
