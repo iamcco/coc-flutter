@@ -192,7 +192,7 @@ export class DaemonServer extends Dispose {
           id: this.currentId++,
           method: 'device.getDevices',
         });
-        if (!message.result || !(message.result as Device[]).length) {
+        if (!this.devices.length && (!message.result || !(message.result as Device[]).length)) {
           statusBar.updateDevice(undefined, false);
         }
       }
