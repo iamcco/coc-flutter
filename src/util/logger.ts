@@ -33,9 +33,11 @@ class Logger extends Dispose {
     return this._traceServer;
   }
 
-  getlog(name: string): (message: string | undefined) => void {
-    return (message: string | undefined) => {
-      message && this._outchannel && this._outchannel.appendLine(`[${name}]: ${message}`);
+  getlog(name: string): (message: string | undefined | (() => string)) => void {
+    return (message: string | undefined | (() => string)) => {
+      message &&
+        this._outchannel &&
+        this._outchannel.appendLine(`[${name}]: ${typeof message === 'function' ? message() : message}`);
     };
   }
 

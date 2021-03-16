@@ -126,6 +126,11 @@
           "default": true,
           "description": "When set to true, dart/textDocument/publishOutline notifications will be sent with information to render the outline."
         },
+        "flutter.lsp.initialization.flutterOutline": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to true, dart/textDocument/publishFlutterOutline notifications will be sent with information to render the outline."
+        },
         "flutter.sdk.dart-command": {
           "type": "string",
           "default": "",
@@ -250,10 +255,18 @@
       },
       {
         "command": "flutter.outline",
+        "title": "Opens a side panel that shows real time the outline"
+      },
+      {
+        "command": "flutter.toggleOutline",
+        "title": "Toggles the outline side panel"
+      },
+      {
+        "command": "flutter.flutterOutline",
         "title": "Opens a side panel that shows real time the flutter outline"
       },
       {
-        "command": "flutter.outline",
+        "command": "flutter.toggleFlutterOutline",
         "title": "Toggles the flutter outline side panel"
       }
     ]

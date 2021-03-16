@@ -84,6 +84,7 @@ export class LspServer extends Dispose {
       suggestFromUnimportedLibraries: true,
       closingLabels: true,
       outline: true,
+      flutterOutline: true,
     });
 
     /**
