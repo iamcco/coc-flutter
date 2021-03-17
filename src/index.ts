@@ -21,6 +21,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   logger.init(config.get<logLevel>('trace.server', 'off'));
 
   const daemon = new DaemonServer();
+  context.subscriptions.push(daemon);
   // register lsp server
   const lsp = new LspServer(daemon);
   context.subscriptions.push(lsp);
