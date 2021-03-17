@@ -332,7 +332,8 @@ export class Outline extends Dispose {
     // generate outline tree view string
     const [lines, outlineItems] = this.generateOutlineStrings(this.outlines[uri]);
     // new generate if same as before
-    if (this.outlineStrings[uri] !== lines) {
+    const oldLines = this.outlineStrings[uri];
+    if (oldLines && oldLines.join() !== lines.join()) {
       this.outlineStrings[uri] = lines;
       this.outlinePanelData[uri] = outlineItems;
       // update outline buffer
