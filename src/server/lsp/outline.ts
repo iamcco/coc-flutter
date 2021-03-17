@@ -241,7 +241,10 @@ export class Outline extends Dispose {
       for (const win of windows) {
         try {
           const buf = await win.buffer;
-          if (buf.id === this.outlineBuffer.id) {
+          if (!buf) {
+            continue;
+          }
+          if (this.outlineBuffer && buf.id === this.outlineBuffer.id) {
             buf.clearHighlight();
             win.setCursor([this.curOutlineItem.lineNumber + 1, 0]).catch((e) => {
               log(e);
@@ -456,12 +459,17 @@ export class Outline extends Dispose {
     const curTab = await curWin.tabpage;
     const wins = await curTab.windows;
     for (const win of wins) {
-      if ((await win.buffer).id === this.outlineBuffer.id) {
+      const buf = await win.buffer;
+      if (!buf) {
+        continue;
+      }
+      if (this.outlineBuffer && buf.id === this.outlineBuffer.id) {
         win.close(true).catch((e) => {
           log(e);
         });
       }
     }
+    this.outlineBuffer = undefined;
   }
 
   onOutline = async (params: ClientParamsOutline) => {
