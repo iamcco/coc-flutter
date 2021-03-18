@@ -21,7 +21,7 @@ import { ClosingLabels } from './closingLabels';
 import { codeActionProvider } from './codeActionProvider';
 import { completionProvider } from './completionProvider';
 import { executeCommandProvider } from './extractProvider';
-import { Outline } from './outline';
+import { registerOutlineProvider } from './outline';
 
 const log = logger.getlog('lsp-server');
 
@@ -152,7 +152,7 @@ export class LspServer extends Dispose {
           // register closing label
           this.push(new ClosingLabels(client));
         }
-        this.push(new Outline(client));
+        this.push(registerOutlineProvider(config, client));
         statusBar.ready();
       })
       .catch((error: Error) => {

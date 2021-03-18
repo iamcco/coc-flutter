@@ -1,4 +1,13 @@
-import { commands, LanguageClient, workspace, Buffer as VimBuffer, Range, Disposable, window } from 'coc.nvim';
+import {
+  commands,
+  LanguageClient,
+  workspace,
+  Buffer as VimBuffer,
+  Range,
+  Disposable,
+  window,
+  WorkspaceConfiguration,
+} from 'coc.nvim';
 import { statusBar } from '../../lib/status';
 import { cmdPrefix } from '../../util/constant';
 
@@ -42,12 +51,12 @@ const iconDefaultNonNerdFont = '* ';
 // outline buffer name
 const outlineBufferName = 'outline://outline';
 // TODO
-const flutterOutlineBufferName = 'outline://outline/flutter';
+// const flutterOutlineBufferName = 'outline://outline/flutter';
 
 // outline request
 const outlineRequest = 'dart/textDocument/publishOutline';
 // TODO
-const flutterOutlineRequest = 'dart/textDocument/publishFlutterOutline';
+// const flutterOutlineRequest = 'dart/textDocument/publishFlutterOutline';
 
 // highlight group
 const fhlOutlineArea = 'FlutterHighlightedOutlineArea';
@@ -112,17 +121,9 @@ export class Outline extends Dispose {
   public iconSpacing = '';
   public useNerdFont = true;
 
-  constructor(client: LanguageClient) {
+  constructor(private outlineName: string, private notificationType: string, client: LanguageClient) {
     super();
     const config = workspace.getConfiguration('flutter');
-    const initialization = config.get('lsp.initialization', {
-      outline: true,
-      flutterOutline: true,
-    });
-    // outline does not enable
-    if (!initialization.outline && !initialization.flutterOutline) {
-      return;
-    }
     this.outlineWidth = config.get<number>('outlineWidth', 30);
     this.useNerdFont = config.get<boolean>('useNerdFont', true);
     this.iconSpacing = ' '.repeat(config.get<number>('outlineIconPadding', 0));
@@ -130,15 +131,8 @@ export class Outline extends Dispose {
       Disposable.create(() => {
         this.hideOutlinePanel();
       }),
-      registerOutlineCodeActionProvider(this),
     );
-    if (initialization.outline) {
-      this.registerOutlineNotification(client);
-    }
-    if (initialization.flutterOutline) {
-      // TODO
-      // this.registerFlutterOutlineNotification(client);
-    }
+    this.registerOutlineNotification(client);
     this.initAutocmdAndCmd();
   }
 
@@ -166,14 +160,9 @@ export class Outline extends Dispose {
       }),
       workspace.registerAutocmd({
         event: 'BufEnter',
-        pattern: `{${outlineBufferName},${flutterOutlineBufferName}}`,
+        pattern: this.outlineName,
         callback: this.closeOnlyOutline,
       }),
-      commands.registerCommand(`${cmdPrefix}.outline`, this.openOutlinePanel),
-      commands.registerCommand(`${cmdPrefix}.toggleOutline`, this.toggleOutlinePanel),
-      // TODO
-      // commands.registerCommand(`${cmdPrefix}.flutterOutline`, this.openOutlinePanel),
-      // commands.registerCommand(`${cmdPrefix}.toggleFlutterOutline`, this.toggleOutlinePanel),
     );
   }
 
@@ -333,7 +322,7 @@ export class Outline extends Dispose {
     const [lines, outlineItems] = this.generateOutlineStrings(this.outlines[uri]);
     // new generate if same as before
     const oldLines = this.outlineStrings[uri];
-    if (oldLines && oldLines.join() !== lines.join()) {
+    if (!oldLines || oldLines.join() !== lines.join()) {
       this.outlineStrings[uri] = lines;
       this.outlinePanelData[uri] = outlineItems;
       // update outline buffer
@@ -346,18 +335,14 @@ export class Outline extends Dispose {
   };
 
   private registerOutlineNotification(client: LanguageClient) {
-    client.onNotification(outlineRequest, this.onOutline);
+    client.onNotification(this.notificationType, this.onOutline);
   }
 
-  private registerFlutterOutlineNotification(client: LanguageClient) {
-    client.onNotification(flutterOutlineRequest, this.onFlutterOutline);
-  }
-
-  private openOutlinePanel = async () => {
+  openOutlinePanel = async () => {
     const { nvim } = workspace;
     const curDartWin = await nvim.window;
     // open outline in the right
-    await nvim.command(`rightbelow ${this.outlineWidth}vsplit ${outlineBufferName}`);
+    await nvim.command(`rightbelow ${this.outlineWidth}vsplit ${this.outlineName}`);
     const outlineWin = await nvim.window;
     const outlineBuf = await outlineWin.buffer;
     this.outlineBuffer = outlineBuf;
@@ -431,7 +416,7 @@ export class Outline extends Dispose {
       workspace.registerLocalKeymap('n', '<LeftRelease>', goto),
       workspace.registerAutocmd({
         event: 'BufUnload',
-        pattern: `{${outlineBufferName},${flutterOutlineBufferName}}`,
+        pattern: this.outlineName,
         callback: () => {
           this.outlineBuffer = undefined;
           for (const item of subs) {
@@ -514,3 +499,55 @@ export class Outline extends Dispose {
     }
   };
 }
+
+export const registerOutlineProvider = (config: WorkspaceConfiguration, client: LanguageClient): Disposable => {
+  const initialization = config.get('lsp.initialization', {
+    outline: true,
+    flutterOutline: true,
+  });
+  const outlines: Map<string, Outline> = new Map();
+
+  let subs: Disposable[] = [
+    commands.registerCommand(`${cmdPrefix}.outline`, () => {
+      if (!initialization.outline) {
+        return window.showMessage('Please enable option `flutter.lsp.initialization.outline`');
+      }
+      const outline = outlines.get(outlineBufferName);
+      if (!outline) {
+        return;
+      }
+      outline.openOutlinePanel();
+    }),
+    commands.registerCommand(`${cmdPrefix}.toggleOutline`, () => {
+      if (!initialization.outline) {
+        window.showMessage('Please enable option `flutter.lsp.initialization.outline`');
+      }
+      const outline = outlines.get(outlineBufferName);
+      if (!outline) {
+        return;
+      }
+      outline.toggleOutlinePanel();
+    }),
+  ];
+  // outline does not enable
+  if (initialization.outline || initialization.flutterOutline) {
+    // outline
+    if (initialization.outline) {
+      outlines.set(outlineBufferName, new Outline(outlineBufferName, outlineRequest, client));
+    }
+    // TODO
+    // flutter outline
+    subs.push(registerOutlineCodeActionProvider(outlines));
+  }
+
+  return Disposable.create(() => {
+    for (const sub of subs) {
+      sub.dispose();
+    }
+    subs = [];
+    outlines.forEach((outline) => {
+      outline.dispose();
+    });
+    outlines.clear();
+  });
+};

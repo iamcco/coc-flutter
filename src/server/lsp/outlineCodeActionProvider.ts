@@ -11,7 +11,7 @@ import {
 } from 'coc.nvim';
 import { Outline } from './outline';
 
-export const registerOutlineCodeActionProvider = (outline: Outline): Disposable => {
+export const registerOutlineCodeActionProvider = (outlines: Map<string, Outline>): Disposable => {
   return languages.registerCodeActionProvider(
     [
       {
@@ -19,8 +19,9 @@ export const registerOutlineCodeActionProvider = (outline: Outline): Disposable 
       },
     ],
     {
-      provideCodeActions: async (_document, range, _context, token): Promise<CodeAction[]> => {
-        if (!outline.curUri) {
+      provideCodeActions: async (document, range, _context, token): Promise<CodeAction[]> => {
+        const outline = outlines.get(document.uri);
+        if (!outline || !outline.curUri) {
           return [];
         }
         const doc = workspace.getDocument(outline.curUri);
