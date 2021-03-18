@@ -1,4 +1,5 @@
 import {
+  Disposable,
   Executable,
   ExecutableOptions,
   LanguageClient,
@@ -36,12 +37,22 @@ class _ExecOptions implements Executable {
 }
 
 export class LspServer extends Dispose {
+  // source should release after lsp restart
+  private subs: Disposable[] = [];
+  private release: Disposable;
+  private readyCallbacks: Array<(client: LanguageClient) => void> = [];
   private _client: LanguageClient | undefined;
 
   constructor(daemon: DaemonServer) {
     super();
     this.daemon = daemon;
     this.init();
+    this.release = Disposable.create(() => {
+      for (const item of this.subs) {
+        item.dispose();
+      }
+      this.subs = [];
+    });
   }
 
   public get client(): LanguageClient | undefined {
@@ -144,16 +155,20 @@ export class LspServer extends Dispose {
       this.push(statusBar);
     }
 
+    this.onLspReady(() => {
+      log('analysis server ready!');
+      if (initialization.closingLabels) {
+        // register closing label
+        this.subs.push(new ClosingLabels(client));
+      }
+      this.subs.push(registerOutlineProvider(config, client));
+      statusBar.ready();
+    });
+
     client
       .onReady()
       .then(() => {
-        log('analysis server ready!');
-        if (initialization.closingLabels) {
-          // register closing label
-          this.push(new ClosingLabels(client));
-        }
-        this.push(registerOutlineProvider(config, client));
-        statusBar.ready();
+        this.ready(client);
       })
       .catch((error: Error) => {
         statusBar.hide();
@@ -172,14 +187,30 @@ export class LspServer extends Dispose {
   }
 
   async restart(): Promise<void> {
+    this.release.dispose();
     statusBar.restartingLsp();
     await this.reloadSdk();
     await this._client?.stop();
     this.daemon.stop();
     this.daemon.start();
-    this._client?.onReady().then(() => {
-      statusBar.ready();
-    });
     this._client?.start();
+    this._client?.onReady().then(() => {
+      this.ready(this._client!);
+    });
+  }
+
+  onLspReady(callback: () => void) {
+    this.readyCallbacks.push(callback);
+  }
+
+  ready(client: LanguageClient) {
+    for (const cb of this.readyCallbacks) {
+      cb(client);
+    }
+  }
+
+  dispose() {
+    super.dispose();
+    this.release.dispose();
   }
 }
