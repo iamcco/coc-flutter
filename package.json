@@ -158,6 +158,18 @@
           "default": null,
           "description": "The id of the device that is selected and will be used by `flutter.run` if it is available."
         },
+        "flutter.devicesDefaultAction": {
+          "type": "string",
+          "default": "workspaceState",
+          "enum": [
+            "workspaceState",
+            "workspaceConfig",
+            "currentSession",
+            "globalState",
+            "globalConfig",
+            "runOnce"
+          ]
+        },
         "dart.analysisExcludedFolders": {
           "type": "array",
           "default": [],

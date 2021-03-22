@@ -57,6 +57,7 @@ class Notification extends Dispose {
         top += message.height;
       }
     }
+    if (!this.messages.length && !this.display.length) return;
     this.timer = setTimeout(() => {
       this.detect();
     }, this.timeGap);
