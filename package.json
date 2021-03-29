@@ -158,6 +158,19 @@
           "default": null,
           "description": "The id of the device that is selected and will be used by `flutter.run` if it is available."
         },
+        "flutter.devicesDefaultAction": {
+          "type": "string",
+          "default": "workspaceState",
+          "enum": [
+            "workspaceState",
+            "workspaceConfig",
+            "currentSession",
+            "globalState",
+            "globalConfig",
+            "runOnce"
+          ],
+          "description": "The default action to use when pressing enter in the `FlutterDevices` list.\nThe `state` options will store the selected device in coc's `memos.json` file.\nThe `config` options will store the selected device in the `coc-settings.json` file."
+        },
         "dart.analysisExcludedFolders": {
           "type": "array",
           "default": [],

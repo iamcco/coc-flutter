@@ -1,5 +1,5 @@
 import { ChildProcess, spawn } from 'child_process';
-import { Disposable, workspace, WorkspaceConfiguration } from 'coc.nvim';
+import { Disposable, Memento, workspace, WorkspaceConfiguration } from 'coc.nvim';
 import os from 'os';
 import { notification } from '../../lib/notification';
 import { flutterSDK } from '../../lib/sdk';
@@ -31,6 +31,15 @@ export interface Device {
   platform: string;
 }
 
+export enum StorageOption {
+  dontStore,
+  memory,
+  workspaceState,
+  globalState,
+  workspaceConfig,
+  globalConfig,
+}
+
 type ResponseCallback = (message: Message) => void;
 
 const selectedDeviceIdKey = 'selectedDeviceId';
@@ -45,6 +54,8 @@ export class DaemonServer extends Dispose {
   private responseCallbacks = new Map<number, ResponseCallback>();
   private _currentDevice?: Device;
   private _devices = new Map<string, Device>();
+  private workspaceState: Memento;
+  private globalState: Memento;
 
   get currentDevice(): Device | undefined {
     return this._currentDevice;
@@ -58,9 +69,28 @@ export class DaemonServer extends Dispose {
     return workspace.getConfiguration('flutter');
   }
 
-  constructor() {
+  private loadSelectedDeviceId() {
+    const selectedDeviceIdConfig = this.config.inspect<string>(selectedDeviceIdKey);
+    const selectedDeviceIdWorkspaceState = this.workspaceState.get<string>(selectedDeviceIdKey);
+    const selectedDeviceIdGlobalState = this.globalState.get<string>(selectedDeviceIdKey);
+    if (selectedDeviceIdConfig?.workspaceValue) {
+      this.selectedDeviceId = selectedDeviceIdConfig.workspaceValue;
+    } else if (selectedDeviceIdWorkspaceState) {
+      this.selectedDeviceId = selectedDeviceIdWorkspaceState;
+    } else if (selectedDeviceIdConfig?.globalValue) {
+      this.selectedDeviceId = selectedDeviceIdConfig.globalValue;
+    } else if (selectedDeviceIdGlobalState) {
+      this.selectedDeviceId = selectedDeviceIdGlobalState;
+    }
+  }
+
+  constructor(props: { workspaceState: Memento; globalState: Memento }) {
     super();
-    this.selectedDeviceId = this.config.get<string>(selectedDeviceIdKey);
+    this.workspaceState = props.workspaceState;
+    this.globalState = props.globalState;
+
+    this.loadSelectedDeviceId();
+
     this.push(
       Disposable.create(() => {
         this.responseCallbacks.clear();
@@ -118,7 +148,7 @@ export class DaemonServer extends Dispose {
     });
     this.process = process;
     process.on('exit', this.onExit);
-    process.on('exit', this.onError);
+    process.on('error', this.onError);
     process.stdout.on('data', this.onStdout);
 
     return true;
@@ -237,10 +267,26 @@ export class DaemonServer extends Dispose {
     statusBar.updateDevice(this._currentDevice?.name, false);
   }
 
-  selectDevice(device: Device) {
+  selectDevice(device: Device, storageOption: StorageOption) {
     this._currentDevice = device;
-    this.selectedDeviceId = device.id;
-    this.config.update(selectedDeviceIdKey, device.id);
+    if (storageOption !== StorageOption.dontStore) {
+      this.selectedDeviceId = device.id;
+    }
+    switch (storageOption) {
+      case StorageOption.workspaceState:
+        this.workspaceState.update(selectedDeviceIdKey, device.id);
+        this.config.update(selectedDeviceIdKey, undefined);
+        break;
+      case StorageOption.globalState:
+        this.globalState.update(selectedDeviceIdKey, device.id);
+        break;
+      case StorageOption.workspaceConfig:
+        this.config.update(selectedDeviceIdKey, device.id);
+        break;
+      case StorageOption.globalConfig:
+        this.config.update(selectedDeviceIdKey, device.id, true);
+        break;
+    }
     statusBar.updateDevice(this._currentDevice?.name, false);
   }
 }
