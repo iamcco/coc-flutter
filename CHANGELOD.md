@@ -1,10 +1,16 @@
-## [1.9.1] - 2021-03-15
+# 1.9.2
 
-- Fixed device loading status if there are no device connected
-- Fixed `foldcolumn` is number which vim and neovim < 0.5.0 and neovim 0.5.0 is string
-- Fixed flutter output channel being empty when reloading the extension
+- The FlutterDevices list now has new actions and also a new default.
+  It will now use the `workspaceState` as the default location to store the selected device.
+  If you want the previous behavior then you can change the `flutter.devicesDefaultAction` config to `workspaceConfig`.
 
-## [1.9.0] - 2021-03-11
+# 1.9.1
+
+- Fixed device loading status if there are no device connected.
+- Fixed `foldcolumn` is number which vim and neovim < 0.5.0 and neovim 0.5.0 is string.
+- Fixed flutter output channel being empty when reloading the extension.
+
+# 1.9.0
 
 - Added device selection for `flutter.run`.
 - FlutterDevices list no longer runs the app but instead selects the device to run on.

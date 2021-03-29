@@ -168,7 +168,8 @@
             "globalState",
             "globalConfig",
             "runOnce"
-          ]
+          ],
+          "description": "The default action to use when pressing enter in the `FlutterDevices` list.\nThe `state` options will store the selected device in coc's `memos.json` file.\nThe `config` options will store the selected device in the `coc-settings.json` file."
         },
         "dart.analysisExcludedFolders": {
           "type": "array",
