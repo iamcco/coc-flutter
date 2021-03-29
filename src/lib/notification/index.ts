@@ -1,4 +1,5 @@
 import { window, workspace } from 'coc.nvim';
+import { formatMessage } from '../../util';
 import { Dispose } from '../../util/dispose';
 import { Message } from './message';
 
@@ -64,7 +65,7 @@ class Notification extends Dispose {
   }
 
   show(message: string | string[], showTime: number = messageDefaultShowTime) {
-    const messages = ([] as string[]).concat(message);
+    const messages = typeof message === 'string' ? formatMessage(message) : message;
     if (messages.length === 0) {
       return;
     }
