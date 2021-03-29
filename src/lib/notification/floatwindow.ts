@@ -42,14 +42,14 @@ export class FloatWindow extends Dispose {
     this.win = win;
 
     nvim.pauseNotification();
-    await win.setOption('number', false);
-    await win.setOption('wrap', true);
-    await win.setOption('relativenumber', false);
-    await win.setOption('cursorline', false);
-    await win.setOption('cursorcolumn', false);
-    await win.setOption('conceallevel', 2);
-    await win.setOption('signcolumn', 'no');
-    await win.setOption('winhighlight', 'FoldColumn:NormalFloat');
+    win.setOption('number', false);
+    win.setOption('wrap', true);
+    win.setOption('relativenumber', false);
+    win.setOption('cursorline', false);
+    win.setOption('cursorcolumn', false);
+    win.setOption('conceallevel', 2);
+    win.setOption('signcolumn', 'no');
+    win.setOption('winhighlight', 'FoldColumn:NormalFloat');
     await nvim.resumeNotification();
     try {
       // vim and neovim < 0.5.0 foldcolumn is number

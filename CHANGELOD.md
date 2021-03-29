@@ -3,6 +3,7 @@
 - The FlutterDevices list now has new actions and also a new default.
   It will now use the `workspaceState` as the default location to store the selected device.
   If you want the previous behavior then you can change the `flutter.devicesDefaultAction` config to `workspaceConfig`.
+- Fixed #116 where `resumeNotification` was not called within the same tick when showing a floating notification.
 
 # 1.9.1
 
