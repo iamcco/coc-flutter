@@ -2,10 +2,16 @@ import { StatusBarItem, window, workspace } from 'coc.nvim';
 import { Dispose } from '../util/dispose';
 
 class StatusBar extends Dispose {
+  private displayMode = '';
   private isLSPReady = false;
   private statusBar: StatusBarItem | undefined = undefined;
   private currentDevice?: string;
   private loadingDevices?: boolean;
+
+  constructor() {
+    super();
+    this.displayMode = workspace.getConfiguration('flutter').get<string>('status', '');
+  }
 
   get isInitialized(): boolean {
     return this.statusBar != undefined;
@@ -43,6 +49,7 @@ class StatusBar extends Dispose {
 
   updateDevice(name: string | undefined, isLoading: boolean) {
     this.currentDevice = name;
+    if (this.displayMode !== 'device') return;
     if (isLoading) {
       this.loadingDevices = true;
       this.show('Loading devices...', true);
@@ -52,6 +59,10 @@ class StatusBar extends Dispose {
     } else {
       this.show(this.currentDevice || 'No device available');
     }
+  }
+
+  updateUIPath(path: string) {
+    if (this.displayMode === 'uipath') this.show(path);
   }
 
   restartingLsp() {

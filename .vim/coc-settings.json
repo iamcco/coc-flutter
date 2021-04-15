@@ -7,12 +7,17 @@
   "cSpell.words": [
     "Autocmd",
     "Unimported",
+    "bufhidden",
+    "buflisted",
+    "buftype",
     "conceallevel",
     "cursorcolumn",
     "cursorline",
     "esbuild",
     "foldcolumn",
     "getlog",
+    "gotoid",
+    "nofile",
     "outchannel",
     "outfile",
     "pubspec",
@@ -20,6 +25,9 @@
     "relativenumber",
     "signcolumn",
     "sourcemap",
+    "swapfile",
+    "tabpage",
+    "winfixwidth",
     "winhighlight"
   ]
 }

@@ -77,6 +77,30 @@
           "item": "string",
           "description": "The paths to search for flutter sdks, either directories where flutter is installed or directories which contain directories where flutter versions have been installed\neg. /path/to/flutter (command at /path/to/flutter/bin/flutter) \n~/flutter_versions (command at ~/flutter_versions/version/bin/flutter)."
         },
+        "flutter.status": {
+          "type": "string",
+          "enum": [
+            "device",
+            "uipath"
+          ],
+          "default": "device",
+          "description": "Controls what to show for the coc#status.\n Valid options:\n    'device' - The selected device\n    'uipath' - The path for the current UI component"
+        },
+        "flutter.useNerdFont": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to show unicode icons for the Flutter Outline items (Requires NerdFont)"
+        },
+        "flutter.outlineWidth": {
+          "type": "number",
+          "default": 30,
+          "description": "The default width of the outline panel"
+        },
+        "flutter.outlineIconPadding": {
+          "type": "number",
+          "default": 0,
+          "description": "The number of spaces between the icon and the item text in the outline panel"
+        },
         "flutter.lsp.debug": {
           "type": "boolean",
           "default": false,
@@ -96,6 +120,16 @@
           "type": "boolean",
           "default": true,
           "description": "When set to true, dart/textDocument/publishClosingLabels notifications will be sent with information to render editor closing labels."
+        },
+        "flutter.lsp.initialization.outline": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to true, dart/textDocument/publishOutline notifications will be sent with information to render the outline."
+        },
+        "flutter.lsp.initialization.flutterOutline": {
+          "type": "boolean",
+          "default": true,
+          "description": "When set to true, dart/textDocument/publishFlutterOutline notifications will be sent with information to render the outline."
         },
         "flutter.sdk.dart-command": {
           "type": "string",
@@ -231,6 +265,22 @@
       {
         "command": "flutter.emulators",
         "title": "open emulators list"
+      },
+      {
+        "command": "flutter.outline",
+        "title": "Opens a side panel that shows real time the outline"
+      },
+      {
+        "command": "flutter.toggleOutline",
+        "title": "Toggles the outline side panel"
+      },
+      {
+        "command": "flutter.flutterOutline",
+        "title": "Opens a side panel that shows real time the flutter outline"
+      },
+      {
+        "command": "flutter.toggleFlutterOutline",
+        "title": "Toggles the flutter outline side panel"
       }
     ]
   },
