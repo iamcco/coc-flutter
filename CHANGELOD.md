@@ -1,3 +1,7 @@
+# 1.9.3
+
+- Fixed #123 where sdk discovery on windows was not working properly.
+
 # 1.9.2
 
 - The FlutterDevices list now has new actions and also a new default.
