@@ -15,7 +15,7 @@
     "coc": "^0.0.80"
   },
   "scripts": {
-    "clean": "rm -rf ./out",
+    "clean": "./node_modules/.bin/rimraf ./out",
     "watch": "NODE_ENV=development node esbuild.js --watch",
     "build": "NODE_ENV=production node esbuild.js",
     "lint": "eslint src",
@@ -247,6 +247,7 @@
     "fast-glob": "^3.2.5",
     "husky": "^5.1.3",
     "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
     "typescript": "^4.2.2",
     "vscode-languageserver-protocol": "^3.16.0",
     "which": "^2.0.2"
