@@ -1,5 +1,6 @@
 import { ExecOptions } from 'child_process';
 import { Uri, workspace, WorkspaceConfiguration } from 'coc.nvim';
+import { readFileSync } from 'fs';
 import os, { homedir } from 'os';
 import { dirname, join } from 'path';
 import which from 'which';
@@ -239,10 +240,19 @@ class FlutterSDK {
     return execCommand(`${this.flutterCommand} ${command}`, options);
   }
 
-  private async versionForSdk(location: string): Promise<string | undefined> {
-    const version = await execCommand(`cat ${join(location, 'version')}`);
-    if (version.err) return;
-    return version.stdout;
+  private versionForSdk(location: string): string | undefined {
+    const versionLocation = join(location, 'version');
+    if (!exists(versionLocation)) {
+      log(`${versionLocation} does not exist`);
+      return;
+    }
+    const version = readFileSync(versionLocation).toString().trim();
+    if (version.length == 0) {
+      log(`${versionLocation} was empty`);
+      return;
+    }
+    log(`${versionLocation} => ${version}`);
+    return version;
   }
 
   private async sdkWithLookup(flutterLookup: string, currentSdk: string): Promise<FlutterSdk | undefined> {
@@ -269,7 +279,7 @@ class FlutterSDK {
       }
       const isFlutterDir = exists(join(flutterPath, 'bin', 'flutter'));
       if (!isFlutterDir) return;
-      const version = await this.versionForSdk(flutterPath);
+      const version = this.versionForSdk(flutterPath);
       if (version) {
         return {
           location: flutterPath,
@@ -302,7 +312,7 @@ class FlutterSDK {
       path = path.replace(/^~/, home).trim();
       const isFlutterDir = exists(join(path, 'bin', 'flutter'));
       if (isFlutterDir) {
-        const version = await this.versionForSdk(path);
+        const version = this.versionForSdk(path);
         if (version && !sdks.some((sdk) => sdk.location == path)) {
           sdks.push({
             location: path,
@@ -320,7 +330,7 @@ class FlutterSDK {
         const isFlutterDir = exists(join(location, 'bin', 'flutter'));
         if (!isFlutterDir) continue;
         if (sdks.some((sdk) => sdk.location == location)) continue;
-        const version = await this.versionForSdk(location);
+        const version = this.versionForSdk(location);
         sdks.push({
           location: location,
           isFvm: false,
@@ -352,7 +362,7 @@ class FlutterSDK {
         const isFlutterDir = exists(join(location, 'bin', 'flutter'));
         if (!isFlutterDir) continue;
         if (sdks.some((sdk) => sdk.location == location)) continue;
-        const flutterVersion = await this.versionForSdk(location);
+        const flutterVersion = this.versionForSdk(location);
         sdks.push({
           location: location,
           fvmVersion: version,
