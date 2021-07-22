@@ -15,7 +15,7 @@
     "coc": "^0.0.80"
   },
   "scripts": {
-    "clean": "./node_modules/.bin/rimraf ./out",
+    "clean": "rimraf ./out",
     "watch": "NODE_ENV=development node esbuild.js --watch",
     "build": "NODE_ENV=production node esbuild.js",
     "lint": "eslint src",
