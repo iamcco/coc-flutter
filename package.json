@@ -15,7 +15,7 @@
     "coc": "^0.0.80"
   },
   "scripts": {
-    "clean": "rm -rf ./out",
+    "clean": "npx del-cli ./out",
     "watch": "NODE_ENV=development node esbuild.js --watch",
     "build": "NODE_ENV=production node esbuild.js",
     "lint": "eslint src",
@@ -240,6 +240,7 @@
     "@typescript-eslint/parser": "^4.16.1",
     "coc.nvim": "^0.0.80",
     "colors": "^1.4.0",
+    "del-cli": "^4.0.1",
     "esbuild": "^0.9.0",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
