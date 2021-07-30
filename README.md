@@ -44,7 +44,7 @@ To do this there are a few options:
 2. You can add the path where to find the sdk to the `flutter.sdk.searchPaths` config option.
    Either specify the exact folder the sdk is installed in or a folder that contains other folders which directly have an sdk in them. *Note that not all of these folders need to have an sdk, if they don't contain one they will simply be ignored*
 3. Set the `flutter.sdk.path` config option to the exact path you want to use for your sdk.
-   If you have also set the `flutter.sdk.searchPaths` then you can use the `FlutterSdks` list (see below) to see what versions you have installed and set the config option for you. **Note that this means that the `flutter.sdk.path` option will be overriden by this list**
+   If you have also set the `flutter.sdk.searchPaths` then you can use the `FlutterSDKs` list (see below) to see what versions you have installed and set the config option for you. **Note that this means that the `flutter.sdk.path` option will be overriden by this list**
 
 ## Running the app
 
@@ -61,8 +61,8 @@ If you want to give arguments to the flutter run command you can simply append t
 
 ## coc-list sources
 
-- FlutterSdks
-  > `:CocList FlutterSdks`
+- FlutterSDKs
+  > `:CocList FlutterSDKs`
 
   Shows all the sdks that can be found by using the `searchPaths` config and the `flutter-lookup` config options and allows you to switch between them, either only for your current workspace or globally.
   Besides those two ways to find sdks it also checks if you are using fvm and if so uses those directories to find your sdk.
