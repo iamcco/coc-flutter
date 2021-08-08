@@ -24,11 +24,15 @@ let tmpClosingLabels: Record<string, ClosingLabelsParams> = {};
 
 export class ClosingLabels extends Dispose {
   private nsIds: Record<string, number> = {};
+  private flutterClosingLabelPrefix: string;
 
   constructor(client: LanguageClient) {
     super();
     this.init(client);
     log('register closing labels');
+    this.flutterClosingLabelPrefix = workspace
+      .getConfiguration('flutter')
+      .get('lsp.initialization.closingLabelPrefix', '// ');
   }
 
   async init(client: LanguageClient) {
@@ -94,7 +98,9 @@ export class ClosingLabels extends Dispose {
     this.nsIds[uri] = await nvim.createNamespace(virtualNamespace);
     nvim.pauseNotification();
     for (const label of labels) {
-      buffer.setVirtualText(this.nsIds[uri], label.range.end.line, [[`// ${label.label}`, flutterClosingLabel]]);
+      buffer.setVirtualText(this.nsIds[uri], label.range.end.line, [
+        [`${this.flutterClosingLabelPrefix}${label.label}`, flutterClosingLabel],
+      ]);
     }
     await nvim.resumeNotification();
   };

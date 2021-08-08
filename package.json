@@ -97,6 +97,11 @@
           "default": true,
           "description": "When set to true, dart/textDocument/publishClosingLabels notifications will be sent with information to render editor closing labels."
         },
+        "flutter.lsp.initialization.closingLabelPrefix": {
+          "type": "string",
+          "default": "// ",
+          "description": "The prefix of closing labels"
+        },
         "flutter.sdk.dart-command": {
           "type": "string",
           "default": "",
