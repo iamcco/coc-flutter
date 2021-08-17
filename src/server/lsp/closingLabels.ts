@@ -32,7 +32,7 @@ export class ClosingLabels extends Dispose {
     log('register closing labels');
     this.flutterClosingLabelPrefix = workspace
       .getConfiguration('flutter')
-      .get('lsp.initialization.closingLabelPrefix', '// ');
+      .get('closingLabelPrefix', '// ');
   }
 
   async init(client: LanguageClient) {
