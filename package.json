@@ -61,6 +61,11 @@
           "default": true,
           "description": "Enable coc-flutter extension"
         },
+        "flutter.closingLabelPrefix": {
+          "type": "string",
+          "default": "// ",
+          "description": "The prefix of closing labels"
+        },
         "flutter.fvm.enabled": {
           "type": "boolean",
           "default": true,
