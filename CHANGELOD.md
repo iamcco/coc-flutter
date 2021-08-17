@@ -1,3 +1,7 @@
+# 1.9.4
+
+- Add `flutter.closingLabelPrefix` for custom closing label prefix by #131
+
 # 1.9.3
 
 - Fixed #123 where sdk discovery on windows was not working properly.
