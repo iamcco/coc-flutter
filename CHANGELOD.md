@@ -1,3 +1,7 @@
+# 1.9.5
+
+- fix #132 hot reload breaking with latest coc.nvim
+
 # 1.9.4
 
 - Add `flutter.closingLabelPrefix` for custom closing label prefix by #131

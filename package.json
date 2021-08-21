@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
