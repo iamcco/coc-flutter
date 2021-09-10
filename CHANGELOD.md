@@ -1,6 +1,10 @@
+# 1.9.6
+
+- Fixed #127 by setting the default for `onlyAnalyzeProjectsWithOpenFiles` to `false`.
+
 # 1.9.5
 
-- fix #132 hot reload breaking with latest coc.nvim
+- Fixed #132 hot reload breaking with latest coc.nvim.
 
 # 1.9.4
 

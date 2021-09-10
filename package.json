@@ -1,6 +1,6 @@
 {
   "name": "coc-flutter",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "description": "flutter support for (Neo)vim",
   "author": "iamcco <ooiss@qq.com>",
   "license": "MIT",
@@ -89,8 +89,8 @@
         },
         "flutter.lsp.initialization.onlyAnalyzeProjectsWithOpenFiles": {
           "type": "boolean",
-          "default": true,
-          "description": "When set to true, analysis will only be performed for projects that have open files rather than the root workspace folder."
+          "default": false,
+          "description": "When set to true, workspace folders will be ignored and analysis will be performed based on the open files, as if no workspace was open at all. This allows opening large folders without causing them to be completely analyzed."
         },
         "flutter.lsp.initialization.suggestFromUnimportedLibraries": {
           "type": "boolean",
