@@ -1,3 +1,8 @@
+# 1.9.7
+
+- Fixed #146 where the dart version was not correctly parsed.
+  This was caused by dart changing the output of `dart --version` from stderr to stdout.
+
 # 1.9.6
 
 - Fixed #127 by setting the default for `onlyAnalyzeProjectsWithOpenFiles` to `false`.
