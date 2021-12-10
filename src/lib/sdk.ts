@@ -63,13 +63,21 @@ class FlutterSDK {
 
   public async getVersion(): Promise<[number, number, number] | undefined> {
     if (this._dartCommand) {
-      const { stderr } = await execCommand(`${this._dartCommand} --version`);
+      const { stderr, stdout } = await execCommand(`${this._dartCommand} --version`);
       if (stderr) {
         const m = stderr.match(/version:\s+(\d+)\.(\d+)\.(\d+)/);
         if (m) {
           log(`dart version: v${m[1]}.${m[2]}.${m[3]}`);
           return [parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])];
         }
+      } else if (stdout) {
+        const m = stdout.match(/version:\s+(\d+)\.(\d+)\.(\d+)/);
+        if (m) {
+          log(`dart version: v${m[1]}.${m[2]}.${m[3]}`);
+          return [parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])];
+        }
+      } else {
+        log('Failed to get dart version');
       }
     }
     return undefined;
