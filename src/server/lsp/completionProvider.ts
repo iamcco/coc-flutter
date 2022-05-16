@@ -23,7 +23,7 @@ export const completionProvider = async (
   if ((res as CompletionList)?.isIncomplete !== undefined) {
     list = (res as CompletionList).items;
   } else {
-    list = res as CompletionItem[] ?? [];
+    list = (res as CompletionItem[]) ?? [];
   }
   const config = workspace.getConfiguration('dart');
   const resolveCompleteItem = getResolveCompleteItemFunc({
