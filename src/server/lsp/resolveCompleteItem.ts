@@ -17,7 +17,7 @@ export const getResolveCompleteItemFunc = (options: { completeFunctionCalls: boo
   }
 
   // delete unnecessary textEdit
-  if (item.textEdit) {
+  if (item.textEdit && item.insertText) {
     delete item.textEdit;
   }
 
