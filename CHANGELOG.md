@@ -1,3 +1,7 @@
+# 1.9.9
+
+- Fixed snippet code completion support with dart 2.18 analyzer.
+
 # 1.9.7
 
 - Fixed #146 where the dart version was not correctly parsed.
