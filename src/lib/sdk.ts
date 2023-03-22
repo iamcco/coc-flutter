@@ -88,7 +88,15 @@ class FlutterSDK {
     if (!v) {
       return false;
     }
-    return v.every((n, idx) => n >= version[idx]);
+    for (let i = 0; i < 3; i++) {
+      if (v[i] > version[i]) {
+        return true;
+      }
+      if (v[i] != version[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   async init(config: WorkspaceConfiguration): Promise<void> {
