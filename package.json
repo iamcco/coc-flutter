@@ -12,7 +12,7 @@
     "dart"
   ],
   "engines": {
-    "coc": "^0.0.80"
+    "coc": "^0.0.82"
   },
   "scripts": {
     "clean": "rimraf ./out",

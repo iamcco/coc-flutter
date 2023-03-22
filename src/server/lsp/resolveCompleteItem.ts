@@ -16,6 +16,10 @@ export const getResolveCompleteItemFunc = (options: { completeFunctionCalls: boo
     delete item.filterText;
   }
 
+  if (item.insertTextFormat === InsertTextFormat.Snippet && (item as any).textEditText) {
+    item.insertText = (item as any).textEditText;
+  }
+
   // delete unnecessary textEdit
   if (item.textEdit && item.insertText) {
     delete item.textEdit;
