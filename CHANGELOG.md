@@ -1,5 +1,10 @@
 # 1.9.9
 
+- Fixed another snippet code completion support with dart 2.18 analyzer.
+- Fixed dart version check such that dart 3 is also supported
+
+# 1.9.9
+
 - Fixed snippet code completion support with dart 2.18 analyzer.
 
 # 1.9.7
