@@ -162,17 +162,24 @@ class DevServer extends Dispose {
   async openDevLog(preserveFocus?: boolean) {
     const config = workspace.getConfiguration('flutter');
     const cmd = config.get<string>('openDevLogSplitCommand', '');
+
     if (this.outputChannel) {
-      if (!cmd) {
-        this.outputChannel.show(preserveFocus);
+      const winId = await workspace.nvim.call('bufwinid', "output:///" + devLogName);
+      if (winId >= 0) {
+        workspace.nvim.call('win_gotoid', [winId]);
       } else {
-        const win = await workspace.nvim.window;
-        await workspace.nvim.command(`${cmd} output:///${devLogName}`);
-        if (!preserveFocus) {
-          workspace.nvim.call('win_gotoid', [win.id]);
+        if (!cmd) {
+          this.outputChannel.show(preserveFocus);
+        } else {
+          const win = await workspace.nvim.window;
+          await workspace.nvim.command(`${cmd} output:///${devLogName}`);
+          if (!preserveFocus) {
+            workspace.nvim.call('win_gotoid', [win.id]);
+          }
         }
       }
     }
+
     setTimeout(() => {
       this.autoScrollLogWin();
     }, 1000);
