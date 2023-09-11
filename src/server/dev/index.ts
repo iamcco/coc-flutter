@@ -164,7 +164,7 @@ class DevServer extends Dispose {
     const cmd = config.get<string>('openDevLogSplitCommand', '');
 
     if (this.outputChannel) {
-      const winId = await workspace.nvim.call('bufwinid', "output:///" + devLogName);
+      const winId = await workspace.nvim.call('bufwinid', 'output:///' + devLogName);
       if (winId >= 0) {
         workspace.nvim.call('win_gotoid', [winId]);
       } else {
